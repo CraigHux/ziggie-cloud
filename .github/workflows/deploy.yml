@@ -20,6 +20,14 @@ jobs:
           # Preserve .env file (contains secrets not in repo)
           rsync -av --exclude='.git' --exclude='.github' --exclude='.env' ./ /opt/ziggie/
 
+      - name: Reload nginx config
+        run: |
+          echo "Validating nginx config..."
+          docker exec ziggie-nginx nginx -t
+          echo "Reloading nginx..."
+          docker exec ziggie-nginx nginx -s reload
+          echo "Nginx config reloaded successfully"
+
       - name: Rebuild and restart services
         run: |
           cd /opt/ziggie
