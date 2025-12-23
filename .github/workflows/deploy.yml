@@ -1,0 +1,64 @@
+name: Deploy to Ziggie Cloud
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Sync to deployment directory
+        run: |
+          echo "Syncing to /opt/ziggie..."
+          sudo rsync -av --exclude='.git' --exclude='.github' ./ /opt/ziggie/
+
+      - name: Rebuild and restart services
+        run: |
+          cd /opt/ziggie
+
+          # Rebuild custom services
+          echo "Rebuilding Ziggie API..."
+          docker compose build ziggie-api
+
+          echo "Rebuilding MCP Gateway..."
+          docker compose build mcp-gateway
+
+          echo "Rebuilding Sim Studio..."
+          docker compose build sim-studio
+
+          # Restart rebuilt services
+          echo "Restarting services..."
+          docker compose up -d ziggie-api mcp-gateway sim-studio
+
+          # Wait for services to be healthy
+          sleep 10
+
+      - name: Health check
+        run: |
+          echo "Running health checks..."
+
+          # Check Ziggie API
+          curl -f http://localhost:8000/health || exit 1
+          echo "Ziggie API: OK"
+
+          # Check MCP Gateway
+          curl -f http://localhost:8080/health || exit 1
+          echo "MCP Gateway: OK"
+
+          # Check Sim Studio
+          curl -f http://localhost:8001/health || exit 1
+          echo "Sim Studio: OK"
+
+          echo "All services healthy!"
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker system prune -f --volumes=false
