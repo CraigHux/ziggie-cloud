@@ -39,22 +39,27 @@ jobs:
           docker compose up -d ziggie-api mcp-gateway sim-studio
 
           # Wait for services to be healthy
-          sleep 10
+          sleep 15
 
       - name: Health check
         run: |
-          echo "Running health checks..."
+          echo "Running health checks via Docker network..."
 
-          # Check Ziggie API
-          curl -f http://localhost:8000/health || exit 1
+          # Get container IPs on ziggie network
+          API_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ziggie-api)
+          MCP_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ziggie-mcp-gateway)
+          SIM_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ziggie-sim-studio)
+
+          echo "API: $API_IP, MCP: $MCP_IP, SIM: $SIM_IP"
+
+          # Health checks using container IPs
+          curl -f http://$API_IP:8000/health || exit 1
           echo "Ziggie API: OK"
 
-          # Check MCP Gateway
-          curl -f http://localhost:8080/health || exit 1
+          curl -f http://$MCP_IP:8080/health || exit 1
           echo "MCP Gateway: OK"
 
-          # Check Sim Studio
-          curl -f http://localhost:8001/health || exit 1
+          curl -f http://$SIM_IP:8001/health || exit 1
           echo "Sim Studio: OK"
 
           echo "All services healthy!"
