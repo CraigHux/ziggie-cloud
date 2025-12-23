@@ -1,0 +1,490 @@
+version: '3.8'
+
+# =============================================================================
+# ZIGGIE COMMAND CENTER - Complete Docker Stack
+# =============================================================================
+# Includes: Portainer, n8n, Ollama, Flowise, Databases, MCP Gateway, Monitoring
+# Target: Hostinger KVM 4 (4 vCPU, 16GB RAM, 200GB NVMe)
+# =============================================================================
+
+services:
+  # ===========================================================================
+  # DOCKER MANAGEMENT
+  # ===========================================================================
+
+  # Portainer - Docker Visual Management UI
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: ziggie-portainer
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9443:9443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - ziggie-network
+
+  # ===========================================================================
+  # WORKFLOW ORCHESTRATION
+  # ===========================================================================
+
+  # n8n - Workflow Automation (Core Orchestrator)
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: ziggie-n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=${N8N_USER:-admin}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD}
+      - N8N_HOST=${VPS_DOMAIN}
+      - N8N_PROTOCOL=http
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - N8N_SECURE_COOKIE=false
+      - WEBHOOK_URL=https://${VPS_DOMAIN}/
+      - GENERIC_TIMEZONE=Europe/London
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=n8n
+      - DB_POSTGRESDB_USER=ziggie
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
+      # GitHub Integration
+      - N8N_GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+      - N8N_GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+      # AI/LLM Credentials
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./n8n-workflows:/home/node/.n8n/workflows
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ziggie-network
+
+  # ===========================================================================
+  # LOCAL AI / LLM SERVICES
+  # ===========================================================================
+
+  # Ollama - Local LLM Server (Llama, Mistral, CodeLlama, etc.)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ziggie-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+      - OLLAMA_ORIGINS=*
+    # GPU support (if available on VPS - usually not)
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+    networks:
+      - ziggie-network
+
+  # Flowise - Visual LLM Workflow Builder (LangChain-based)
+  flowise:
+    image: flowiseai/flowise:latest
+    container_name: ziggie-flowise
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      - FLOWISE_USERNAME=${FLOWISE_USER:-admin}
+      - FLOWISE_PASSWORD=${FLOWISE_PASSWORD}
+      - DATABASE_PATH=/root/.flowise
+      - APIKEY_PATH=/root/.flowise
+      - SECRETKEY_PATH=/root/.flowise
+      - LOG_PATH=/root/.flowise/logs
+      # Connect to local Ollama
+      - OLLAMA_BASE_URL=http://ollama:11434
+      # External API keys
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    volumes:
+      - flowise_data:/root/.flowise
+    depends_on:
+      - ollama
+    networks:
+      - ziggie-network
+
+  # Open WebUI - Chat Interface for Ollama (Optional but useful)
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: ziggie-open-webui
+    restart: unless-stopped
+    ports:
+      - "3002:8080"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - WEBUI_AUTH=true
+      - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY}
+    volumes:
+      - open_webui_data:/app/backend/data
+    depends_on:
+      - ollama
+    networks:
+      - ziggie-network
+
+  # ===========================================================================
+  # DATABASES
+  # ===========================================================================
+
+  # PostgreSQL - Primary Relational Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: ziggie-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=ziggie
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_MULTIPLE_DATABASES=ziggie,n8n,simstudio
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts/postgres:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ziggie"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ziggie-network
+
+  # MongoDB - Document Database (Agent State, Workflows)
+  mongodb:
+    image: mongo:7
+    container_name: ziggie-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=ziggie
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_INITDB_DATABASE=ziggie
+    volumes:
+      - mongodb_data:/data/db
+      - ./init-scripts/mongo:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ziggie-network
+
+  # Redis - Cache, Message Broker, Session Store
+  redis:
+    image: redis:7-alpine
+    container_name: ziggie-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ziggie-network
+
+  # ===========================================================================
+  # ZIGGIE CORE SERVICES
+  # ===========================================================================
+
+  # MCP Gateway - Route MCP requests to appropriate servers
+  mcp-gateway:
+    build:
+      context: ./mcp-gateway
+      dockerfile: Dockerfile
+    container_name: ziggie-mcp-gateway
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=production
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
+      - MONGODB_URL=mongodb://ziggie:${MONGO_PASSWORD}@mongodb:27017/ziggie
+      - OLLAMA_URL=http://ollama:11434
+      - N8N_URL=http://n8n:5678
+      - AWS_REGION=eu-north-1
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    volumes:
+      - ./mcp-gateway:/app
+      - /app/node_modules
+    depends_on:
+      - redis
+      - mongodb
+      - ollama
+    networks:
+      - ziggie-network
+
+  # Ziggie API - Main Backend API (FastAPI)
+  ziggie-api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: ziggie-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://ziggie:${POSTGRES_PASSWORD}@postgres:5432/ziggie
+      - MONGODB_URL=mongodb://ziggie:${MONGO_PASSWORD}@mongodb:27017
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
+      - OLLAMA_URL=http://ollama:11434
+      - MCP_GATEWAY_URL=http://mcp-gateway:8080
+      - AWS_REGION=eu-north-1
+      - SECRET_KEY=${API_SECRET_KEY}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+    volumes:
+      - ./api:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ziggie-network
+
+  # Sim Studio - Agent Simulation Platform
+  sim-studio:
+    build:
+      context: ./sim-studio
+      dockerfile: Dockerfile
+    container_name: ziggie-sim-studio
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    environment:
+      - DATABASE_URL=postgresql://ziggie:${POSTGRES_PASSWORD}@postgres:5432/simstudio
+      - MONGODB_URL=mongodb://ziggie:${MONGO_PASSWORD}@mongodb:27017/simstudio
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
+      - OLLAMA_URL=http://ollama:11434
+      - N8N_WEBHOOK_URL=http://n8n:5678/webhook
+    volumes:
+      - ./sim-studio:/app
+      - sim_studio_data:/app/data
+    depends_on:
+      - postgres
+      - mongodb
+      - ollama
+    networks:
+      - ziggie-network
+
+  # ===========================================================================
+  # REVERSE PROXY & SSL
+  # ===========================================================================
+
+  # Nginx - Reverse Proxy with SSL
+  nginx:
+    image: nginx:alpine
+    container_name: ziggie-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - certbot_data:/var/www/certbot
+      - certbot_certs:/etc/letsencrypt
+    depends_on:
+      - n8n
+      - mcp-gateway
+      - ziggie-api
+      - portainer
+      - flowise
+      - open-webui
+    networks:
+      - ziggie-network
+
+  # Certbot - SSL Certificate Management
+  certbot:
+    image: certbot/certbot:latest
+    container_name: ziggie-certbot
+    volumes:
+      - certbot_data:/var/www/certbot
+      - certbot_certs:/etc/letsencrypt
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    networks:
+      - ziggie-network
+
+  # ===========================================================================
+  # MONITORING & OBSERVABILITY
+  # ===========================================================================
+
+  # Prometheus - Metrics Collection
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: ziggie-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/alerts:/etc/prometheus/alerts:ro
+      - prometheus_data:/prometheus
+    networks:
+      - ziggie-network
+
+  # Grafana - Dashboards & Visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ziggie-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - prometheus
+    networks:
+      - ziggie-network
+
+  # Loki - Log Aggregation
+  loki:
+    image: grafana/loki:latest
+    container_name: ziggie-loki
+    restart: unless-stopped
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./loki/loki-config.yml:/etc/loki/local-config.yaml:ro
+      - loki_data:/loki
+    networks:
+      - ziggie-network
+
+  # Promtail - Log Collector
+  promtail:
+    image: grafana/promtail:latest
+    container_name: ziggie-promtail
+    restart: unless-stopped
+    volumes:
+      - ./promtail/promtail-config.yml:/etc/promtail/config.yml:ro
+      - /var/log:/var/log:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      - loki
+    networks:
+      - ziggie-network
+
+  # ===========================================================================
+  # CI/CD & GITHUB INTEGRATION
+  # ===========================================================================
+
+  # Watchtower - Auto-update containers from GitHub Container Registry
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: ziggie-watchtower
+    restart: unless-stopped
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_POLL_INTERVAL=300
+      - WATCHTOWER_INCLUDE_STOPPED=true
+      - WATCHTOWER_REVIVE_STOPPED=true
+      - WATCHTOWER_NOTIFICATIONS=slack
+      - WATCHTOWER_NOTIFICATION_SLACK_HOOK_URL=${SLACK_WEBHOOK_URL}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - ziggie-network
+
+  # GitHub Runner (Self-hosted) - For CI/CD
+  github-runner:
+    image: myoung34/github-runner:latest
+    container_name: ziggie-github-runner
+    restart: unless-stopped
+    environment:
+      - REPO_URL=${GITHUB_REPO_URL}
+      - RUNNER_TOKEN=${GITHUB_RUNNER_TOKEN}
+      - RUNNER_NAME=ziggie-vps-runner
+      - RUNNER_WORKDIR=/tmp/github-runner
+      - LABELS=self-hosted,linux,ziggie
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - github_runner_data:/tmp/github-runner
+    networks:
+      - ziggie-network
+
+# =============================================================================
+# NETWORKS
+# =============================================================================
+
+networks:
+  ziggie-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+# =============================================================================
+# VOLUMES
+# =============================================================================
+
+volumes:
+  # Management
+  portainer_data:
+
+  # Workflow
+  n8n_data:
+
+  # AI/LLM
+  ollama_data:
+  flowise_data:
+  open_webui_data:
+
+  # Databases
+  postgres_data:
+  mongodb_data:
+  redis_data:
+
+  # Ziggie
+  sim_studio_data:
+
+  # SSL
+  certbot_data:
+  certbot_certs:
+
+  # Monitoring
+  prometheus_data:
+  grafana_data:
+  loki_data:
+
+  # CI/CD
+  github_runner_data:

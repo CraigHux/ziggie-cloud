@@ -1,0 +1,24 @@
+# Environment files
+.env
+*.env.local
+
+# Secrets
+*.pem
+*.key
+credentials.json
+
+# Logs
+*.log
+logs/
+
+# Docker
+*.tar
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
