@@ -17,7 +17,8 @@ jobs:
       - name: Sync to deployment directory
         run: |
           echo "Syncing to /opt/ziggie..."
-          sudo rsync -av --exclude='.git' --exclude='.github' ./ /opt/ziggie/
+          # Preserve .env file (contains secrets not in repo)
+          rsync -av --exclude='.git' --exclude='.github' --exclude='.env' ./ /opt/ziggie/
 
       - name: Rebuild and restart services
         run: |
