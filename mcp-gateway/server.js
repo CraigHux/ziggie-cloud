@@ -174,8 +174,8 @@ const server = http.createServer(async (req, res) => {
     return;
   }
   
-  // MCP JSON-RPC endpoint
-  if (url.pathname === "/mcp" && req.method === "POST") {
+  // MCP JSON-RPC endpoint (both /mcp and / for nginx proxying)
+  if ((url.pathname === "/mcp" || url.pathname === "/") && req.method === "POST") {
     let body = "";
     req.on("data", chunk => body += chunk);
     req.on("end", async () => {
