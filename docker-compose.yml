@@ -42,10 +42,13 @@ services:
       - N8N_BASIC_AUTH_USER=${N8N_USER:-admin}
       - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD}
       - N8N_HOST=${VPS_DOMAIN}
-      - N8N_PROTOCOL=http
+      - N8N_PROTOCOL=https
       - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
       - N8N_SECURE_COOKIE=false
-      - WEBHOOK_URL=https://${VPS_DOMAIN}/
+      # Subpath configuration for reverse proxy
+      - N8N_PATH=/n8n/
+      - N8N_EDITOR_BASE_URL=https://${VPS_DOMAIN}/n8n/
+      - WEBHOOK_URL=https://${VPS_DOMAIN}/n8n/
       - GENERIC_TIMEZONE=Europe/London
       - DB_TYPE=postgresdb
       - DB_POSTGRESDB_HOST=postgres
