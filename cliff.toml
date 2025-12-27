@@ -1,0 +1,147 @@
+# Git Cliff Configuration for Ziggie AI Ecosystem
+# https://git-cliff.org/docs/configuration
+
+[changelog]
+# Changelog header
+header = """
+# Changelog
+
+All notable changes to the Ziggie AI Ecosystem will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
+
+"""
+
+# Template for the changelog body
+body = """
+{% if version %}\
+    ## [{{ version | trim_start_matches(pat="v") }}] - {{ timestamp | date(format="%Y-%m-%d") }}
+{% else %}\
+    ## [Unreleased]
+{% endif %}\
+{% for group, commits in commits | group_by(attribute="group") %}
+    ### {{ group | striptags | trim | upper_first }}
+    {% for commit in commits %}
+        - {% if commit.scope %}**{{ commit.scope }}**: {% endif %}\
+            {{ commit.message | upper_first }}{% if commit.github.username %} by @{{ commit.github.username }}{%- endif %}\
+    {% endfor %}
+{% endfor %}\n
+"""
+
+# Changelog footer
+footer = """
+---
+*Generated with [git-cliff](https://git-cliff.org/)*
+"""
+
+# Remove leading/trailing whitespace from body
+trim = true
+
+# Postprocessors for changelog
+postprocessors = [
+    # Remove extra whitespace
+    { pattern = '\n{3,}', replace = "\n\n" },
+]
+
+[git]
+# Parse conventional commits
+conventional_commits = true
+
+# Filter out non-conventional commits
+filter_unconventional = true
+
+# Process each line of a commit as an individual commit
+split_commits = false
+
+# Regex for preprocessing commit messages
+commit_preprocessors = [
+    # Remove issue numbers from commit messages
+    { pattern = '\((\w+\s)?#([0-9]+)\)', replace = "" },
+]
+
+# Regex for parsing and grouping commits
+commit_parsers = [
+    # Features
+    { message = "^feat", group = "Features" },
+    { message = "^feature", group = "Features" },
+
+    # Bug Fixes
+    { message = "^fix", group = "Bug Fixes" },
+    { message = "^bugfix", group = "Bug Fixes" },
+
+    # Documentation
+    { message = "^docs", group = "Documentation" },
+    { message = "^doc", group = "Documentation" },
+
+    # Refactoring
+    { message = "^refactor", group = "Refactoring" },
+    { message = "^ref", group = "Refactoring" },
+
+    # Performance
+    { message = "^perf", group = "Performance" },
+
+    # Styling
+    { message = "^style", group = "Styling" },
+
+    # Testing
+    { message = "^test", group = "Testing" },
+
+    # Build System
+    { message = "^build", group = "Build System" },
+
+    # CI/CD
+    { message = "^ci", group = "CI/CD" },
+
+    # Chores
+    { message = "^chore", group = "Chores" },
+
+    # Revert
+    { message = "^revert", group = "Reverts" },
+
+    # Security
+    { message = "^security", group = "Security" },
+
+    # Dependencies
+    { message = "^deps", group = "Dependencies" },
+    { message = "^dep", group = "Dependencies" },
+
+    # Infrastructure
+    { message = "^infra", group = "Infrastructure" },
+
+    # Agents (Ziggie-specific)
+    { message = "^agent", group = "Agent Updates" },
+
+    # MCP (Ziggie-specific)
+    { message = "^mcp", group = "MCP Integration" },
+
+    # Assets (Game-specific)
+    { message = "^asset", group = "Asset Pipeline" },
+
+    # Skip merge commits
+    { message = "^Merge", skip = true },
+]
+
+# Protect breaking changes from being skipped
+protect_breaking_commits = true
+
+# Filter out commits by pattern
+filter_commits = false
+
+# Tag pattern
+tag_pattern = "v[0-9].*"
+
+# Skip commits that don't match tag pattern
+skip_tags = ""
+
+# Ignore tags
+ignore_tags = ""
+
+# Sort commits by oldest first
+topo_order = false
+
+# Sort by date
+sort_commits = "oldest"
+
+# Limit the number of commits per release
+# limit_commits = 42
