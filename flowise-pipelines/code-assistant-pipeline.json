@@ -1,0 +1,400 @@
+{
+  "name": "Ziggie Code Assistant",
+  "description": "RAG pipeline for querying Python and TypeScript codebase. Helps answer questions about code structure, implementations, and patterns.",
+  "nodes": [
+    {
+      "id": "codeDirectoryLoader_0",
+      "position": { "x": 100, "y": 150 },
+      "type": "customNode",
+      "data": {
+        "id": "codeDirectoryLoader_0",
+        "label": "Code Directory Loader",
+        "name": "directoryLoader",
+        "category": "Document Loaders",
+        "description": "Load Python and TypeScript files from Ziggie codebase",
+        "inputParams": [
+          {
+            "name": "folderPath",
+            "type": "string",
+            "label": "Folder Path",
+            "description": "Path to the codebase folder",
+            "value": "/app/data/ziggie-code"
+          },
+          {
+            "name": "recursive",
+            "type": "boolean",
+            "label": "Recursive",
+            "description": "Recursively load files from subdirectories",
+            "value": true
+          },
+          {
+            "name": "extensions",
+            "type": "string",
+            "label": "File Extensions",
+            "description": "Comma-separated list of file extensions to load",
+            "value": ".py,.ts,.tsx,.js,.jsx,.json"
+          }
+        ],
+        "inputAnchors": [],
+        "outputs": {
+          "output": "documents"
+        },
+        "outputAnchors": [
+          {
+            "id": "codeDirectoryLoader_0-output-output-documents",
+            "name": "output",
+            "label": "Documents",
+            "type": "documents"
+          }
+        ]
+      }
+    },
+    {
+      "id": "codeTextSplitter_0",
+      "position": { "x": 400, "y": 150 },
+      "type": "customNode",
+      "data": {
+        "id": "codeTextSplitter_0",
+        "label": "Code Text Splitter",
+        "name": "codeTextSplitter",
+        "category": "Text Splitters",
+        "description": "Split code by language-aware separators (functions, classes)",
+        "inputParams": [
+          {
+            "name": "chunkSize",
+            "type": "number",
+            "label": "Chunk Size",
+            "description": "Maximum size of each chunk",
+            "value": 2000
+          },
+          {
+            "name": "chunkOverlap",
+            "type": "number",
+            "label": "Chunk Overlap",
+            "description": "Overlap between chunks",
+            "value": 300
+          },
+          {
+            "name": "language",
+            "type": "string",
+            "label": "Language",
+            "description": "Programming language for splitting",
+            "value": "python"
+          }
+        ],
+        "inputAnchors": [
+          {
+            "id": "codeTextSplitter_0-input-document-documents",
+            "name": "document",
+            "label": "Documents",
+            "type": "documents"
+          }
+        ],
+        "outputs": {
+          "output": "documents"
+        },
+        "outputAnchors": [
+          {
+            "id": "codeTextSplitter_0-output-output-documents",
+            "name": "output",
+            "label": "Documents",
+            "type": "documents"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ollamaCodeEmbedding_0",
+      "position": { "x": 400, "y": 350 },
+      "type": "customNode",
+      "data": {
+        "id": "ollamaCodeEmbedding_0",
+        "label": "Ollama Code Embeddings",
+        "name": "ollamaEmbedding",
+        "category": "Embeddings",
+        "description": "Generate embeddings using Ollama (nomic-embed-text)",
+        "inputParams": [
+          {
+            "name": "baseUrl",
+            "type": "string",
+            "label": "Base URL",
+            "description": "Ollama server URL",
+            "value": "http://ollama:11434"
+          },
+          {
+            "name": "modelName",
+            "type": "string",
+            "label": "Model Name",
+            "description": "Embedding model to use",
+            "value": "nomic-embed-text"
+          }
+        ],
+        "inputAnchors": [],
+        "outputs": {
+          "output": "embeddings"
+        },
+        "outputAnchors": [
+          {
+            "id": "ollamaCodeEmbedding_0-output-output-embeddings",
+            "name": "output",
+            "label": "Embeddings",
+            "type": "embeddings"
+          }
+        ]
+      }
+    },
+    {
+      "id": "codeVectorStore_0",
+      "position": { "x": 700, "y": 250 },
+      "type": "customNode",
+      "data": {
+        "id": "codeVectorStore_0",
+        "label": "Code Vector Store",
+        "name": "memoryVectorStore",
+        "category": "Vector Stores",
+        "description": "Store code embeddings in memory for fast retrieval",
+        "inputParams": [
+          {
+            "name": "topK",
+            "type": "number",
+            "label": "Top K",
+            "description": "Number of top results to return",
+            "value": 8
+          }
+        ],
+        "inputAnchors": [
+          {
+            "id": "codeVectorStore_0-input-document-documents",
+            "name": "document",
+            "label": "Documents",
+            "type": "documents"
+          },
+          {
+            "id": "codeVectorStore_0-input-embeddings-embeddings",
+            "name": "embeddings",
+            "label": "Embeddings",
+            "type": "embeddings"
+          }
+        ],
+        "outputs": {
+          "output": "vectorStore",
+          "retriever": "retriever"
+        },
+        "outputAnchors": [
+          {
+            "id": "codeVectorStore_0-output-retriever-retriever",
+            "name": "retriever",
+            "label": "Retriever",
+            "type": "retriever"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ollamaCodeChat_0",
+      "position": { "x": 700, "y": 450 },
+      "type": "customNode",
+      "data": {
+        "id": "ollamaCodeChat_0",
+        "label": "Ollama Code Chat Model",
+        "name": "chatOllama",
+        "category": "Chat Models",
+        "description": "Ollama LLM optimized for code assistance",
+        "inputParams": [
+          {
+            "name": "baseUrl",
+            "type": "string",
+            "label": "Base URL",
+            "description": "Ollama server URL",
+            "value": "http://ollama:11434"
+          },
+          {
+            "name": "modelName",
+            "type": "string",
+            "label": "Model Name",
+            "description": "Chat model to use (codellama for code, or llama3.2)",
+            "value": "codellama:7b"
+          },
+          {
+            "name": "temperature",
+            "type": "number",
+            "label": "Temperature",
+            "description": "Sampling temperature (0-1, lower for code)",
+            "value": 0.1
+          }
+        ],
+        "inputAnchors": [],
+        "outputs": {
+          "output": "chatModel"
+        },
+        "outputAnchors": [
+          {
+            "id": "ollamaCodeChat_0-output-output-chatModel",
+            "name": "output",
+            "label": "Chat Model",
+            "type": "chatModel"
+          }
+        ]
+      }
+    },
+    {
+      "id": "codeRetrievalQA_0",
+      "position": { "x": 1000, "y": 300 },
+      "type": "customNode",
+      "data": {
+        "id": "codeRetrievalQA_0",
+        "label": "Code Retrieval QA Chain",
+        "name": "conversationalRetrievalQAChain",
+        "category": "Chains",
+        "description": "QA chain for code-related questions",
+        "inputParams": [
+          {
+            "name": "systemMessagePrompt",
+            "type": "string",
+            "label": "System Message",
+            "description": "System prompt for code assistant",
+            "value": "You are a senior software engineer assistant for the Ziggie AI orchestration system. You have access to the codebase which includes:\n\n**Python Components:**\n- Control Center backend (FastAPI APIs for agents, Docker, health, LLM)\n- AI knowledge base management (transcript extraction, AI analysis)\n- AWS Lambda functions and Bedrock integration\n- Testing and validation scripts\n- Rate limiting and security implementations\n\n**TypeScript/JavaScript Components:**\n- Frontend components and React code\n- API integrations\n- Configuration files\n\n**When answering code questions:**\n1. Reference specific files and line numbers when possible\n2. Explain the purpose and design patterns used\n3. Suggest improvements or best practices if relevant\n4. For implementation questions, provide complete, working code\n5. Consider error handling and edge cases\n6. Follow the project's existing code style and patterns"
+          },
+          {
+            "name": "returnSourceDocuments",
+            "type": "boolean",
+            "label": "Return Source Documents",
+            "description": "Return the source code files used for the answer",
+            "value": true
+          }
+        ],
+        "inputAnchors": [
+          {
+            "id": "codeRetrievalQA_0-input-model-chatModel",
+            "name": "model",
+            "label": "Chat Model",
+            "type": "chatModel"
+          },
+          {
+            "id": "codeRetrievalQA_0-input-vectorStoreRetriever-retriever",
+            "name": "vectorStoreRetriever",
+            "label": "Vector Store Retriever",
+            "type": "retriever"
+          }
+        ],
+        "outputs": {
+          "output": "response"
+        },
+        "outputAnchors": [
+          {
+            "id": "codeRetrievalQA_0-output-output-response",
+            "name": "output",
+            "label": "Response",
+            "type": "response"
+          }
+        ]
+      }
+    },
+    {
+      "id": "codeBufferMemory_0",
+      "position": { "x": 1000, "y": 500 },
+      "type": "customNode",
+      "data": {
+        "id": "codeBufferMemory_0",
+        "label": "Code Session Memory",
+        "name": "bufferMemory",
+        "category": "Memory",
+        "description": "Store conversation history for code discussions",
+        "inputParams": [
+          {
+            "name": "memoryKey",
+            "type": "string",
+            "label": "Memory Key",
+            "value": "code_chat_history"
+          },
+          {
+            "name": "sessionId",
+            "type": "string",
+            "label": "Session ID",
+            "value": ""
+          }
+        ],
+        "inputAnchors": [],
+        "outputs": {
+          "output": "memory"
+        },
+        "outputAnchors": [
+          {
+            "id": "codeBufferMemory_0-output-output-memory",
+            "name": "output",
+            "label": "Memory",
+            "type": "memory"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "codeDirectoryLoader_0-codeTextSplitter_0",
+      "source": "codeDirectoryLoader_0",
+      "sourceHandle": "codeDirectoryLoader_0-output-output-documents",
+      "target": "codeTextSplitter_0",
+      "targetHandle": "codeTextSplitter_0-input-document-documents",
+      "type": "buttonedge"
+    },
+    {
+      "id": "codeTextSplitter_0-codeVectorStore_0",
+      "source": "codeTextSplitter_0",
+      "sourceHandle": "codeTextSplitter_0-output-output-documents",
+      "target": "codeVectorStore_0",
+      "targetHandle": "codeVectorStore_0-input-document-documents",
+      "type": "buttonedge"
+    },
+    {
+      "id": "ollamaCodeEmbedding_0-codeVectorStore_0",
+      "source": "ollamaCodeEmbedding_0",
+      "sourceHandle": "ollamaCodeEmbedding_0-output-output-embeddings",
+      "target": "codeVectorStore_0",
+      "targetHandle": "codeVectorStore_0-input-embeddings-embeddings",
+      "type": "buttonedge"
+    },
+    {
+      "id": "codeVectorStore_0-codeRetrievalQA_0",
+      "source": "codeVectorStore_0",
+      "sourceHandle": "codeVectorStore_0-output-retriever-retriever",
+      "target": "codeRetrievalQA_0",
+      "targetHandle": "codeRetrievalQA_0-input-vectorStoreRetriever-retriever",
+      "type": "buttonedge"
+    },
+    {
+      "id": "ollamaCodeChat_0-codeRetrievalQA_0",
+      "source": "ollamaCodeChat_0",
+      "sourceHandle": "ollamaCodeChat_0-output-output-chatModel",
+      "target": "codeRetrievalQA_0",
+      "targetHandle": "codeRetrievalQA_0-input-model-chatModel",
+      "type": "buttonedge"
+    }
+  ],
+  "metadata": {
+    "version": "1.0.0",
+    "created": "2025-12-27",
+    "author": "Ziggie AI Pipeline Agent",
+    "requirements": {
+      "ollama_models": ["codellama:7b", "nomic-embed-text"],
+      "data_path": "/app/data/ziggie-code",
+      "file_extensions": [".py", ".ts", ".tsx", ".js", ".jsx", ".json"],
+      "chunk_size": 2000,
+      "chunk_overlap": 300
+    },
+    "code_directories": {
+      "control_center": "control-center/backend/api/",
+      "ai_agents": "ai-agents/knowledge-base/src/",
+      "aws_config": "aws-config/",
+      "automation": "automation/",
+      "scripts": "scripts/"
+    },
+    "notes": [
+      "Mount Ziggie codebase to /app/data/ziggie-code in Docker",
+      "Use codellama:7b for better code understanding (or llama3.2 as fallback)",
+      "Higher topK (8) to capture more code context",
+      "Lower temperature (0.1) for more deterministic code answers",
+      "Exclude node_modules, __pycache__, .git directories"
+    ]
+  }
+}

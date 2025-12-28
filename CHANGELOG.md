@@ -7,6 +7,14 @@ and this project adheres to [Conventional Commits](https://www.conventionalcommi
 
 ## [Unreleased]
 
+### Bug Fixes
+
+- Update cliff.toml to use commit.remote instead of deprecated commit.github
+
+### Documentation
+
+- Add changelog generation script and initial CHANGELOG
+
 ### Features
 
 - Add git-cliff configuration for changelog generation

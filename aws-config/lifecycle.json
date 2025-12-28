@@ -1,0 +1,30 @@
+{
+    "Rules": [
+        {
+            "ID": "MoveToGlacierAfter90Days",
+            "Status": "Enabled",
+            "Filter": {
+                "Prefix": "backups/"
+            },
+            "Transitions": [
+                {
+                    "Days": 90,
+                    "StorageClass": "GLACIER"
+                }
+            ]
+        },
+        {
+            "ID": "IntelligentTieringForAssets",
+            "Status": "Enabled",
+            "Filter": {
+                "Prefix": "game-assets/"
+            },
+            "Transitions": [
+                {
+                    "Days": 0,
+                    "StorageClass": "INTELLIGENT_TIERING"
+                }
+            ]
+        }
+    ]
+}

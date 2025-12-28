@@ -1,0 +1,114 @@
+{
+    "agent": {
+        "metrics_collection_interval": 60,
+        "run_as_user": "root",
+        "logfile": "/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log"
+    },
+    "metrics": {
+        "namespace": "CWAgent",
+        "append_dimensions": {
+            "InstanceId": "${aws:InstanceId}"
+        },
+        "metrics_collected": {
+            "mem": {
+                "measurement": [
+                    "mem_used_percent",
+                    "mem_available_percent",
+                    "mem_used",
+                    "mem_total"
+                ],
+                "metrics_collection_interval": 60
+            },
+            "disk": {
+                "measurement": [
+                    "disk_used_percent",
+                    "disk_free",
+                    "disk_used",
+                    "disk_total"
+                ],
+                "metrics_collection_interval": 60,
+                "resources": [
+                    "/"
+                ],
+                "ignore_file_system_types": [
+                    "tmpfs",
+                    "devtmpfs",
+                    "overlay"
+                ]
+            },
+            "diskio": {
+                "measurement": [
+                    "reads",
+                    "writes",
+                    "read_bytes",
+                    "write_bytes"
+                ],
+                "metrics_collection_interval": 60,
+                "resources": [
+                    "*"
+                ]
+            },
+            "swap": {
+                "measurement": [
+                    "swap_used_percent",
+                    "swap_used",
+                    "swap_free"
+                ],
+                "metrics_collection_interval": 60
+            },
+            "cpu": {
+                "measurement": [
+                    "cpu_usage_idle",
+                    "cpu_usage_user",
+                    "cpu_usage_system",
+                    "cpu_usage_iowait"
+                ],
+                "metrics_collection_interval": 60,
+                "totalcpu": true,
+                "resources": [
+                    "*"
+                ]
+            },
+            "net": {
+                "measurement": [
+                    "bytes_sent",
+                    "bytes_recv",
+                    "packets_sent",
+                    "packets_recv"
+                ],
+                "metrics_collection_interval": 60,
+                "resources": [
+                    "*"
+                ]
+            },
+            "processes": {
+                "measurement": [
+                    "running",
+                    "sleeping",
+                    "total"
+                ],
+                "metrics_collection_interval": 60
+            }
+        }
+    },
+    "logs": {
+        "logs_collected": {
+            "files": {
+                "collect_list": [
+                    {
+                        "file_path": "/var/log/syslog",
+                        "log_group_name": "ziggie-ec2-syslog",
+                        "log_stream_name": "{instance_id}",
+                        "timezone": "UTC"
+                    },
+                    {
+                        "file_path": "/var/log/cloud-init-output.log",
+                        "log_group_name": "ziggie-ec2-cloud-init",
+                        "log_stream_name": "{instance_id}",
+                        "timezone": "UTC"
+                    }
+                ]
+            }
+        }
+    }
+}

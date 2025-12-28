@@ -1,0 +1,253 @@
+# =============================================================================
+# APPLICATION ALERT RULES
+# =============================================================================
+# Critical alerts for Ziggie services, APIs, and workflows
+# =============================================================================
+
+groups:
+  - name: applications
+    interval: 30s
+    rules:
+      # =========================================================================
+      # ZIGGIE API ALERTS
+      # =========================================================================
+
+      - alert: ZiggieApiDown
+        expr: up{job="ziggie-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          tier: application
+          service: ziggie-api
+        annotations:
+          summary: "Ziggie API is down"
+          description: "Ziggie API service is not responding to health checks"
+
+      - alert: ZiggieApiHighLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="ziggie-api"}[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          tier: application
+          service: ziggie-api
+        annotations:
+          summary: "High Ziggie API latency"
+          description: "95th percentile latency is {{ $value | printf \"%.2f\" }}s"
+
+      - alert: ZiggieApiHighErrorRate
+        expr: rate(http_requests_total{job="ziggie-api",status=~"5.."}[5m]) / rate(http_requests_total{job="ziggie-api"}[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          tier: application
+          service: ziggie-api
+        annotations:
+          summary: "High Ziggie API error rate"
+          description: "Error rate is {{ $value | printf \"%.1f\" }}%"
+
+      - alert: ZiggieApiCriticalErrorRate
+        expr: rate(http_requests_total{job="ziggie-api",status=~"5.."}[5m]) / rate(http_requests_total{job="ziggie-api"}[5m]) > 0.10
+        for: 2m
+        labels:
+          severity: critical
+          tier: application
+          service: ziggie-api
+        annotations:
+          summary: "Critical Ziggie API error rate"
+          description: "Error rate is {{ $value | printf \"%.1f\" }}%. Immediate investigation required."
+
+      # =========================================================================
+      # MCP GATEWAY ALERTS
+      # =========================================================================
+
+      - alert: MCPGatewayDown
+        expr: up{job="mcp-gateway"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          tier: application
+          service: mcp-gateway
+        annotations:
+          summary: "MCP Gateway is down"
+          description: "MCP Gateway service is not responding"
+
+      - alert: MCPGatewayHighLatency
+        expr: histogram_quantile(0.95, rate(mcp_request_duration_seconds_bucket{job="mcp-gateway"}[5m])) > 5
+        for: 5m
+        labels:
+          severity: warning
+          tier: application
+          service: mcp-gateway
+        annotations:
+          summary: "High MCP Gateway latency"
+          description: "95th percentile latency is {{ $value | printf \"%.2f\" }}s"
+
+      - alert: MCPGatewayBackendDown
+        expr: mcp_backend_up == 0
+        for: 2m
+        labels:
+          severity: warning
+          tier: application
+          service: mcp-gateway
+        annotations:
+          summary: "MCP backend {{ $labels.backend }} is down"
+          description: "Backend has been unreachable for 2 minutes"
+
+      # =========================================================================
+      # SIM STUDIO ALERTS
+      # =========================================================================
+
+      - alert: SimStudioDown
+        expr: up{job="sim-studio"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          tier: application
+          service: sim-studio
+        annotations:
+          summary: "Sim Studio is down"
+          description: "Sim Studio service is not responding"
+
+      - alert: SimStudioAgentQueueBacklog
+        expr: sim_studio_agent_queue_size > 100
+        for: 10m
+        labels:
+          severity: warning
+          tier: application
+          service: sim-studio
+        annotations:
+          summary: "Sim Studio agent queue backlog"
+          description: "{{ $value }} agents waiting in queue"
+
+      - alert: SimStudioAgentFailures
+        expr: rate(sim_studio_agent_failures_total[5m]) > 5
+        for: 5m
+        labels:
+          severity: warning
+          tier: application
+          service: sim-studio
+        annotations:
+          summary: "High Sim Studio agent failure rate"
+          description: "{{ $value | printf \"%.1f\" }} agent failures per second"
+
+      # =========================================================================
+      # N8N WORKFLOW ALERTS
+      # =========================================================================
+
+      - alert: N8nDown
+        expr: up{job="n8n"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          tier: workflow
+          service: n8n
+        annotations:
+          summary: "n8n is down"
+          description: "n8n workflow engine is not responding"
+
+      - alert: N8nWorkflowFailures
+        expr: rate(n8n_workflow_failures_total[15m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          tier: workflow
+          service: n8n
+        annotations:
+          summary: "n8n workflow failures detected"
+          description: "{{ $value | printf \"%.2f\" }} workflow failures per second"
+
+      - alert: N8nHighExecutionTime
+        expr: histogram_quantile(0.95, rate(n8n_workflow_execution_duration_seconds_bucket[5m])) > 300
+        for: 10m
+        labels:
+          severity: warning
+          tier: workflow
+          service: n8n
+        annotations:
+          summary: "Long-running n8n workflows"
+          description: "95th percentile execution time is {{ $value | printf \"%.0f\" }}s"
+
+      # =========================================================================
+      # AI/LLM SERVICE ALERTS
+      # =========================================================================
+
+      - alert: OllamaDown
+        expr: up{job="ollama"} == 0
+        for: 2m
+        labels:
+          severity: warning
+          tier: ai
+          service: ollama
+        annotations:
+          summary: "Ollama is down"
+          description: "Ollama LLM service is not responding"
+
+      - alert: OllamaHighLatency
+        expr: histogram_quantile(0.95, rate(ollama_request_duration_seconds_bucket[5m])) > 30
+        for: 5m
+        labels:
+          severity: warning
+          tier: ai
+          service: ollama
+        annotations:
+          summary: "High Ollama response latency"
+          description: "95th percentile latency is {{ $value | printf \"%.1f\" }}s"
+
+      - alert: FlowiseDown
+        expr: up{job="flowise"} == 0
+        for: 2m
+        labels:
+          severity: warning
+          tier: ai
+          service: flowise
+        annotations:
+          summary: "Flowise is down"
+          description: "Flowise LLM workflow builder is not responding"
+
+      # =========================================================================
+      # NGINX ALERTS
+      # =========================================================================
+
+      - alert: NginxDown
+        expr: nginx_up == 0
+        for: 1m
+        labels:
+          severity: critical
+          tier: infrastructure
+          service: nginx
+        annotations:
+          summary: "Nginx is down"
+          description: "Nginx reverse proxy is not responding"
+
+      - alert: NginxHighConnections
+        expr: nginx_connections_active > 500
+        for: 5m
+        labels:
+          severity: warning
+          tier: infrastructure
+          service: nginx
+        annotations:
+          summary: "High Nginx connection count"
+          description: "{{ $value }} active connections"
+
+      - alert: NginxHighRequestRate
+        expr: rate(nginx_http_requests_total[5m]) > 1000
+        for: 5m
+        labels:
+          severity: warning
+          tier: infrastructure
+          service: nginx
+        annotations:
+          summary: "High Nginx request rate"
+          description: "{{ $value | printf \"%.0f\" }} requests per second"
+
+      - alert: NginxHigh5xxRate
+        expr: rate(nginx_http_requests_total{status=~"5.."}[5m]) / rate(nginx_http_requests_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          tier: infrastructure
+          service: nginx
+        annotations:
+          summary: "High Nginx 5xx error rate"
+          description: "{{ $value | printf \"%.1f\" }}% of requests returning 5xx"

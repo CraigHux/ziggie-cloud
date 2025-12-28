@@ -1,0 +1,150 @@
+# =============================================================================
+# ZIGGIE COMMAND CENTER - Dependabot Configuration
+# =============================================================================
+# Automated dependency updates for security and maintenance
+# =============================================================================
+
+version: 2
+
+registries:
+  npm-registry:
+    type: npm-registry
+    url: https://registry.npmjs.org
+
+updates:
+  # ==========================================================================
+  # GitHub Actions Dependencies
+  # ==========================================================================
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Europe/London"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "github-actions"
+      - "automated"
+    reviewers:
+      - "CraigHux"
+    open-pull-requests-limit: 5
+
+  # ==========================================================================
+  # Python Dependencies (Backend)
+  # ==========================================================================
+  - package-ecosystem: "pip"
+    directory: "/control-center/backend"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+      timezone: "Europe/London"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "python"
+      - "automated"
+    reviewers:
+      - "CraigHux"
+    open-pull-requests-limit: 10
+    # Group minor/patch updates together
+    groups:
+      python-minor-updates:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    # Security updates have priority
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+        # Review major updates manually
+
+  # ==========================================================================
+  # JavaScript/npm Dependencies (Frontend)
+  # ==========================================================================
+  - package-ecosystem: "npm"
+    directory: "/control-center/frontend"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "09:00"
+      timezone: "Europe/London"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "javascript"
+      - "automated"
+    reviewers:
+      - "CraigHux"
+    open-pull-requests-limit: 10
+    registries:
+      - npm-registry
+    # Group minor/patch updates together
+    groups:
+      npm-minor-updates:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # ==========================================================================
+  # Docker Dependencies
+  # ==========================================================================
+  - package-ecosystem: "docker"
+    directory: "/control-center/backend"
+    schedule:
+      interval: "weekly"
+      day: "thursday"
+      time: "09:00"
+      timezone: "Europe/London"
+    commit-message:
+      prefix: "docker"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "docker"
+      - "automated"
+    reviewers:
+      - "CraigHux"
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: "docker"
+    directory: "/mcp-gateway"
+    schedule:
+      interval: "weekly"
+      day: "thursday"
+      time: "09:30"
+      timezone: "Europe/London"
+    commit-message:
+      prefix: "docker"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "docker"
+      - "automated"
+
+  - package-ecosystem: "docker"
+    directory: "/hostinger-vps"
+    schedule:
+      interval: "weekly"
+      day: "thursday"
+      time: "10:00"
+      timezone: "Europe/London"
+    commit-message:
+      prefix: "docker"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "docker"
+      - "automated"

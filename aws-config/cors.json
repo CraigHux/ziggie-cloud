@@ -1,0 +1,14 @@
+{
+    "CORSRules": [
+        {
+            "AllowedHeaders": ["*"],
+            "AllowedMethods": ["GET", "HEAD"],
+            "AllowedOrigins": [
+                "https://ziggie.cloud",
+                "http://localhost:*"
+            ],
+            "ExposeHeaders": ["ETag"],
+            "MaxAgeSeconds": 3600
+        }
+    ]
+}

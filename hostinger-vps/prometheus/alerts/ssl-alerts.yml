@@ -1,0 +1,104 @@
+groups:
+  - name: ssl-certificate-alerts
+    rules:
+      # =======================================================================
+      # SSL Certificate Expiry Alerts
+      # =======================================================================
+      # Uses blackbox_exporter probe_ssl_earliest_cert_expiry metric
+      # Values are in Unix timestamp seconds
+
+      # Alert 30 days before expiry (informational)
+      - alert: SSLCertificateExpiring30Days
+        expr: (probe_ssl_earliest_cert_expiry - time()) / 86400 < 30
+        for: 1h
+        labels:
+          severity: info
+        annotations:
+          summary: "SSL certificate expiring in less than 30 days"
+          description: "SSL certificate for {{ $labels.instance }} expires in {{ printf \"%.0f\" $value }} days"
+          runbook_url: "https://github.com/ziggie-cloud/docs/blob/main/runbooks/ssl-renewal.md"
+
+      # Alert 14 days before expiry (warning)
+      - alert: SSLCertificateExpiring14Days
+        expr: (probe_ssl_earliest_cert_expiry - time()) / 86400 < 14
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "SSL certificate expiring in less than 14 days"
+          description: "SSL certificate for {{ $labels.instance }} expires in {{ printf \"%.0f\" $value }} days. Renewal should have happened automatically - investigate certbot."
+          runbook_url: "https://github.com/ziggie-cloud/docs/blob/main/runbooks/ssl-renewal.md"
+
+      # Alert 7 days before expiry (critical)
+      - alert: SSLCertificateExpiring7Days
+        expr: (probe_ssl_earliest_cert_expiry - time()) / 86400 < 7
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "CRITICAL: SSL certificate expiring in less than 7 days"
+          description: "SSL certificate for {{ $labels.instance }} expires in {{ printf \"%.0f\" $value }} days! Immediate action required."
+          runbook_url: "https://github.com/ziggie-cloud/docs/blob/main/runbooks/ssl-renewal.md"
+
+      # Alert if certificate already expired
+      - alert: SSLCertificateExpired
+        expr: (probe_ssl_earliest_cert_expiry - time()) <= 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "CRITICAL: SSL certificate has EXPIRED"
+          description: "SSL certificate for {{ $labels.instance }} has expired! Site is showing security warnings to users."
+          runbook_url: "https://github.com/ziggie-cloud/docs/blob/main/runbooks/ssl-renewal.md"
+
+      # =======================================================================
+      # SSL Configuration Alerts
+      # =======================================================================
+
+      # Alert if SSL handshake fails
+      - alert: SSLHandshakeFailed
+        expr: probe_ssl_last_chain_info == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "SSL handshake failed"
+          description: "SSL handshake failed for {{ $labels.instance }}. Check certificate configuration."
+
+      # Alert if probe fails entirely
+      - alert: SSLProbeDown
+        expr: probe_success == 0 and probe_http_ssl == 1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "SSL probe failed"
+          description: "Cannot reach {{ $labels.instance }} over HTTPS. Service may be down or SSL misconfigured."
+
+      # =======================================================================
+      # TLS Version Alerts
+      # =======================================================================
+
+      # Alert if TLS version is too old (less than 1.2)
+      - alert: SSLUsingOldTLSVersion
+        expr: probe_tls_version_info{version!~"TLS 1\\.[23]"} == 1
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "Old TLS version detected"
+          description: "{{ $labels.instance }} is using {{ $labels.version }} which is insecure. Upgrade to TLS 1.2 or 1.3."
+
+  - name: ssl-certificate-health
+    rules:
+      # =======================================================================
+      # Certificate Health Recording Rules
+      # =======================================================================
+
+      # Record days until expiry for dashboard
+      - record: ssl_certificate_days_until_expiry
+        expr: (probe_ssl_earliest_cert_expiry - time()) / 86400
+
+      # Record certificate validity status
+      - record: ssl_certificate_valid
+        expr: (probe_ssl_earliest_cert_expiry - time()) > 0

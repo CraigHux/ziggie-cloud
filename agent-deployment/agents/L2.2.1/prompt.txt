@@ -1,0 +1,28 @@
+
+Fix CRITICAL security issues in Control Center:
+
+ISSUE #1 - NO AUTHENTICATION (CRITICAL):
+Location: All API endpoints
+Task: Implement API key authentication
+- Add API key middleware to backend/main.py
+- Create verify_api_key dependency
+- Protect all /api/* endpoints with Depends(verify_api_key)
+- Add API_KEY to backend/config.py settings
+- Update frontend/src/services/api.js to include X-API-Key header
+- Test: Verify unauthenticated requests return 403
+Code example in: C:/Ziggie/CONTROL_CENTER_ISSUES_ACTION_PLAN.md (Issue #1)
+
+ISSUE #3 - WEBSOCKET NO AUTH (HIGH):
+Location: backend/api/system.py:152
+Task: Add token-based WebSocket authentication
+- Add token query parameter to websocket endpoint
+- Verify token before accepting connection
+- Update frontend to pass token in WS URL
+- Test: Verify unauthorized connections rejected
+Code example in: C:/Ziggie/CONTROL_CENTER_ISSUES_ACTION_PLAN.md (Issue #3)
+
+DELIVERABLE:
+- Create completion report: C:/Ziggie/agent-reports/L2.2.1_SECURITY_FIX_REPORT.md
+- Document: Changes made, files modified, testing performed
+- Status: List what works, any issues encountered
+    

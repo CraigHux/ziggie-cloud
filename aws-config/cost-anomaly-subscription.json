@@ -1,0 +1,18 @@
+{
+    "SubscriptionName": "ziggie-anomaly-alerts",
+    "Frequency": "IMMEDIATE",
+    "MonitorArnList": [],
+    "Subscribers": [
+        {
+            "Type": "SNS",
+            "Address": "arn:aws:sns:eu-north-1:785186659442:ziggie-alerts"
+        }
+    ],
+    "ThresholdExpression": {
+        "Dimensions": {
+            "Key": "ANOMALY_TOTAL_IMPACT_ABSOLUTE",
+            "MatchOptions": ["GREATER_THAN_OR_EQUAL"],
+            "Values": ["10"]
+        }
+    }
+}

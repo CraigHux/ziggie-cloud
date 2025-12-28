@@ -1,0 +1,112 @@
+version: '3.8'
+
+services:
+  # MongoDB Database for Ziggie Control Center
+  mongodb:
+    image: mongo:7.0.15
+    container_name: ziggie-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ziggie_admin
+      MONGO_INITDB_ROOT_PASSWORD: ziggie_secure_password
+      MONGO_INITDB_DATABASE: ziggie
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - ziggie-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Ziggie Control Center Backend API
+  backend:
+    build:
+      context: ./control-center/backend
+      dockerfile: Dockerfile
+    container_name: ziggie-backend
+    restart: unless-stopped
+    environment:
+      HOST: 0.0.0.0
+      PORT: 54112
+      DEBUG: "true"
+      CORS_ORIGINS: '["http://localhost:3001", "http://localhost:3000"]'
+      OLLAMA_URL: http://ollama:11434
+    ports:
+      - "54112:54112"
+    depends_on:
+      - mongodb
+      - ollama
+    networks:
+      - ziggie-network
+    volumes:
+      - ./control-center/backend:/app
+      - backend_logs:/app/logs
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:54112/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Ziggie Control Center Frontend
+  frontend:
+    build:
+      context: ./control-center/frontend
+      dockerfile: Dockerfile
+    container_name: ziggie-frontend
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: http://localhost:54112/api
+      VITE_WS_URL: ws://localhost:54112/ws/system
+      VITE_APP_NAME: Ziggie Control Center
+    ports:
+      - "3001:3001"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - ziggie-network
+    volumes:
+      - ./control-center/frontend:/app
+      - /app/node_modules
+
+  # Ollama LLM Service for AI-powered features
+  ollama:
+    image: ollama/ollama:0.5.13
+    container_name: ziggie-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+      - OLLAMA_ORIGINS=http://ziggie-backend:54112
+      - OLLAMA_MAX_LOADED_MODELS=2
+      - OLLAMA_NUM_PARALLEL=4
+      - OLLAMA_KEEP_ALIVE=10m
+    networks:
+      - ziggie-network
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 45s
+
+volumes:
+  mongodb_data:
+    driver: local
+  backend_logs:
+    driver: local
+  ollama_models:
+    driver: local
+
+networks:
+  ziggie-network:
+    driver: bridge

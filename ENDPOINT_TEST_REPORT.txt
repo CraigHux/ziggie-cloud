@@ -1,0 +1,392 @@
+================================================================================
+ZIGGIE CONTROL CENTER - L3 ENDPOINT TESTING REPORT
+================================================================================
+Date: 2025-11-10
+Tester: L3 Endpoint Testing Specialist
+Objective: Verify System Info and Knowledge Recent endpoints functionality
+
+================================================================================
+EXECUTIVE SUMMARY
+================================================================================
+Status: PASS - Both endpoints are fully functional and operational
+- System Info Endpoint (/api/system/info): OPERATIONAL
+- Knowledge Recent Endpoint (/api/knowledge/recent): OPERATIONAL
+
+================================================================================
+ISSUE IDENTIFICATION AND RESOLUTION
+================================================================================
+
+ROOT CAUSE:
+The backend processes were running stale code that did not include the updated
+endpoint implementations. Additionally, a Pydantic Settings configuration issue
+was preventing the backend from initializing properly.
+
+FIXES APPLIED:
+1. Configuration Fix: Updated config.py to set extra="ignore" in the Config class
+   This allows the Settings class to ignore unexpected environment variables
+   that were causing validation errors.
+
+2. Backend Restart: Killed all existing backend processes and restarted with
+   fresh code, enabling the newly implemented endpoints.
+
+FILES MODIFIED:
+- c:\Ziggie\control-center\backend\config.py
+  Added: extra = "ignore" to Config class to handle extra environment variables
+
+================================================================================
+PHASE 1: INITIAL STATUS CHECK
+================================================================================
+
+Health Endpoint: http://127.0.0.1:54112/health
+Status Code: 200 OK
+Response:
+{
+    "status": "healthy",
+    "timestamp": "2025-11-10T14:00:24.636365",
+    "version": "1.0.0"
+}
+Result: PASS - Server is responsive and healthy
+
+System Info Endpoint: http://127.0.0.1:54112/api/system/info
+Status Code: 200 OK
+Response:
+{
+    "success": true,
+    "os": "Windows 11",
+    "python": "3.13.9",
+    "hostname": "Ziggie",
+    "uptime": 210750,
+    "platform": "Windows",
+    "platform_release": "11",
+    "platform_version": "10.0.26100",
+    "arch": "AMD64",
+    "processor": "AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD",
+    "totalMemory": 16487870464,
+    "cpuCores": 16,
+    "cpuCoresPhysical": 8,
+    "boot_time": 1762572485.9819248
+}
+Result: PASS - Endpoint is responding correctly
+
+Knowledge Recent Endpoint: http://127.0.0.1:54112/api/knowledge/recent?limit=1
+Status Code: 200 OK
+Response:
+{
+    "success": true,
+    "count": 1,
+    "files": [
+        {
+            "id": "1",
+            "name": "instasd-E2E_TEST_001-20251107.md",
+            "path": "C:\\meowping-rts\\ai-agents\\ai-agents\\integration\\comfyui-workflows\\instasd-E2E_TEST_001-20251107.md",
+            "modified": "2025-11-07T12:15:29.777231",
+            "size": 1642,
+            "agent": "integration",
+            "category": "comfyui-workflows"
+        }
+    ]
+}
+Result: PASS - Endpoint is responding correctly
+
+================================================================================
+PHASE 3: COMPREHENSIVE TESTING
+================================================================================
+
+TEST 3.1: System Info Endpoint (with verbose HTTP headers)
+---------------------------------------------------------------
+URL: http://127.0.0.1:54112/api/system/info
+Method: GET
+Status Code: 200 OK
+Status Line: HTTP/1.1 200 OK
+
+Response Structure Validation:
+✓ "success" field present: boolean = true
+✓ "os" field present: string = "Windows 11"
+✓ "python" field present: string = "3.13.9"
+✓ "hostname" field present: string = "Ziggie"
+✓ "uptime" field present: integer = 210750
+✓ All required fields present
+✓ No Python tracebacks in response
+
+Result: PASS
+
+TEST 3.2: Knowledge Recent Endpoint - Limit Parameter Testing
+---------------------------------------------------------------
+
+Subtest A: limit=1
+URL: http://127.0.0.1:54112/api/knowledge/recent?limit=1
+Status Code: 200 OK
+Response:
+  - "success": true
+  - "count": 1
+  - "files" array length: 1
+  - Each file has: id, name, path, modified, size, agent, category
+Result: PASS - Returns exactly 1 file
+
+Subtest B: limit=5
+URL: http://127.0.0.1:54112/api/knowledge/recent?limit=5
+Status Code: 200 OK
+Response:
+  - "success": true
+  - "count": 5
+  - "files" array length: 5
+  - All files have required fields
+Result: PASS - Returns exactly 5 files
+
+Subtest C: limit=10
+URL: http://127.0.0.1:54112/api/knowledge/recent?limit=10
+Status Code: 200 OK
+Response:
+  - "success": true
+  - "count": 8 (limited by available files in system)
+  - "files" array length: 8
+  - All files have required fields
+Result: PASS - Returns available files up to limit
+
+TEST 3.3: Input Validation Testing
+---------------------------------------------------------------
+
+Subtest A: limit=0 (below minimum)
+URL: http://127.0.0.1:54112/api/knowledge/recent?limit=0
+Status Code: 422 Unprocessable Entity
+Response includes validation error:
+  - "type": "greater_than_equal"
+  - "msg": "Input should be greater than or equal to 1"
+  - Constraint: ge=1
+Result: PASS - Proper validation error
+
+Subtest B: limit=101 (above maximum)
+URL: http://127.0.0.1:54112/api/knowledge/recent?limit=101
+Status Code: 422 Unprocessable Entity
+Response includes validation error:
+  - "type": "less_than_equal"
+  - "msg": "Input should be less than or equal to 100"
+  - Constraint: le=100
+Result: PASS - Proper validation error
+
+TEST 3.4: Response Performance Analysis
+---------------------------------------------------------------
+
+System Info Endpoint Response Time:
+  - Test 1: 43ms
+  - Test 2: 40ms
+  - Average: 41.5ms
+  - Status: PASS (< 500ms threshold)
+
+Knowledge Recent Endpoint Response Time (limit=5):
+  - Test 1: 40ms
+  - Test 2: 39ms
+  - Average: 39.5ms
+  - Status: PASS (< 500ms threshold)
+
+Both endpoints meet the 500ms performance threshold.
+
+TEST 3.5: Response Format Validation
+---------------------------------------------------------------
+
+System Info Response:
+✓ Content-Type: application/json
+✓ Valid JSON structure
+✓ All expected fields present with correct data types
+✓ No Python tracebacks or error messages
+✓ Status code is 200 (success)
+
+Knowledge Recent Response:
+✓ Content-Type: application/json
+✓ Valid JSON structure
+✓ All expected fields present with correct data types
+✓ File objects have complete metadata
+✓ No Python tracebacks or error messages
+✓ Status code is 200 (success)
+
+TEST 3.6: OpenAPI Schema Integration
+---------------------------------------------------------------
+
+Verified endpoints present in OpenAPI schema:
+✓ /api/system/info (GET)
+✓ /api/system/stats (GET)
+✓ /api/system/processes (GET)
+✓ /api/system/ports (GET)
+✓ /api/knowledge/recent (GET)
+✓ /api/knowledge/stats (GET)
+✓ /api/knowledge/files (GET)
+✓ /api/knowledge/creators (GET)
+✓ /api/knowledge/search (GET)
+✓ /api/knowledge/cache/stats (GET)
+
+Result: PASS - All endpoints properly registered
+
+================================================================================
+RESPONSE VALIDATION SUMMARY
+================================================================================
+
+System Info Endpoint (/api/system/info):
+  Status Code: 200 OK
+  Response Format: Valid JSON
+  Required Fields:
+    - success: ✓ Present (boolean)
+    - os: ✓ Present (string)
+    - python: ✓ Present (string)
+    - hostname: ✓ Present (string)
+    - uptime: ✓ Present (integer)
+  Data Type Validation: ✓ All correct
+  Python Tracebacks: ✓ None found
+  Response Time: ✓ 41.5ms (< 500ms)
+
+Knowledge Recent Endpoint (/api/knowledge/recent?limit=5):
+  Status Code: 200 OK
+  Response Format: Valid JSON
+  Required Fields:
+    - success: ✓ Present (boolean)
+    - count: ✓ Present (integer)
+    - files: ✓ Present (array)
+  File Object Structure:
+    - id: ✓ Present (string)
+    - name: ✓ Present (string)
+    - path: ✓ Present (string)
+    - modified: ✓ Present (ISO datetime string)
+    - size: ✓ Present (integer)
+    - agent: ✓ Present (string)
+    - category: ✓ Present (string)
+  Data Type Validation: ✓ All correct
+  Python Tracebacks: ✓ None found
+  Response Time: ✓ 39.5ms (< 500ms)
+
+================================================================================
+TEST CRITERIA ASSESSMENT
+================================================================================
+
+PASS Criteria:
+✓ Status code 200 - PASS
+✓ Response has required fields - PASS
+✓ Data types match specification - PASS
+✓ No error messages in response - PASS
+✓ No Python tracebacks - PASS
+✓ Response time < 500ms - PASS
+✓ Input validation works correctly - PASS
+✓ Endpoints in OpenAPI schema - PASS
+
+FAIL Criteria (None detected):
+✗ Status code 404, 500, or other error - NOT OBSERVED
+✗ Missing required fields - NOT OBSERVED
+✗ Python traceback visible - NOT OBSERVED
+✗ Response timeout - NOT OBSERVED
+
+================================================================================
+PASS/FAIL SUMMARY
+================================================================================
+
+ENDPOINT 1: System Info (/api/system/info)
+  Overall Status: PASS
+  - Functionality: PASS
+  - Response Format: PASS
+  - Data Validation: PASS
+  - Performance: PASS
+
+ENDPOINT 2: Knowledge Recent (/api/knowledge/recent)
+  Overall Status: PASS
+  - Functionality: PASS
+  - Response Format: PASS
+  - Data Validation: PASS
+  - Input Validation: PASS
+  - Performance: PASS
+
+OVERALL PROJECT STATUS: PASS
+Both problematic endpoints are now fully functional and meet all testing criteria.
+
+================================================================================
+DETAILED FINDINGS
+================================================================================
+
+1. SYSTEM INFO ENDPOINT (/api/system/info)
+   Implementation Location: c:\Ziggie\control-center\backend\api\system.py (line 117)
+
+   Endpoint Details:
+   - Route: GET /api/system/info
+   - Rate Limit: 60 requests/minute
+   - Authentication: Not required (public endpoint)
+
+   Response Fields:
+   - success: boolean (indicates successful retrieval)
+   - os: string (e.g., "Windows 11")
+   - python: string (e.g., "3.13.9")
+   - hostname: string (e.g., "Ziggie")
+   - uptime: integer (seconds since system boot: 210750)
+   - platform: string (e.g., "Windows")
+   - platform_release: string (e.g., "11")
+   - platform_version: string (e.g., "10.0.26100")
+   - arch: string (e.g., "AMD64")
+   - processor: string (CPU details)
+   - totalMemory: integer (bytes)
+   - cpuCores: integer (16 cores)
+   - cpuCoresPhysical: integer (8 physical cores)
+   - boot_time: float (Unix timestamp)
+
+   Status: WORKING CORRECTLY
+
+2. KNOWLEDGE RECENT ENDPOINT (/api/knowledge/recent)
+   Implementation Location: c:\Ziggie\control-center\backend\api\knowledge.py (line 150)
+
+   Endpoint Details:
+   - Route: GET /api/knowledge/recent
+   - Query Parameters: limit (optional, default=10, range 1-100)
+   - Rate Limit: 60 requests/minute
+   - Authentication: Not required (public endpoint)
+   - Caching: 5-minute TTL on file scan operation
+
+   Response Fields:
+   - success: boolean (indicates successful retrieval)
+   - count: integer (number of files returned)
+   - files: array of file objects
+
+   File Object Fields:
+   - id: string (sequential ID)
+   - name: string (filename)
+   - path: string (full filesystem path)
+   - modified: string (ISO 8601 datetime)
+   - size: integer (file size in bytes)
+   - agent: string (agent responsible for file)
+   - category: string (file category/type)
+
+   Status: WORKING CORRECTLY
+
+================================================================================
+ENVIRONMENTAL DATA
+================================================================================
+
+Backend Server: http://127.0.0.1:54112
+Operating System: Windows 11
+Python Version: 3.13.9
+System Uptime: 210750 seconds (approximately 2.4 days)
+Total Memory: 16,487,870,464 bytes (16 GB)
+CPU Cores: 16 logical, 8 physical
+Hostname: Ziggie
+
+================================================================================
+RECOMMENDATIONS
+================================================================================
+
+1. MONITOR: Continue monitoring both endpoints in production to ensure
+   consistent performance.
+
+2. CACHING: The knowledge base endpoint implements a 5-minute TTL cache
+   for the file scan operation, which is appropriate for the use case.
+
+3. RATE LIMITING: Both endpoints are protected by rate limiting
+   (60 requests/minute for system/info, 60 requests/minute for knowledge/recent).
+
+4. ERROR HANDLING: Both endpoints use the UserFriendlyError handler for
+   consistent error responses. Continue maintaining this pattern.
+
+5. DEPLOYMENT: The configuration fix should be committed to the repository
+   and deployed to all backend instances to prevent similar issues.
+
+================================================================================
+TEST COMPLETION
+================================================================================
+Report Generated: 2025-11-10T14:00:00Z
+All tests completed successfully
+No blocking issues identified
+System ready for production deployment
+
+Status: PASS - All endpoints operational and fully functional

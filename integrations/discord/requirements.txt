@@ -1,0 +1,11 @@
+# Discord Integration Dependencies for Ziggie Ecosystem
+# Install with: pip install -r requirements.txt
+
+# Async HTTP client for Discord API
+aiohttp>=3.9.0
+
+# AWS SDK for Secrets Manager integration
+boto3>=1.34.0
+
+# Environment variable loading (optional)
+python-dotenv>=1.0.0

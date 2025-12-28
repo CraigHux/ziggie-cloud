@@ -1,0 +1,62 @@
+[
+    {
+        "Notification": {
+            "NotificationType": "ACTUAL",
+            "ComparisonOperator": "GREATER_THAN",
+            "Threshold": 50,
+            "ThresholdType": "PERCENTAGE",
+            "NotificationState": "ALARM"
+        },
+        "Subscribers": [
+            {
+                "SubscriptionType": "SNS",
+                "Address": "arn:aws:sns:eu-north-1:785186659442:ziggie-alerts"
+            }
+        ]
+    },
+    {
+        "Notification": {
+            "NotificationType": "ACTUAL",
+            "ComparisonOperator": "GREATER_THAN",
+            "Threshold": 80,
+            "ThresholdType": "PERCENTAGE",
+            "NotificationState": "ALARM"
+        },
+        "Subscribers": [
+            {
+                "SubscriptionType": "SNS",
+                "Address": "arn:aws:sns:eu-north-1:785186659442:ziggie-alerts"
+            }
+        ]
+    },
+    {
+        "Notification": {
+            "NotificationType": "ACTUAL",
+            "ComparisonOperator": "GREATER_THAN",
+            "Threshold": 100,
+            "ThresholdType": "PERCENTAGE",
+            "NotificationState": "ALARM"
+        },
+        "Subscribers": [
+            {
+                "SubscriptionType": "SNS",
+                "Address": "arn:aws:sns:eu-north-1:785186659442:ziggie-alerts"
+            }
+        ]
+    },
+    {
+        "Notification": {
+            "NotificationType": "FORECASTED",
+            "ComparisonOperator": "GREATER_THAN",
+            "Threshold": 120,
+            "ThresholdType": "PERCENTAGE",
+            "NotificationState": "ALARM"
+        },
+        "Subscribers": [
+            {
+                "SubscriptionType": "SNS",
+                "Address": "arn:aws:sns:eu-north-1:785186659442:ziggie-alerts"
+            }
+        ]
+    }
+]

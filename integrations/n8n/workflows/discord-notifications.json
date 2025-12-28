@@ -1,0 +1,437 @@
+{
+  "name": "Ziggie Discord Notifications",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [240, 300],
+      "webhookId": "ziggie-discord-notify",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "discord-notify",
+        "authentication": "headerAuth",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "validate-payload",
+      "name": "Validate Payload",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [440, 300],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "check-type",
+              "leftValue": "={{ $json.notification_type }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists"
+              }
+            },
+            {
+              "id": "check-title",
+              "leftValue": "={{ $json.title }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "route-notification",
+      "name": "Route by Type",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [640, 200],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "outputKey": "asset",
+              "conditions": {
+                "options": {
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "asset-type",
+                    "leftValue": "={{ $json.notification_type }}",
+                    "rightValue": "asset",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "deployment",
+              "conditions": {
+                "options": {
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "deploy-type",
+                    "leftValue": "={{ $json.notification_type }}",
+                    "rightValue": "deployment",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "error",
+              "conditions": {
+                "options": {
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "error-type",
+                    "leftValue": "={{ $json.notification_type }}",
+                    "rightValue": "error",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "cost",
+              "conditions": {
+                "options": {
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "cost-type",
+                    "leftValue": "={{ $json.notification_type }}",
+                    "rightValue": "cost",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "backup",
+              "conditions": {
+                "options": {
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "backup-type",
+                    "leftValue": "={{ $json.notification_type }}",
+                    "rightValue": "backup",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "fallbackOutput": "extra"
+      }
+    },
+    {
+      "parameters": {},
+      "id": "format-asset",
+      "name": "Format Asset Notification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [860, 100],
+      "parameters": {
+        "jsCode": "// Format asset generation notification\nconst input = $input.first().json;\n\nconst embed = {\n  title: `🎨 Asset Generated: ${input.asset_name || input.title}`,\n  description: input.description || `New ${input.asset_type || 'asset'} created`,\n  color: 0x9B59B6, // Purple\n  fields: [\n    { name: 'Asset Name', value: input.asset_name || 'N/A', inline: true },\n    { name: 'Type', value: input.asset_type || 'N/A', inline: true },\n    { name: 'Quality', value: input.quality || 'N/A', inline: true }\n  ],\n  footer: { text: 'Asset Pipeline | Ziggie' },\n  timestamp: new Date().toISOString()\n};\n\nif (input.faction) {\n  embed.fields.push({ name: 'Faction', value: input.faction, inline: true });\n}\n\nif (input.preview_url) {\n  embed.image = { url: input.preview_url };\n}\n\nreturn {\n  json: {\n    username: 'Ziggie Asset Bot',\n    embeds: [embed]\n  }\n};"
+      }
+    },
+    {
+      "parameters": {},
+      "id": "format-deployment",
+      "name": "Format Deployment Notification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [860, 200],
+      "parameters": {
+        "jsCode": "// Format deployment notification\nconst input = $input.first().json;\nconst isSuccess = ['success', 'complete', 'deployed'].includes((input.status || '').toLowerCase());\n\nconst embed = {\n  title: `${isSuccess ? '🚀' : '❌'} Deployment ${input.status || 'Update'}: ${input.environment || 'N/A'}`,\n  description: input.description || `Deployment to ${input.environment} ${input.status}`,\n  color: isSuccess ? 0x3498DB : 0xDC3545,\n  fields: [\n    { name: 'Environment', value: input.environment || 'N/A', inline: true },\n    { name: 'Version', value: `\\`${input.version || 'N/A'}\\``, inline: true },\n    { name: 'Status', value: input.status || 'N/A', inline: true }\n  ],\n  footer: { text: 'DevOps | Ziggie' },\n  timestamp: new Date().toISOString()\n};\n\nif (input.duration) {\n  embed.fields.push({ name: 'Duration', value: input.duration, inline: true });\n}\n\nif (input.services && Array.isArray(input.services)) {\n  const serviceList = input.services.map(s => `• ${s}`).join('\\n');\n  embed.fields.push({ name: 'Services', value: serviceList, inline: false });\n}\n\nconst result = {\n  username: 'Ziggie Deploy Bot',\n  embeds: [embed]\n};\n\n// Add @here for failures\nif (!isSuccess) {\n  result.content = `@here **DEPLOYMENT FAILED** to ${input.environment}`;\n}\n\nreturn { json: result };"
+      }
+    },
+    {
+      "parameters": {},
+      "id": "format-error",
+      "name": "Format Error Notification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [860, 300],
+      "parameters": {
+        "jsCode": "// Format error notification\nconst input = $input.first().json;\nconst isCritical = (input.severity || '').toLowerCase() === 'critical';\n\nconst embed = {\n  title: `${isCritical ? '🚨' : '❌'} ${input.severity || 'ERROR'}: ${input.error_type || input.title}`,\n  description: input.description || `Error in ${input.source}`,\n  color: isCritical ? 0xFF0000 : 0xDC3545,\n  fields: [\n    { name: 'Error Type', value: `\\`${input.error_type || 'N/A'}\\``, inline: true },\n    { name: 'Source', value: input.source || 'N/A', inline: true },\n    { name: 'Severity', value: input.severity || 'ERROR', inline: true },\n    { name: 'Message', value: (input.error_message || input.message || 'No message').substring(0, 1024), inline: false }\n  ],\n  footer: { text: 'Error Monitoring | Ziggie' },\n  timestamp: new Date().toISOString()\n};\n\nif (input.trace) {\n  const truncatedTrace = input.trace.substring(0, 1000);\n  embed.fields.push({ \n    name: 'Stack Trace', \n    value: `\\`\\`\\`\\n${truncatedTrace}\\n\\`\\`\\``, \n    inline: false \n  });\n}\n\nconst result = {\n  username: 'Ziggie Error Bot',\n  embeds: [embed]\n};\n\n// Add @here for critical errors\nif (isCritical) {\n  result.content = '@here **CRITICAL ERROR** - Immediate attention required!';\n}\n\nreturn { json: result };"
+      }
+    },
+    {
+      "parameters": {},
+      "id": "format-cost",
+      "name": "Format Cost Notification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [860, 400],
+      "parameters": {
+        "jsCode": "// Format cost alert notification\nconst input = $input.first().json;\nconst percentage = (input.current_cost / input.budget_limit) * 100;\nconst isExceeded = percentage >= 100;\nconst isHigh = percentage >= 80;\n\n// Create visual progress bar\nconst filled = Math.min(Math.round(percentage / 10), 10);\nconst empty = 10 - filled;\nconst progressBar = '█'.repeat(filled) + '░'.repeat(empty);\n\nlet color;\nif (isExceeded) color = 0xDC3545;  // Red\nelse if (isHigh) color = 0xFFC107;  // Yellow\nelse color = 0xE67E22;  // Orange\n\nconst embed = {\n  title: `💰 Cost Alert: ${input.service || 'AWS'}`,\n  description: `**${input.service}** has reached **${percentage.toFixed(1)}%** of ${input.period || 'monthly'} budget`,\n  color: color,\n  fields: [\n    { name: 'Service', value: input.service || 'N/A', inline: true },\n    { name: 'Period', value: (input.period || 'monthly').charAt(0).toUpperCase() + (input.period || 'monthly').slice(1), inline: true },\n    { name: 'Usage', value: `[${progressBar}] ${percentage.toFixed(1)}%`, inline: false },\n    { name: 'Current Cost', value: `$${input.current_cost.toFixed(2)}`, inline: true },\n    { name: 'Budget Limit', value: `$${input.budget_limit.toFixed(2)}`, inline: true },\n    { name: 'Remaining', value: `$${Math.max(0, input.budget_limit - input.current_cost).toFixed(2)}`, inline: true }\n  ],\n  footer: { text: 'Cost Management | Ziggie' },\n  timestamp: new Date().toISOString()\n};\n\nif (input.forecast) {\n  embed.fields.push({ name: 'Forecasted Total', value: `$${input.forecast.toFixed(2)}`, inline: true });\n}\n\nconst result = {\n  username: 'Ziggie Cost Bot',\n  embeds: [embed]\n};\n\nif (isExceeded) {\n  result.content = `@here **BUDGET EXCEEDED**: ${input.service}`;\n}\n\nreturn { json: result };"
+      }
+    },
+    {
+      "parameters": {},
+      "id": "format-backup",
+      "name": "Format Backup Notification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [860, 500],
+      "parameters": {
+        "jsCode": "// Format backup notification\nconst input = $input.first().json;\nconst isSuccess = ['success', 'complete', 'completed'].includes((input.status || '').toLowerCase());\n\nconst embed = {\n  title: `${isSuccess ? '💾' : '❌'} Backup ${input.status || 'Update'}: ${input.backup_type || 'N/A'}`,\n  description: input.description || `${input.backup_type} backup ${input.status}`,\n  color: isSuccess ? 0x1ABC9C : 0xDC3545,\n  fields: [\n    { name: 'Backup Type', value: input.backup_type || 'N/A', inline: true },\n    { name: 'Status', value: input.status || 'N/A', inline: true }\n  ],\n  footer: { text: 'Backup System | Ziggie' },\n  timestamp: new Date().toISOString()\n};\n\nif (input.size) {\n  embed.fields.push({ name: 'Size', value: input.size, inline: true });\n}\n\nif (input.duration) {\n  embed.fields.push({ name: 'Duration', value: input.duration, inline: true });\n}\n\nif (input.destination) {\n  embed.fields.push({ name: 'Destination', value: `\\`${input.destination}\\``, inline: false });\n}\n\nreturn {\n  json: {\n    username: 'Ziggie Backup Bot',\n    embeds: [embed]\n  }\n};"
+      }
+    },
+    {
+      "parameters": {},
+      "id": "format-generic",
+      "name": "Format Generic Notification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [860, 600],
+      "parameters": {
+        "jsCode": "// Format generic notification\nconst input = $input.first().json;\n\n// Map notification types to colors\nconst typeColors = {\n  success: 0x28A745,\n  error: 0xDC3545,\n  warning: 0xFFC107,\n  info: 0x17A2B8\n};\n\nconst typeEmojis = {\n  success: '✅',\n  error: '❌',\n  warning: '⚠️',\n  info: 'ℹ️'\n};\n\nconst type = (input.notification_type || 'info').toLowerCase();\nconst emoji = typeEmojis[type] || 'ℹ️';\nconst color = typeColors[type] || 0x17A2B8;\n\nconst embed = {\n  title: `${emoji} ${input.title}`,\n  description: input.description || '',\n  color: color,\n  footer: { text: 'Ziggie Ecosystem' },\n  timestamp: new Date().toISOString()\n};\n\n// Add custom fields if provided\nif (input.fields && Array.isArray(input.fields)) {\n  embed.fields = input.fields;\n}\n\nreturn {\n  json: {\n    username: 'Ziggie Bot',\n    embeds: [embed]\n  }\n};"
+      }
+    },
+    {
+      "parameters": {},
+      "id": "get-webhook-url",
+      "name": "Get Discord Webhook URL",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1080, 300],
+      "parameters": {
+        "jsCode": "// Get Discord webhook URL from environment or input\nconst input = $input.first().json;\n\n// Priority: input > env > fallback\nlet webhookUrl = input.webhook_url || \n                 $env.DISCORD_WEBHOOK_URL || \n                 null;\n\nif (!webhookUrl) {\n  throw new Error('No Discord webhook URL configured. Set DISCORD_WEBHOOK_URL environment variable.');\n}\n\nreturn {\n  json: {\n    ...input,\n    webhook_url: webhookUrl\n  }\n};"
+      }
+    },
+    {
+      "parameters": {},
+      "id": "send-discord",
+      "name": "Send to Discord",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1280, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.webhook_url }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "handle-response",
+      "name": "Handle Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1480, 300],
+      "parameters": {
+        "jsCode": "// Handle Discord API response\nconst input = $input.first().json;\nconst statusCode = input.statusCode || 200;\n\nif (statusCode === 204) {\n  return {\n    json: {\n      success: true,\n      message: 'Discord notification sent successfully',\n      timestamp: new Date().toISOString()\n    }\n  };\n} else if (statusCode === 429) {\n  // Rate limited\n  return {\n    json: {\n      success: false,\n      error: 'Rate limited by Discord',\n      retry_after: input.headers?.['retry-after'] || 1,\n      timestamp: new Date().toISOString()\n    }\n  };\n} else {\n  return {\n    json: {\n      success: false,\n      error: `Discord API error: ${statusCode}`,\n      details: input.body,\n      timestamp: new Date().toISOString()\n    }\n  };\n}"
+      }
+    },
+    {
+      "parameters": {},
+      "id": "invalid-payload",
+      "name": "Invalid Payload Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [640, 400],
+      "parameters": {
+        "options": {
+          "responseCode": 400
+        },
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ error: 'Invalid payload. Required fields: notification_type, title' }) }}"
+      }
+    },
+    {
+      "parameters": {},
+      "id": "success-response",
+      "name": "Success Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1680, 300],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          { "node": "Validate Payload", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Validate Payload": {
+      "main": [
+        [
+          { "node": "Route by Type", "type": "main", "index": 0 }
+        ],
+        [
+          { "node": "Invalid Payload Response", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Route by Type": {
+      "main": [
+        [
+          { "node": "Format Asset Notification", "type": "main", "index": 0 }
+        ],
+        [
+          { "node": "Format Deployment Notification", "type": "main", "index": 0 }
+        ],
+        [
+          { "node": "Format Error Notification", "type": "main", "index": 0 }
+        ],
+        [
+          { "node": "Format Cost Notification", "type": "main", "index": 0 }
+        ],
+        [
+          { "node": "Format Backup Notification", "type": "main", "index": 0 }
+        ],
+        [
+          { "node": "Format Generic Notification", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Format Asset Notification": {
+      "main": [
+        [
+          { "node": "Get Discord Webhook URL", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Format Deployment Notification": {
+      "main": [
+        [
+          { "node": "Get Discord Webhook URL", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Format Error Notification": {
+      "main": [
+        [
+          { "node": "Get Discord Webhook URL", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Format Cost Notification": {
+      "main": [
+        [
+          { "node": "Get Discord Webhook URL", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Format Backup Notification": {
+      "main": [
+        [
+          { "node": "Get Discord Webhook URL", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Format Generic Notification": {
+      "main": [
+        [
+          { "node": "Get Discord Webhook URL", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Get Discord Webhook URL": {
+      "main": [
+        [
+          { "node": "Send to Discord", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Send to Discord": {
+      "main": [
+        [
+          { "node": "Handle Response", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Handle Response": {
+      "main": [
+        [
+          { "node": "Success Response", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    { "name": "discord" },
+    { "name": "notifications" },
+    { "name": "ziggie" }
+  ],
+  "triggerCount": 1,
+  "active": true
+}

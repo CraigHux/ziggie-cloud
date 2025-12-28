@@ -1,0 +1,134 @@
+{
+  "summary": {
+    "total_tests": 21,
+    "passed": 19,
+    "failed": 2,
+    "warnings": 2,
+    "success_rate": "90.5%",
+    "total_time": "104.91s",
+    "errors": [
+      {
+        "test": "GET /api/system/processes",
+        "error": "Request timeout"
+      },
+      {
+        "test": "Rate limiting (60/minute)",
+        "error": "Rate limiting may not be working - sent 70 requests without being rate limited"
+      }
+    ]
+  },
+  "performance": {
+    "GET /": {
+      "avg": 1.0785503387451172,
+      "max": 1.0785503387451172,
+      "min": 1.0785503387451172
+    },
+    "GET /health": {
+      "avg": 0.0018877983093261719,
+      "max": 0.0018877983093261719,
+      "min": 0.0018877983093261719
+    },
+    "GET /api/system/stats": {
+      "avg": 1.0030779838562012,
+      "max": 1.0030779838562012,
+      "min": 1.0030779838562012
+    },
+    "GET /api/system/info": {
+      "avg": 0.06309866905212402,
+      "max": 0.06309866905212402,
+      "min": 0.06309866905212402
+    },
+    "GET /api/system/processes": {
+      "avg": 10.030939102172852,
+      "max": 10.030939102172852,
+      "min": 10.030939102172852
+    },
+    "GET /api/system/ports": {
+      "avg": 0.36344194412231445,
+      "max": 0.36344194412231445,
+      "min": 0.36344194412231445
+    },
+    "GET /api/knowledge/recent": {
+      "avg": 0.027597904205322266,
+      "max": 0.027597904205322266,
+      "min": 0.027597904205322266
+    },
+    "GET /api/knowledge/recent?limit=5": {
+      "avg": 0.015747547149658203,
+      "max": 0.015747547149658203,
+      "min": 0.015747547149658203
+    },
+    "GET /api/knowledge/stats": {
+      "avg": 0.002109050750732422,
+      "max": 0.002109050750732422,
+      "min": 0.002109050750732422
+    },
+    "GET /api/knowledge/files": {
+      "avg": 0.013012886047363281,
+      "max": 0.013012886047363281,
+      "min": 0.013012886047363281
+    },
+    "GET /api/agents": {
+      "avg": 0.0052378177642822266,
+      "max": 0.0052378177642822266,
+      "min": 0.0052378177642822266
+    },
+    "GET /api/agents?page=1&page_size=5": {
+      "avg": 0.025146007537841797,
+      "max": 0.025146007537841797,
+      "min": 0.025146007537841797
+    },
+    "GET /api/agents/stats": {
+      "avg": 0.01441812515258789,
+      "max": 0.01441812515258789,
+      "min": 0.01441812515258789
+    },
+    "GET /api/services": {
+      "avg": 0.004884004592895508,
+      "max": 0.004884004592895508,
+      "min": 0.004884004592895508
+    },
+    "GET /api/services?page=1&page_size=10": {
+      "avg": 0.004123210906982422,
+      "max": 0.004123210906982422,
+      "min": 0.004123210906982422
+    },
+    "Rate limiting (60/minute)": {
+      "avg": 0.0,
+      "max": 0,
+      "min": 0
+    },
+    "404 Error Handling": {
+      "avg": 0.019166231155395508,
+      "max": 0.019166231155395508,
+      "min": 0.019166231155395508
+    },
+    "Invalid Query Parameter Handling": {
+      "avg": 0.004490375518798828,
+      "max": 0.004490375518798828,
+      "min": 0.004490375518798828
+    },
+    "Performance: /health": {
+      "avg": 0.019535636901855467,
+      "max": 0.019535636901855467,
+      "min": 0.019535636901855467
+    },
+    "Performance: /api/system/stats": {
+      "avg": 1.0261473178863525,
+      "max": 1.0261473178863525,
+      "min": 1.0261473178863525
+    },
+    "Performance: /api/system/info": {
+      "avg": 0.01912837028503418,
+      "max": 0.01912837028503418,
+      "min": 0.01912837028503418
+    }
+  },
+  "passed_gates": [],
+  "failed_gates": [
+    "Critical endpoints failing (2 failures)",
+    "Performance degradation detected in 4 endpoints",
+    "Rate limiting not working correctly"
+  ],
+  "timestamp": "2025-11-10T13:52:42.786989"
+}

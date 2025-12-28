@@ -1,0 +1,25 @@
+Audit the ZIGGIE Control Center security:
+
+1. Check for exposed credentials or API keys:
+   - Scan for hardcoded secrets
+   - Review environment variable usage
+   - Check for sensitive data in logs
+
+2. Verify authentication mechanisms:
+   - Review auth implementation
+   - Check session management
+   - Verify token handling
+
+3. Review CORS and security headers:
+   - Check CORS configuration
+   - Verify security headers (CSP, HSTS, etc.)
+   - Review origin validation
+
+4. Scan for common vulnerabilities (OWASP Top 10):
+   - SQL Injection
+   - XSS vulnerabilities
+   - CSRF protection
+   - Security misconfigurations
+   - Known vulnerable dependencies
+
+Focus on the Control Center codebase. Provide specific security recommendations with remediation steps.

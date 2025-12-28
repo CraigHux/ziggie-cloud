@@ -1,0 +1,230 @@
+# =============================================================================
+# DATABASE ALERT RULES
+# =============================================================================
+# Critical alerts for PostgreSQL, MongoDB, and Redis
+# =============================================================================
+
+groups:
+  - name: databases
+    interval: 30s
+    rules:
+      # =========================================================================
+      # POSTGRESQL ALERTS
+      # =========================================================================
+
+      - alert: PostgresDown
+        expr: pg_up == 0
+        for: 1m
+        labels:
+          severity: critical
+          tier: database
+          service: postgres
+        annotations:
+          summary: "PostgreSQL is down"
+          description: "PostgreSQL instance {{ $labels.instance }} is not responding"
+
+      - alert: PostgresHighConnections
+        expr: pg_stat_activity_count > 80
+        for: 5m
+        labels:
+          severity: warning
+          tier: database
+          service: postgres
+        annotations:
+          summary: "High PostgreSQL connection count"
+          description: "Connection count is {{ $value }}. Max is typically 100."
+
+      - alert: PostgresCriticalConnections
+        expr: pg_stat_activity_count > 95
+        for: 2m
+        labels:
+          severity: critical
+          tier: database
+          service: postgres
+        annotations:
+          summary: "Critical PostgreSQL connection count"
+          description: "Connection count is {{ $value }}. Connection exhaustion imminent."
+
+      - alert: PostgresSlowQueries
+        expr: rate(pg_stat_statements_seconds_total[5m]) / rate(pg_stat_statements_calls_total[5m]) > 1
+        for: 5m
+        labels:
+          severity: warning
+          tier: database
+          service: postgres
+        annotations:
+          summary: "Slow PostgreSQL queries detected"
+          description: "Average query time is {{ $value | printf \"%.2f\" }}s"
+
+      - alert: PostgresReplicationLag
+        expr: pg_replication_lag > 30
+        for: 5m
+        labels:
+          severity: warning
+          tier: database
+          service: postgres
+        annotations:
+          summary: "PostgreSQL replication lag"
+          description: "Replication lag is {{ $value }}s"
+
+      - alert: PostgresDeadlocks
+        expr: increase(pg_stat_database_deadlocks[5m]) > 5
+        for: 0m
+        labels:
+          severity: warning
+          tier: database
+          service: postgres
+        annotations:
+          summary: "PostgreSQL deadlocks detected"
+          description: "{{ $value }} deadlocks in the last 5 minutes"
+
+      - alert: PostgresTableBloat
+        expr: pg_stat_user_tables_n_dead_tup > 10000
+        for: 30m
+        labels:
+          severity: warning
+          tier: database
+          service: postgres
+        annotations:
+          summary: "PostgreSQL table bloat detected"
+          description: "Table {{ $labels.relname }} has {{ $value }} dead tuples. Consider VACUUM."
+
+      # =========================================================================
+      # MONGODB ALERTS
+      # =========================================================================
+
+      - alert: MongoDBDown
+        expr: mongodb_up == 0
+        for: 1m
+        labels:
+          severity: critical
+          tier: database
+          service: mongodb
+        annotations:
+          summary: "MongoDB is down"
+          description: "MongoDB instance {{ $labels.instance }} is not responding"
+
+      - alert: MongoDBHighConnections
+        expr: mongodb_connections{state="current"} > 500
+        for: 5m
+        labels:
+          severity: warning
+          tier: database
+          service: mongodb
+        annotations:
+          summary: "High MongoDB connection count"
+          description: "Current connections: {{ $value }}"
+
+      - alert: MongoDBReplicationLag
+        expr: mongodb_mongod_replset_member_replication_lag > 30
+        for: 5m
+        labels:
+          severity: warning
+          tier: database
+          service: mongodb
+        annotations:
+          summary: "MongoDB replication lag"
+          description: "Replication lag is {{ $value }}s on member {{ $labels.name }}"
+
+      - alert: MongoDBHighOplog
+        expr: mongodb_mongod_replset_oplog_size_bytes / mongodb_mongod_replset_oplog_max_size_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          tier: database
+          service: mongodb
+        annotations:
+          summary: "MongoDB oplog nearly full"
+          description: "Oplog is {{ $value | printf \"%.0f\" }}% full"
+
+      - alert: MongoDBSlowQueries
+        expr: rate(mongodb_mongod_op_latencies_latency_total{type="command"}[5m]) / rate(mongodb_mongod_op_latencies_ops_total{type="command"}[5m]) > 100
+        for: 5m
+        labels:
+          severity: warning
+          tier: database
+          service: mongodb
+        annotations:
+          summary: "Slow MongoDB operations detected"
+          description: "Average operation latency is {{ $value | printf \"%.0f\" }}ms"
+
+      # =========================================================================
+      # REDIS ALERTS
+      # =========================================================================
+
+      - alert: RedisDown
+        expr: redis_up == 0
+        for: 1m
+        labels:
+          severity: critical
+          tier: database
+          service: redis
+        annotations:
+          summary: "Redis is down"
+          description: "Redis instance {{ $labels.instance }} is not responding"
+
+      - alert: RedisHighMemoryUsage
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          tier: database
+          service: redis
+        annotations:
+          summary: "High Redis memory usage"
+          description: "Redis is using {{ $value | printf \"%.0f\" }}% of max memory"
+
+      - alert: RedisCriticalMemoryUsage
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.95
+        for: 2m
+        labels:
+          severity: critical
+          tier: database
+          service: redis
+        annotations:
+          summary: "Critical Redis memory usage"
+          description: "Redis is using {{ $value | printf \"%.0f\" }}% of max memory. Eviction may occur."
+
+      - alert: RedisHighConnections
+        expr: redis_connected_clients > 100
+        for: 5m
+        labels:
+          severity: warning
+          tier: database
+          service: redis
+        annotations:
+          summary: "High Redis connection count"
+          description: "Current connections: {{ $value }}"
+
+      - alert: RedisRejectedConnections
+        expr: increase(redis_rejected_connections_total[5m]) > 0
+        for: 0m
+        labels:
+          severity: warning
+          tier: database
+          service: redis
+        annotations:
+          summary: "Redis rejected connections"
+          description: "{{ $value }} connections rejected in the last 5 minutes"
+
+      - alert: RedisKeysEvicted
+        expr: increase(redis_evicted_keys_total[5m]) > 100
+        for: 0m
+        labels:
+          severity: warning
+          tier: database
+          service: redis
+        annotations:
+          summary: "Redis evicting keys"
+          description: "{{ $value }} keys evicted in the last 5 minutes due to memory pressure"
+
+      - alert: RedisReplicationBroken
+        expr: redis_connected_slaves < 1 and redis_instance_info{role="master"} == 1
+        for: 5m
+        labels:
+          severity: warning
+          tier: database
+          service: redis
+        annotations:
+          summary: "Redis replication broken"
+          description: "Master has no connected slaves"

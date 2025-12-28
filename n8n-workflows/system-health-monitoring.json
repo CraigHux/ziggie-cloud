@@ -1,0 +1,313 @@
+{
+  "name": "System Health Monitoring",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 5
+            }
+          ]
+        }
+      },
+      "id": "health-schedule",
+      "name": "Health Check Schedule (5min)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Define all services to monitor\n\nconst services = [\n  // Core Infrastructure\n  { name: 'ziggie-api', url: 'http://ziggie-api:8000/health', category: 'core', critical: true },\n  { name: 'mcp-gateway', url: 'http://mcp-gateway:8080/health', category: 'core', critical: true },\n  { name: 'sim-studio', url: 'http://sim-studio:8001/health', category: 'core', critical: true },\n  \n  // AI/LLM Services\n  { name: 'ollama', url: 'http://ollama:11434/api/tags', category: 'ai', critical: false },\n  { name: 'flowise', url: 'http://flowise:3000/api/v1/ping', category: 'ai', critical: false },\n  { name: 'open-webui', url: 'http://open-webui:8080/api/health', category: 'ai', critical: false },\n  \n  // Asset Generation\n  { name: 'comfyui', url: 'http://comfyui:8188/system_stats', category: 'asset-gen', critical: false },\n  \n  // Databases\n  { name: 'postgres', url: 'http://ziggie-api:8000/db/health', category: 'database', critical: true },\n  { name: 'mongodb', url: 'http://mcp-gateway:8080/db/health', category: 'database', critical: true },\n  { name: 'redis', url: 'http://ziggie-api:8000/cache/health', category: 'database', critical: true },\n  \n  // Monitoring\n  { name: 'prometheus', url: 'http://prometheus:9090/-/healthy', category: 'monitoring', critical: false },\n  { name: 'grafana', url: 'http://grafana:3000/api/health', category: 'monitoring', critical: false },\n  \n  // Management\n  { name: 'portainer', url: 'http://portainer:9000/api/status', category: 'management', critical: false },\n  { name: 'n8n', url: 'http://n8n:5678/healthz', category: 'core', critical: true }\n];\n\nreturn services.map(s => ({ json: s }));"
+      },
+      "id": "define-services",
+      "name": "Define Services to Monitor",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.url }}",
+        "options": {
+          "timeout": 5000,
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "check-service-health",
+      "name": "Check Service Health",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 300],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process health check result\n\nconst serviceInfo = $('Define Services to Monitor').item.json;\nconst response = $input.first().json;\n\n// Determine health status\nlet status = 'healthy';\nlet errorMessage = null;\nlet responseTime = null;\n\nif (response.error) {\n  status = 'unhealthy';\n  errorMessage = response.error.message || response.error || 'Unknown error';\n} else if (response.statusCode && response.statusCode >= 400) {\n  status = 'unhealthy';\n  errorMessage = `HTTP ${response.statusCode}`;\n} else if (response.statusCode && response.statusCode >= 300) {\n  status = 'warning';\n  errorMessage = `HTTP ${response.statusCode} (redirect)`;\n}\n\nreturn {\n  json: {\n    name: serviceInfo.name,\n    category: serviceInfo.category,\n    critical: serviceInfo.critical,\n    url: serviceInfo.url,\n    status: status,\n    statusCode: response.statusCode || null,\n    error: errorMessage,\n    checkedAt: new Date().toISOString()\n  }\n};"
+      },
+      "id": "process-health-result",
+      "name": "Process Health Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "services",
+        "include": "allFieldsExcept",
+        "fieldsToExclude": "url"
+      },
+      "id": "aggregate-health-results",
+      "name": "Aggregate Health Results",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build comprehensive health report\n\nconst services = $input.first().json.services;\nconst now = new Date().toISOString();\n\n// Categorize services\nconst healthy = services.filter(s => s.status === 'healthy');\nconst warning = services.filter(s => s.status === 'warning');\nconst unhealthy = services.filter(s => s.status === 'unhealthy');\n\n// Check for critical failures\nconst criticalFailures = unhealthy.filter(s => s.critical);\nconst hasCriticalFailure = criticalFailures.length > 0;\n\n// Calculate health score\nconst totalWeight = services.reduce((sum, s) => sum + (s.critical ? 2 : 1), 0);\nconst healthyWeight = healthy.reduce((sum, s) => sum + (s.critical ? 2 : 1), 0);\nconst healthScore = Math.round((healthyWeight / totalWeight) * 100);\n\n// Group by category\nconst byCategory = {};\nservices.forEach(s => {\n  if (!byCategory[s.category]) {\n    byCategory[s.category] = { healthy: 0, warning: 0, unhealthy: 0, services: [] };\n  }\n  byCategory[s.category][s.status]++;\n  byCategory[s.category].services.push(s.name);\n});\n\n// Determine overall status\nlet overallStatus = 'operational';\nif (hasCriticalFailure) {\n  overallStatus = 'critical_failure';\n} else if (unhealthy.length > 0) {\n  overallStatus = 'degraded';\n} else if (warning.length > 0) {\n  overallStatus = 'warning';\n}\n\nreturn {\n  json: {\n    checkId: `health_${Date.now()}`,\n    timestamp: now,\n    overallStatus: overallStatus,\n    healthScore: healthScore,\n    summary: {\n      total: services.length,\n      healthy: healthy.length,\n      warning: warning.length,\n      unhealthy: unhealthy.length,\n      criticalFailures: criticalFailures.length\n    },\n    byCategory: byCategory,\n    criticalFailures: criticalFailures.map(s => ({\n      name: s.name,\n      category: s.category,\n      error: s.error\n    })),\n    unhealthyServices: unhealthy.map(s => ({\n      name: s.name,\n      category: s.category,\n      error: s.error\n    })),\n    allServices: services,\n    requiresAlert: hasCriticalFailure || unhealthy.length >= 3\n  }\n};"
+      },
+      "id": "build-health-report",
+      "name": "Build Health Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1340, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "requires-alert",
+              "leftValue": "={{ $json.requiresAlert }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "check-requires-alert",
+      "name": "Requires Alert?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1560, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.DISCORD_WEBHOOK_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"{{ $json.overallStatus === 'critical_failure' ? '@here ' : '' }}System Health Alert\",\n  \"embeds\": [{\n    \"title\": \"System Health Alert - {{ $json.overallStatus.replace('_', ' ').toUpperCase() }}\",\n    \"color\": {{ $json.overallStatus === 'critical_failure' ? 15158332 : $json.overallStatus === 'degraded' ? 16744448 : 16776960 }},\n    \"fields\": [\n      {\n        \"name\": \"Health Score\",\n        \"value\": \"{{ $json.healthScore }}/100\",\n        \"inline\": true\n      },\n      {\n        \"name\": \"Status Summary\",\n        \"value\": \"Healthy: {{ $json.summary.healthy }}\\nWarning: {{ $json.summary.warning }}\\nUnhealthy: {{ $json.summary.unhealthy }}\",\n        \"inline\": true\n      },\n      {\n        \"name\": \"Critical Failures\",\n        \"value\": \"{{ $json.criticalFailures.length > 0 ? $json.criticalFailures.map(s => s.name + ': ' + s.error).join('\\\\n') : 'None' }}\"\n      },\n      {\n        \"name\": \"Unhealthy Services\",\n        \"value\": \"{{ $json.unhealthyServices.length > 0 ? $json.unhealthyServices.map(s => s.name + ' (' + s.category + ')').join(', ') : 'None' }}\"\n      }\n    ],\n    \"footer\": {\n      \"text\": \"Ziggie System Monitor\"\n    },\n    \"timestamp\": \"{{ $json.timestamp }}\"\n  }]\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "send-alert-notification",
+      "name": "Send Alert Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1780, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Log health report for healthy systems\nconst report = $input.first().json;\nconsole.log(`System Health Check: ${report.healthScore}/100 - ${report.overallStatus}`);\nreturn $input.all();"
+      },
+      "id": "log-healthy-status",
+      "name": "Log Healthy Status",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1780, 400]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "id": "merge-alert-paths",
+      "name": "Merge Alert Paths",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [2000, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://prometheus:9090/api/v1/write",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"ziggie_health_score\": {{ $json.healthScore }},\n  \"ziggie_services_healthy\": {{ $json.summary.healthy }},\n  \"ziggie_services_unhealthy\": {{ $json.summary.unhealthy }},\n  \"ziggie_critical_failures\": {{ $json.summary.criticalFailures }}\n}",
+        "options": {
+          "timeout": 5000
+        }
+      },
+      "id": "push-metrics-prometheus",
+      "name": "Push Metrics to Prometheus",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2220, 300],
+      "continueOnFail": true
+    }
+  ],
+  "connections": {
+    "Health Check Schedule (5min)": {
+      "main": [
+        [
+          {
+            "node": "Define Services to Monitor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Define Services to Monitor": {
+      "main": [
+        [
+          {
+            "node": "Check Service Health",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Service Health": {
+      "main": [
+        [
+          {
+            "node": "Process Health Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Health Result": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Health Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Health Results": {
+      "main": [
+        [
+          {
+            "node": "Build Health Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Health Report": {
+      "main": [
+        [
+          {
+            "node": "Requires Alert?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Requires Alert?": {
+      "main": [
+        [
+          {
+            "node": "Send Alert Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Healthy Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Alert Notification": {
+      "main": [
+        [
+          {
+            "node": "Merge Alert Paths",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Healthy Status": {
+      "main": [
+        [
+          {
+            "node": "Merge Alert Paths",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Alert Paths": {
+      "main": [
+        [
+          {
+            "node": "Push Metrics to Prometheus",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "ziggie-health-monitoring"
+  },
+  "pinData": {},
+  "versionId": "1.0.0",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "name": "monitoring",
+      "id": "tag-monitoring"
+    },
+    {
+      "name": "health-check",
+      "id": "tag-health"
+    },
+    {
+      "name": "alerts",
+      "id": "tag-alerts"
+    }
+  ]
+}

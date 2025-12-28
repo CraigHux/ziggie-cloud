@@ -1,0 +1,243 @@
+# =============================================================================
+# ZIGGIE COMMAND CENTER - Pull Request Validation
+# =============================================================================
+# Runs on pull requests to main branch
+# Validates code quality, security, and deployment readiness
+# =============================================================================
+
+name: PR Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+env:
+  DEPLOYMENT_DIR: /opt/ziggie
+
+jobs:
+  # ===========================================================================
+  # CODE QUALITY CHECKS
+  # ===========================================================================
+  lint:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for secrets in code
+        run: |
+          echo "Scanning for potential secrets..."
+
+          # Patterns to check
+          PATTERNS=(
+            'sk-[a-zA-Z0-9]{48}'           # OpenAI
+            'sk-ant-[a-zA-Z0-9]+'          # Anthropic
+            'ghp_[a-zA-Z0-9]{36}'          # GitHub PAT
+            'AKIA[A-Z0-9]{16}'             # AWS Access Key
+            'password\s*=\s*["\x27][^"\x27]+["\x27]'  # Hardcoded passwords
+          )
+
+          FOUND_SECRETS=0
+          for pattern in "${PATTERNS[@]}"; do
+            if grep -rE "$pattern" --include="*.py" --include="*.js" --include="*.ts" --include="*.json" --include="*.yml" --include="*.yaml" . 2>/dev/null | grep -v '.env.example' | grep -v 'node_modules'; then
+              echo "::error::Potential secret found matching pattern: $pattern"
+              FOUND_SECRETS=1
+            fi
+          done
+
+          if [ $FOUND_SECRETS -eq 1 ]; then
+            exit 1
+          fi
+
+          echo "No secrets detected in code"
+
+      - name: Validate YAML files
+        run: |
+          echo "Validating YAML files..."
+
+          # Install yamllint
+          pip install yamllint
+
+          # Check all YAML files
+          find . -name "*.yml" -o -name "*.yaml" | grep -v node_modules | while read file; do
+            yamllint -d relaxed "$file" || echo "::warning::YAML issues in $file"
+          done
+
+      - name: Validate Docker Compose
+        run: |
+          if [ -f "docker-compose.yml" ]; then
+            docker compose -f docker-compose.yml config --quiet
+            echo "docker-compose.yml is valid"
+          fi
+
+          if [ -f "hostinger-vps/docker-compose.yml" ]; then
+            docker compose -f hostinger-vps/docker-compose.yml config --quiet
+            echo "hostinger-vps/docker-compose.yml is valid"
+          fi
+
+  # ===========================================================================
+  # SECURITY SCAN
+  # ===========================================================================
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '0'  # Don't fail, just report
+          format: 'table'
+
+      - name: Check Dockerfile best practices
+        run: |
+          echo "Checking Dockerfile best practices..."
+
+          find . -name "Dockerfile*" | while read dockerfile; do
+            echo "Checking $dockerfile..."
+
+            # Check for latest tag usage
+            if grep -q 'FROM.*:latest' "$dockerfile"; then
+              echo "::warning::$dockerfile uses :latest tag - consider pinning version"
+            fi
+
+            # Check for root user
+            if ! grep -q 'USER' "$dockerfile"; then
+              echo "::warning::$dockerfile doesn't specify a non-root USER"
+            fi
+
+            # Check for HEALTHCHECK
+            if ! grep -q 'HEALTHCHECK' "$dockerfile"; then
+              echo "::warning::$dockerfile doesn't have a HEALTHCHECK instruction"
+            fi
+          done
+
+  # ===========================================================================
+  # BUILD TEST
+  # ===========================================================================
+  build:
+    name: Test Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Test building custom services
+        run: |
+          echo "Testing Docker builds..."
+
+          # Find and test all Dockerfiles
+          find . -name "Dockerfile" -not -path "*/node_modules/*" | while read dockerfile; do
+            DIR=$(dirname "$dockerfile")
+            echo "Building $DIR..."
+
+            docker build -t "test-$(basename $DIR)" "$DIR" || {
+              echo "::error::Failed to build $DIR"
+              exit 1
+            }
+          done
+
+          echo "All builds successful"
+
+  # ===========================================================================
+  # DEPLOYMENT DRY RUN
+  # ===========================================================================
+  dry_run:
+    name: Deployment Dry Run
+    runs-on: self-hosted
+    needs: [lint, security, build]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate against production config
+        run: |
+          echo "Comparing with production configuration..."
+
+          # Check if docker-compose.yml has breaking changes
+          if [ -f "${{ env.DEPLOYMENT_DIR }}/docker-compose.yml" ]; then
+            # Compare service definitions
+            PROD_SERVICES=$(docker compose -f ${{ env.DEPLOYMENT_DIR }}/docker-compose.yml config --services | sort)
+            PR_SERVICES=$(docker compose config --services 2>/dev/null | sort || echo "")
+
+            if [ -n "$PR_SERVICES" ]; then
+              # Check for removed services
+              for service in $PROD_SERVICES; do
+                if ! echo "$PR_SERVICES" | grep -q "^$service$"; then
+                  echo "::warning::Service '$service' exists in production but not in PR"
+                fi
+              done
+            fi
+          fi
+
+      - name: Simulate deployment steps
+        run: |
+          echo "Simulating deployment steps..."
+
+          # Check rsync would work
+          echo "Testing file sync simulation..."
+          rsync -avnc \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.env' \
+            ./ /tmp/deployment-test/ 2>&1 | head -20
+
+          echo "Dry run successful"
+
+  # ===========================================================================
+  # SUMMARY
+  # ===========================================================================
+  summary:
+    name: PR Summary
+    runs-on: ubuntu-latest
+    needs: [lint, security, build, dry_run]
+    if: always()
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## PR Validation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ needs.lint.result }}" = "success" ]; then
+            echo "| Code Quality | :white_check_mark: Passed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Code Quality | :x: Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "${{ needs.security.result }}" = "success" ]; then
+            echo "| Security Scan | :white_check_mark: Passed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Security Scan | :x: Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "${{ needs.build.result }}" = "success" ]; then
+            echo "| Build Test | :white_check_mark: Passed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Build Test | :x: Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "${{ needs.dry_run.result }}" = "success" ]; then
+            echo "| Deployment Dry Run | :white_check_mark: Passed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Deployment Dry Run | :x: Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Ready for merge**: ${{ needs.lint.result == 'success' && needs.security.result == 'success' && needs.build.result == 'success' && needs.dry_run.result == 'success' }}" >> $GITHUB_STEP_SUMMARY

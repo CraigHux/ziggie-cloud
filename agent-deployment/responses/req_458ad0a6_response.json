@@ -1,0 +1,9 @@
+{
+  "request_id": "req_458ad0a6",
+  "agent_id": "L2.TEST.1",
+  "status": "running",
+  "pid": 31256,
+  "started_at": "2025-11-09T16:04:30.747113",
+  "message": "Agent L2.TEST.1 deployed successfully (MVP simulation)",
+  "error": null
+}

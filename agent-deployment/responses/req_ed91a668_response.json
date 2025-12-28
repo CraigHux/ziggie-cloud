@@ -1,0 +1,9 @@
+{
+  "request_id": "req_ed91a668",
+  "agent_id": "L2.OVERWATCH.4",
+  "status": "running",
+  "pid": 43128,
+  "started_at": "2025-11-09T23:18:42.897952",
+  "message": "Agent L2.OVERWATCH.4 deployed successfully (PID: 43128)",
+  "error": null
+}

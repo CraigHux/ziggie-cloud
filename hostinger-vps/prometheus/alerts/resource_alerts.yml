@@ -1,0 +1,339 @@
+groups:
+  - name: resource_alerts
+    interval: 30s
+    rules:
+      # ===================================================================
+      # HOST-LEVEL RESOURCE ALERTS
+      # ===================================================================
+
+      - alert: HostMemoryCriticallyLow
+        expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) < 0.1
+        for: 2m
+        labels:
+          severity: critical
+          component: infrastructure
+        annotations:
+          summary: "Host memory critically low (<10% available)"
+          description: "Available memory is {{ $value | humanizePercentage }}. OOM killer may terminate containers."
+          action: "Check container memory usage with 'docker stats'. Consider restarting non-critical services or upgrading VPS."
+
+      - alert: HostMemoryLow
+        expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) < 0.2
+        for: 5m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "Host memory low (<20% available)"
+          description: "Available memory is {{ $value | humanizePercentage }}. Monitor closely."
+
+      - alert: HighCPUUsage
+        expr: (100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)) > 90
+        for: 5m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "Host CPU usage >90% for 5 minutes"
+          description: "CPU usage is {{ $value | humanize }}%. Check top processes with 'docker stats'."
+          action: "Identify CPU-intensive containers and optimize or scale horizontally."
+
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_avail_bytes{mountpoint="/mnt/nvme"} / node_filesystem_size_bytes{mountpoint="/mnt/nvme"}) < 0.15
+        for: 5m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "NVMe disk space <15% available"
+          description: "Available disk space is {{ $value | humanizePercentage }}."
+          action: "Clean up old logs, Docker images, or volumes. Check: docker system df"
+
+      - alert: DiskSpaceCritical
+        expr: (node_filesystem_avail_bytes{mountpoint="/mnt/nvme"} / node_filesystem_size_bytes{mountpoint="/mnt/nvme"}) < 0.05
+        for: 2m
+        labels:
+          severity: critical
+          component: infrastructure
+        annotations:
+          summary: "NVMe disk space <5% available"
+          description: "Available disk space is {{ $value | humanizePercentage }}. Services may fail."
+          action: "IMMEDIATE ACTION: Run 'docker system prune -af' and remove old volumes."
+
+      # ===================================================================
+      # CONTAINER-LEVEL RESOURCE ALERTS
+      # ===================================================================
+
+      - alert: ContainerMemoryNearLimit
+        expr: (container_memory_usage_bytes / container_spec_memory_limit_bytes) > 0.9
+        for: 1m
+        labels:
+          severity: warning
+          component: container
+        annotations:
+          summary: "Container {{ $labels.name }} using >90% of memory limit"
+          description: "Memory usage: {{ $value | humanizePercentage }} of limit."
+          action: "Check container logs for memory leaks. Consider increasing limit if legitimate usage."
+
+      - alert: ContainerCPUThrottled
+        expr: rate(container_cpu_cfs_throttled_seconds_total[5m]) > 0.5
+        for: 2m
+        labels:
+          severity: warning
+          component: container
+        annotations:
+          summary: "Container {{ $labels.name }} heavily CPU throttled"
+          description: "CPU throttling rate: {{ $value }} seconds/second."
+          action: "Container needs more CPU. Increase CPU limit or optimize code."
+
+      - alert: ContainerRestarting
+        expr: rate(container_last_seen[5m]) > 2
+        for: 1m
+        labels:
+          severity: critical
+          component: container
+        annotations:
+          summary: "Container {{ $labels.name }} restarting frequently"
+          description: "Container has restarted {{ $value }} times in 5 minutes."
+          action: "Check logs: docker logs {{ $labels.name }}. Likely OOM or crash loop."
+
+      # ===================================================================
+      # APPLICATION PERFORMANCE ALERTS
+      # ===================================================================
+
+      - alert: APILatencyHigh
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="ziggie-api"}[5m])) > 0.5
+        for: 2m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "API P95 latency >500ms"
+          description: "P95 latency: {{ $value | humanizeDuration }}. Target: <500ms."
+          action: "Check database query performance. Review slow logs."
+
+      - alert: APILatencyCritical
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="ziggie-api"}[5m])) > 1.0
+        for: 1m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "API P95 latency >1s"
+          description: "P95 latency: {{ $value | humanizeDuration }}. User experience degraded."
+          action: "IMMEDIATE ACTION: Check database connections, Redis, and CPU usage."
+
+      - alert: APIErrorRateHigh
+        expr: (rate(http_requests_total{job="ziggie-api",status=~"5.."}[5m]) / rate(http_requests_total{job="ziggie-api"}[5m])) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "API error rate >5%"
+          description: "Error rate: {{ $value | humanizePercentage }}."
+          action: "Check application logs immediately. Possible database or dependency failure."
+
+      # ===================================================================
+      # DATABASE ALERTS
+      # ===================================================================
+
+      - alert: PostgreSQLConnectionsHigh
+        expr: pg_stat_database_numbackends > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "PostgreSQL connections >80 (limit: 100)"
+          description: "Active connections: {{ $value }}. Approaching max_connections limit."
+          action: "Check for connection leaks. Review connection pooling settings."
+
+      - alert: PostgreSQLConnectionsCritical
+        expr: pg_stat_database_numbackends > 95
+        for: 1m
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: "PostgreSQL connections >95 (limit: 100)"
+          description: "Active connections: {{ $value }}. New connections will fail."
+          action: "IMMEDIATE ACTION: Restart misbehaving services or increase max_connections."
+
+      - alert: RedisMemoryHigh
+        expr: (redis_memory_used_bytes / redis_memory_max_bytes) > 0.9
+        for: 2m
+        labels:
+          severity: warning
+          component: cache
+        annotations:
+          summary: "Redis memory usage >90% of maxmemory"
+          description: "Memory usage: {{ $value | humanizePercentage }}. LRU eviction active."
+          action: "Check cache hit rates. Consider increasing maxmemory or optimizing cache keys."
+
+      - alert: MongoDBConnectionsHigh
+        expr: mongodb_connections{state="current"} > 800
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "MongoDB active connections high"
+          description: "Active connections: {{ $value }}."
+          action: "Review application connection pooling. Check for connection leaks."
+
+      # ===================================================================
+      # OLLAMA / LLM ALERTS
+      # ===================================================================
+
+      - alert: OllamaMemoryHigh
+        expr: (container_memory_usage_bytes{name="ziggie-ollama"} / container_spec_memory_limit_bytes{name="ziggie-ollama"}) > 0.95
+        for: 1m
+        labels:
+          severity: critical
+          component: ai
+        annotations:
+          summary: "Ollama using >95% of memory limit (4GB)"
+          description: "Memory usage: {{ $value | humanizePercentage }}. May OOM soon."
+          action: "Reduce OLLAMA_MAX_LOADED_MODELS or use smaller quantized models (Q4_K_M)."
+
+      - alert: OllamaResponseTimeSlow
+        expr: histogram_quantile(0.95, rate(ollama_request_duration_seconds_bucket[5m])) > 30
+        for: 5m
+        labels:
+          severity: warning
+          component: ai
+        annotations:
+          summary: "Ollama P95 response time >30s"
+          description: "P95 latency: {{ $value | humanizeDuration }}."
+          action: "Check model size and CPU allocation. Consider GPU offloading."
+
+      # ===================================================================
+      # DOCKER DAEMON ALERTS
+      # ===================================================================
+
+      - alert: DockerDaemonDown
+        expr: up{job="docker"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: infrastructure
+        annotations:
+          summary: "Docker daemon is down"
+          description: "Cannot scrape Docker metrics."
+          action: "IMMEDIATE ACTION: Check Docker service status. All containers may be down."
+
+      - alert: TooManyContainers
+        expr: count(container_last_seen) > 25
+        for: 5m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "Too many containers running ({{ $value }})"
+          description: "Expected ~20 containers. Extra containers may indicate runaway processes."
+          action: "Check for zombie containers: docker ps -a. Clean up with docker rm."
+
+      # ===================================================================
+      # NETWORK ALERTS
+      # ===================================================================
+
+      - alert: NetworkErrorsHigh
+        expr: rate(node_network_receive_errs_total[5m]) > 100
+        for: 2m
+        labels:
+          severity: warning
+          component: network
+        annotations:
+          summary: "Network receive errors detected"
+          description: "Error rate: {{ $value }} errors/sec."
+          action: "Check network interface: ip link. May indicate hardware issues."
+
+      - alert: NetworkDropsHigh
+        expr: rate(node_network_receive_drop_total[5m]) > 100
+        for: 2m
+        labels:
+          severity: warning
+          component: network
+        annotations:
+          summary: "Network packet drops detected"
+          description: "Drop rate: {{ $value }} packets/sec."
+          action: "Check network congestion. May need to increase buffer sizes."
+
+      # ===================================================================
+      # HEALTH CHECK ALERTS
+      # ===================================================================
+
+      - alert: ContainerUnhealthy
+        expr: container_health_status{health_status="unhealthy"} == 1
+        for: 2m
+        labels:
+          severity: critical
+          component: container
+        annotations:
+          summary: "Container {{ $labels.name }} is unhealthy"
+          description: "Health check failing for 2 minutes."
+          action: "Check logs: docker logs {{ $labels.name }}. Container may need restart."
+
+      - alert: HealthCheckTimeout
+        expr: rate(container_health_check_failures_total[5m]) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+          component: container
+        annotations:
+          summary: "Container {{ $labels.name }} health checks timing out"
+          description: "Health check failure rate: {{ $value }}/sec."
+          action: "Health check timeout too aggressive or service overloaded. Review health check settings."
+
+      # ===================================================================
+      # STORAGE I/O ALERTS
+      # ===================================================================
+
+      - alert: HighDiskIOWait
+        expr: rate(node_disk_io_time_seconds_total[5m]) > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          component: storage
+        annotations:
+          summary: "High disk I/O wait time"
+          description: "I/O wait: {{ $value | humanizePercentage }}."
+          action: "Check with iotop. Database may be causing heavy I/O. Consider blkio weights."
+
+      - alert: DiskReadLatencyHigh
+        expr: rate(node_disk_read_time_seconds_total[5m]) / rate(node_disk_reads_completed_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          component: storage
+        annotations:
+          summary: "Disk read latency >100ms"
+          description: "Average read latency: {{ $value | humanizeDuration }}."
+          action: "NVMe should have <10ms latency. Check disk health: smartctl -a /dev/nvme0n1"
+
+      # ===================================================================
+      # PROMETHEUS SELF-MONITORING
+      # ===================================================================
+
+      - alert: PrometheusTargetDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: monitoring
+        annotations:
+          summary: "Prometheus target {{ $labels.job }} is down"
+          description: "Target has been down for 1 minute."
+          action: "Check target availability. Service may be crashed or misconfigured."
+
+      - alert: PrometheusTSDBReloadFailing
+        expr: increase(prometheus_tsdb_reloads_failures_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+          component: monitoring
+        annotations:
+          summary: "Prometheus TSDB reload failures"
+          description: "Failed to reload TSDB {{ $value }} times."
+          action: "Check Prometheus logs. Configuration may be corrupt."

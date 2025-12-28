@@ -1,0 +1,62 @@
+# =============================================================================
+# SSL Certificate Monitoring Alerts for Prometheus
+# =============================================================================
+
+groups:
+  - name: ssl_certificate_alerts
+    interval: 1h
+    rules:
+      # Warning: Certificate expires in less than 30 days
+      - alert: SSLCertificateExpiringSoon
+        expr: ssl_certificate_expiry_days < 30 and ssl_certificate_expiry_days >= 0
+        for: 1h
+        labels:
+          severity: warning
+          category: ssl
+        annotations:
+          summary: "SSL certificate expiring soon for {{ $labels.domain }}"
+          description: "Certificate for {{ $labels.domain }} expires in {{ $value }} days. Auto-renewal should handle this, but verify certbot logs."
+
+      # Critical: Certificate expires in less than 7 days
+      - alert: SSLCertificateExpiringCritical
+        expr: ssl_certificate_expiry_days < 7 and ssl_certificate_expiry_days >= 0
+        for: 10m
+        labels:
+          severity: critical
+          category: ssl
+        annotations:
+          summary: "SSL certificate CRITICALLY expiring for {{ $labels.domain }}"
+          description: "Certificate for {{ $labels.domain }} expires in {{ $value }} days! Immediate action required."
+
+      # Critical: Certificate has expired
+      - alert: SSLCertificateExpired
+        expr: ssl_certificate_expiry_days < 0
+        for: 5m
+        labels:
+          severity: critical
+          category: ssl
+        annotations:
+          summary: "SSL certificate EXPIRED for {{ $labels.domain }}"
+          description: "Certificate for {{ $labels.domain }} has EXPIRED! HTTPS is likely broken. Renew immediately with: docker compose run --rm certbot renew --force-renewal"
+
+      # Warning: Certificate file not found
+      - alert: SSLCertificateNotFound
+        expr: ssl_certificate_expiry_days == -1
+        for: 5m
+        labels:
+          severity: warning
+          category: ssl
+        annotations:
+          summary: "SSL certificate file not found for {{ $labels.domain }}"
+          description: "Certificate file missing for {{ $labels.domain }}. Check certbot setup and run init-ssl.sh if needed."
+
+      # Info: Certificate renewed successfully
+      - alert: SSLCertificateRenewed
+        expr: ssl_certificate_expiry_days > 85
+        for: 1h
+        labels:
+          severity: info
+          category: ssl
+        annotations:
+          summary: "SSL certificate recently renewed for {{ $labels.domain }}"
+          description: "Certificate for {{ $labels.domain }} valid for {{ $value }} days. Recent renewal detected."

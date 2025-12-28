@@ -1,0 +1,264 @@
+================================================================================
+                   MIGRATION QUICK REFERENCE CARD
+         AI Agents & Control Center: C:\meowping-rts → C:\Ziggie
+================================================================================
+
+EXECUTE MIGRATION
+────────────────────────────────────────────────────────────────────────────
+  cd C:\Ziggie
+  .\migrate_all.ps1
+
+  Time: 30-45 minutes | Risk: Low | Backup: Automatic
+────────────────────────────────────────────────────────────────────────────
+
+
+PRE-FLIGHT CHECKLIST
+────────────────────────────────────────────────────────────────────────────
+  [ ] Stop Control Center backend (port 8080)
+  [ ] Stop Control Center frontend (port 3000)
+  [ ] Stop ComfyUI (port 8188)
+  [ ] 1 GB free space on C: drive
+  [ ] Administrator privileges
+────────────────────────────────────────────────────────────────────────────
+
+
+WHAT'S BEING MOVED
+────────────────────────────────────────────────────────────────────────────
+  ✓ ai-agents/              22 MB, 54 files
+  ✓ control-center/         500 MB, 1500+ files
+  ✓ .claude/                Configuration
+────────────────────────────────────────────────────────────────────────────
+
+
+WHAT STAYS IN PLACE
+────────────────────────────────────────────────────────────────────────────
+  ✓ C:\ComfyUI             ComfyUI installation
+  ✓ C:\meowping-rts        Game code & docs
+────────────────────────────────────────────────────────────────────────────
+
+
+AFTER MIGRATION - TEST SERVICES
+────────────────────────────────────────────────────────────────────────────
+  Backend:
+    cd C:\Ziggie\control-center\backend
+    python main.py
+    ✓ Should start on port 8080
+
+  Frontend:
+    cd C:\Ziggie\control-center\frontend
+    npm run dev
+    ✓ Should start on port 3000
+
+  Knowledge Base:
+    cd C:\Ziggie\ai-agents\knowledge-base
+    python manage.py status
+    ✓ Should show status without errors
+────────────────────────────────────────────────────────────────────────────
+
+
+IF SOMETHING GOES WRONG
+────────────────────────────────────────────────────────────────────────────
+  Rollback:
+    cd C:\Ziggie
+    .\rollback.ps1
+    (Type 'ROLLBACK' when prompted)
+
+  ✓ Restores from backup in C:\Backups\Migration_*
+────────────────────────────────────────────────────────────────────────────
+
+
+INDIVIDUAL PHASES (Optional)
+────────────────────────────────────────────────────────────────────────────
+  .\1_backup.ps1           Create backup (15 min)
+  .\2_copy_files.ps1       Copy files (10 min)
+  .\3_update_paths.ps1     Update paths (5 min)
+  .\4_verify.ps1           Verify migration (5 min)
+────────────────────────────────────────────────────────────────────────────
+
+
+VERIFICATION
+────────────────────────────────────────────────────────────────────────────
+  Automatic:
+    .\4_verify.ps1
+    ✓ Generates verification_report.json
+
+  Manual:
+    Select-String -Path "C:\Ziggie\**\*.py" -Pattern "C:/meowping-rts" -Recurse
+    ✓ Should return no results
+────────────────────────────────────────────────────────────────────────────
+
+
+KEY LOCATIONS AFTER MIGRATION
+────────────────────────────────────────────────────────────────────────────
+  AI Agents:        C:\Ziggie\ai-agents
+  Knowledge Base:   C:\Ziggie\ai-agents\knowledge-base
+  Control Center:   C:\Ziggie\control-center
+  Backend:          C:\Ziggie\control-center\backend
+  Frontend:         C:\Ziggie\control-center\frontend
+  Database:         C:\Ziggie\control-center\backend\control-center.db
+  Config:           C:\Ziggie\control-center\backend\config.py
+────────────────────────────────────────────────────────────────────────────
+
+
+FILES UPDATED (Automated)
+────────────────────────────────────────────────────────────────────────────
+  ✓ control-center/backend/config.py
+  ✓ control-center/backend/services/agent_loader.py
+  ✓ control-center/backend/services/kb_manager.py
+  ✓ control-center/backend/api/*.py (4 files)
+  ✓ ai-agents/knowledge-base/.env
+  ✓ control-center/tests/**/*.py (all test files)
+
+  OLD: C:/meowping-rts → NEW: C:/Ziggie
+  OLD: C:\\meowping-rts → NEW: C:\\Ziggie
+────────────────────────────────────────────────────────────────────────────
+
+
+SUCCESS CRITERIA
+────────────────────────────────────────────────────────────────────────────
+  ✓ All files copied to C:\Ziggie
+  ✓ No old paths in config files
+  ✓ Backend starts without errors
+  ✓ Frontend loads successfully
+  ✓ Knowledge Base accessible
+  ✓ Database functional
+  ✓ API endpoints respond
+  ✓ Verification passes
+  ✓ Backup accessible
+────────────────────────────────────────────────────────────────────────────
+
+
+DOCUMENTATION
+────────────────────────────────────────────────────────────────────────────
+  MIGRATION_PLAN.md        Complete 60-page guide
+  QUICK_START.md           Quick reference
+  MIGRATION_README.md      Detailed supplement
+  MIGRATION_SUMMARY.md     Executive summary
+  MIGRATION_QUICKREF.txt   This file
+────────────────────────────────────────────────────────────────────────────
+
+
+COMMON ISSUES
+────────────────────────────────────────────────────────────────────────────
+  Issue: "Access Denied"
+    → Run PowerShell as Administrator
+
+  Issue: Old paths still found
+    → Re-run .\3_update_paths.ps1
+
+  Issue: Services won't start
+    → Check ports: netstat -ano | findstr "8080 8188 3000"
+    → Verify dependencies: pip install -r requirements.txt
+
+  Issue: Database errors
+    → Check: Test-Path C:\Ziggie\control-center\backend\control-center.db
+────────────────────────────────────────────────────────────────────────────
+
+
+TIMELINE
+────────────────────────────────────────────────────────────────────────────
+  Phase 1: Backup          15 min
+  Phase 2: Copy            10 min
+  Phase 3: Update Paths     5 min
+  Phase 4: Verify           5 min
+  Testing:                 10 min
+  ─────────────────────────────
+  TOTAL:                   45 min
+────────────────────────────────────────────────────────────────────────────
+
+
+BACKUP LOCATION
+────────────────────────────────────────────────────────────────────────────
+  Stored in: C:\Ziggie\backup_location.txt
+  Format:    C:\Backups\Migration_YYYY-MM-DD_HHMMSS\
+
+  ⚠ Keep backup for at least 1 week!
+────────────────────────────────────────────────────────────────────────────
+
+
+SCRIPTS AVAILABLE
+────────────────────────────────────────────────────────────────────────────
+  PowerShell:              Bash (Git Bash):
+  .\migrate_all.ps1        ./migrate_all.sh
+  .\1_backup.ps1           (PowerShell only)
+  .\2_copy_files.ps1       (PowerShell only)
+  .\3_update_paths.ps1     (PowerShell only)
+  .\4_verify.ps1           (PowerShell only)
+  .\rollback.ps1           (PowerShell only)
+────────────────────────────────────────────────────────────────────────────
+
+
+QUICK COMMANDS
+────────────────────────────────────────────────────────────────────────────
+  Full Migration:
+    cd C:\Ziggie && .\migrate_all.ps1
+
+  Verification Only:
+    cd C:\Ziggie && .\4_verify.ps1
+
+  Rollback:
+    cd C:\Ziggie && .\rollback.ps1
+
+  Check Ports:
+    netstat -ano | findstr "8080 8188 3000"
+
+  Kill Python/Node:
+    taskkill /F /IM python.exe
+    taskkill /F /IM node.exe
+────────────────────────────────────────────────────────────────────────────
+
+
+AFTER SUCCESSFUL MIGRATION
+────────────────────────────────────────────────────────────────────────────
+  Week 1:
+    ✓ Keep backup in C:\Backups\Migration_*
+    ✓ Keep original files in C:\meowping-rts
+    ✓ Monitor services for issues
+    ✓ Test all functionality
+
+  After 1 Week (Optional):
+    ✓ Delete old directories (keep backup)
+    ✓ Update internal documentation
+    ✓ Notify team of new locations
+────────────────────────────────────────────────────────────────────────────
+
+
+EXTERNAL DEPENDENCIES (Unchanged)
+────────────────────────────────────────────────────────────────────────────
+  ComfyUI:       C:\ComfyUI
+  Python:        C:\ComfyUI\python_embeded\python.exe
+  Game Backend:  C:\meowping-rts\backend
+  Game Frontend: C:\meowping-rts\frontend
+────────────────────────────────────────────────────────────────────────────
+
+
+API ENDPOINTS AFTER MIGRATION
+────────────────────────────────────────────────────────────────────────────
+  Control Center:          http://127.0.0.1:8080/api
+    /agents                List agents
+    /knowledge/files       KB files
+    /knowledge/creators    YouTube creators
+    /comfyui/start         Start ComfyUI
+    /services              Service status
+    /system/health         System health
+
+  Frontend:                http://localhost:3000
+
+  ComfyUI:                 http://127.0.0.1:8188
+────────────────────────────────────────────────────────────────────────────
+
+
+NEED HELP?
+────────────────────────────────────────────────────────────────────────────
+  Quick Start:       QUICK_START.md
+  Full Guide:        MIGRATION_PLAN.md
+  Detailed Info:     MIGRATION_README.md
+  Summary:           MIGRATION_SUMMARY.md
+  This Card:         MIGRATION_QUICKREF.txt
+────────────────────────────────────────────────────────────────────────────
+
+
+================================================================================
+                        READY TO MIGRATE?
+                    RUN: .\migrate_all.ps1
+================================================================================

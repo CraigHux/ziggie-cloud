@@ -1,0 +1,820 @@
+version: '3.8'
+
+# =============================================================================
+# ZIGGIE COMMAND CENTER - OPTIMIZED Docker Stack
+# =============================================================================
+# Performance Optimized by: HEPHAESTUS (Technical Art Director)
+# Date: 2025-12-28
+# Target: Hostinger KVM 4 (4 vCPU, 16GB RAM, 200GB NVMe)
+# Resource Budget: 13.8GB RAM, 3.5 vCPU (98% utilization with 200MB safety margin)
+# =============================================================================
+
+services:
+  # ===========================================================================
+  # DOCKER MANAGEMENT
+  # ===========================================================================
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: ziggie-portainer
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9443:9443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - ziggie-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 256M
+          pids: 50
+        reservations:
+          cpus: '0.05'
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9000/api/status"]
+      interval: 60s
+      timeout: 5s
+      retries: 2
+      start_period: 15s
+
+  # ===========================================================================
+  # WORKFLOW ORCHESTRATION
+  # ===========================================================================
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: ziggie-n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=${N8N_USER:-admin}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD}
+      - N8N_HOST=${VPS_DOMAIN}
+      - N8N_PROTOCOL=https
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - WEBHOOK_URL=https://${VPS_DOMAIN}/
+      - GENERIC_TIMEZONE=Europe/London
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=n8n
+      - DB_POSTGRESDB_USER=ziggie
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
+      - N8N_GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+      - N8N_GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      # Performance tuning
+      - N8N_PAYLOAD_SIZE_MAX=64
+      - EXECUTIONS_DATA_PRUNE=true
+      - EXECUTIONS_DATA_MAX_AGE=168
+      - N8N_METRICS=true
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./n8n-workflows:/home/node/.n8n/workflows
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ziggie-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1.5G
+          pids: 100
+        reservations:
+          cpus: '0.25'
+          memory: 768M
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5678/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # ===========================================================================
+  # LOCAL AI / LLM SERVICES
+  # ===========================================================================
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ziggie-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+      - OLLAMA_ORIGINS=*
+      - OLLAMA_NUM_PARALLEL=2
+      - OLLAMA_MAX_LOADED_MODELS=1
+      - OLLAMA_FLASH_ATTENTION=1
+    networks:
+      - ziggie-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.8'
+          memory: 4G
+          pids: 100
+        reservations:
+          cpus: '0.2'
+          memory: 2G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    ulimits:
+      memlock: -1
+      stack: 67108864
+
+  flowise:
+    image: flowiseai/flowise:latest
+    container_name: ziggie-flowise
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      - FLOWISE_USERNAME=${FLOWISE_USER:-admin}
+      - FLOWISE_PASSWORD=${FLOWISE_PASSWORD}
+      - DATABASE_PATH=/root/.flowise
+      - APIKEY_PATH=/root/.flowise
+      - SECRETKEY_PATH=/root/.flowise
+      - LOG_PATH=/root/.flowise/logs
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - NODE_OPTIONS=--max-old-space-size=440
+    volumes:
+      - flowise_data:/root/.flowise
+    depends_on:
+      - ollama
+    networks:
+      - ziggie-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 512M
+          pids: 50
+        reservations:
+          cpus: '0.1'
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/v1/ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: ziggie-open-webui
+    restart: unless-stopped
+    ports:
+      - "3002:8080"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - WEBUI_AUTH=true
+      - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY}
+    volumes:
+      - open_webui_data:/app/backend/data
+    depends_on:
+      - ollama
+    networks:
+      - ziggie-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 256M
+          pids: 50
+        reservations:
+          cpus: '0.05'
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  # ===========================================================================
+  # DATABASES
+  # ===========================================================================
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: ziggie-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=ziggie
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_MULTIPLE_DATABASES=ziggie,n8n,simstudio
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts/postgres:/docker-entrypoint-initdb.d
+    command: >
+      postgres
+      -c shared_buffers=768MB
+      -c effective_cache_size=2.25G
+      -c work_mem=32MB
+      -c maintenance_work_mem=256MB
+      -c max_connections=100
+      -c checkpoint_completion_target=0.9
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c wal_buffers=16MB
+      -c min_wal_size=1GB
+      -c max_wal_size=4GB
+    networks:
+      - ziggie-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.8'
+          memory: 3G
+          pids: 200
+        reservations:
+          cpus: '0.4'
+          memory: 1.5G
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ziggie"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+    ulimits:
+      nofile:
+        soft: 1024
+        hard: 2048
+    blkio_config:
+      weight: 800
+
+  mongodb:
+    image: mongo:7
+    container_name: ziggie-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=ziggie
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_INITDB_DATABASE=ziggie
+    volumes:
+      - mongodb_data:/data/db
+      - ./init-scripts/mongo:/docker-entrypoint-initdb.d
+    command: >
+      mongod
+      --wiredTigerCacheSizeGB 1.0
+      --bind_ip_all
+    networks:
+      - ziggie-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 1.5G
+          pids: 100
+        reservations:
+          cpus: '0.15'
+          memory: 768M
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    blkio_config:
+      weight: 600
+
+  redis:
+    image: redis:7-alpine
+    container_name: ziggie-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: >
+      redis-server
+      --requirepass ${REDIS_PASSWORD}
+      --appendonly yes
+      --maxmemory 450mb
+      --maxmemory-policy allkeys-lru
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+      --tcp-backlog 511
+      --timeout 300
+      --tcp-keepalive 60
+    volumes:
+      - redis_data:/data
+    networks:
+      - ziggie-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 512M
+          pids: 50
+        reservations:
+          cpus: '0.1'
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 2s
+      retries: 5
+      start_period: 10s
+    blkio_config:
+      weight: 800
+
+  # ===========================================================================
+  # ZIGGIE CORE SERVICES
+  # ===========================================================================
+
+  mcp-gateway:
+    build:
+      context: ./mcp-gateway
+      dockerfile: Dockerfile
+    container_name: ziggie-mcp-gateway
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=production
+      - NODE_OPTIONS=--max-old-space-size=1280
+      - UV_THREADPOOL_SIZE=8
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
+      - MONGODB_URL=mongodb://ziggie:${MONGO_PASSWORD}@mongodb:27017/ziggie
+      - OLLAMA_URL=http://ollama:11434
+      - N8N_URL=http://n8n:5678
+      - AWS_REGION=eu-north-1
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    volumes:
+      - ./mcp-gateway:/app
+      - /app/node_modules
+    depends_on:
+      - redis
+      - mongodb
+      - ollama
+    networks:
+      - ziggie-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.8'
+          memory: 1.5G
+          pids: 150
+        reservations:
+          cpus: '0.4'
+          memory: 768M
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 15s
+
+  ziggie-api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: ziggie-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://ziggie:${POSTGRES_PASSWORD}@postgres:5432/ziggie
+      - MONGODB_URL=mongodb://ziggie:${MONGO_PASSWORD}@mongodb:27017
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
+      - OLLAMA_URL=http://ollama:11434
+      - MCP_GATEWAY_URL=http://mcp-gateway:8080
+      - AWS_REGION=eu-north-1
+      - SECRET_KEY=${API_SECRET_KEY}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      # Performance tuning
+      - WORKERS=4
+      - WORKER_CLASS=uvicorn.workers.UvicornWorker
+      - WORKER_CONNECTIONS=1000
+      - MAX_REQUESTS=5000
+      - MAX_REQUESTS_JITTER=500
+      - TIMEOUT=30
+      - GRACEFUL_TIMEOUT=30
+      - KEEPALIVE=5
+    volumes:
+      - ./api:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ziggie-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+          pids: 200
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 20s
+
+  sim-studio:
+    build:
+      context: ./sim-studio
+      dockerfile: Dockerfile
+    container_name: ziggie-sim-studio
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    environment:
+      - DATABASE_URL=postgresql://ziggie:${POSTGRES_PASSWORD}@postgres:5432/simstudio
+      - MONGODB_URL=mongodb://ziggie:${MONGO_PASSWORD}@mongodb:27017/simstudio
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
+      - OLLAMA_URL=http://ollama:11434
+      - N8N_WEBHOOK_URL=http://n8n:5678/webhook
+    volumes:
+      - ./sim-studio:/app
+      - sim_studio_data:/app/data
+    depends_on:
+      - postgres
+      - mongodb
+      - ollama
+    networks:
+      - ziggie-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 512M
+          pids: 100
+        reservations:
+          cpus: '0.1'
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  # ===========================================================================
+  # REVERSE PROXY & SSL
+  # ===========================================================================
+
+  nginx:
+    image: nginx:alpine
+    container_name: ziggie-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - certbot_data:/var/www/certbot
+      - certbot_certs:/etc/letsencrypt
+    depends_on:
+      - n8n
+      - mcp-gateway
+      - ziggie-api
+      - portainer
+      - flowise
+      - open-webui
+    networks:
+      - ziggie-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 256M
+          pids: 50
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  certbot:
+    image: certbot/certbot:latest
+    container_name: ziggie-certbot
+    volumes:
+      - certbot_data:/var/www/certbot
+      - certbot_certs:/etc/letsencrypt
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    networks:
+      - ziggie-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.05'
+          memory: 128M
+          pids: 10
+        reservations:
+          cpus: '0.01'
+          memory: 32M
+
+  # ===========================================================================
+  # MONITORING & OBSERVABILITY
+  # ===========================================================================
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: ziggie-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+      - '--storage.tsdb.retention.size=900MB'
+      - '--query.max-concurrency=10'
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/alerts:/etc/prometheus/alerts:ro
+      - prometheus_data:/prometheus
+    networks:
+      - ziggie-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 1G
+          pids: 50
+        reservations:
+          cpus: '0.1'
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ziggie-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=https://${VPS_DOMAIN}/grafana
+      - GF_DATABASE_CACHE_MODE=shared
+      - GF_LOG_LEVEL=warn
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - prometheus
+    networks:
+      - ziggie-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 512M
+          pids: 50
+        reservations:
+          cpus: '0.05'
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  loki:
+    image: grafana/loki:latest
+    container_name: ziggie-loki
+    restart: unless-stopped
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./loki/loki-config.yml:/etc/loki/local-config.yaml:ro
+      - loki_data:/loki
+    networks:
+      - ziggie-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 512M
+          pids: 50
+        reservations:
+          cpus: '0.05'
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3100/ready"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    blkio_config:
+      weight: 200
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: ziggie-promtail
+    restart: unless-stopped
+    volumes:
+      - ./promtail/promtail-config.yml:/etc/promtail/config.yml:ro
+      - /var/log:/var/log:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      - loki
+    networks:
+      - ziggie-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.05'
+          memory: 128M
+          pids: 20
+        reservations:
+          cpus: '0.02'
+          memory: 64M
+
+  # cAdvisor - Container Metrics
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: ziggie-cadvisor
+    restart: unless-stopped
+    ports:
+      - "8081:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    privileged: true
+    devices:
+      - /dev/kmsg
+    networks:
+      - ziggie-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 256M
+          pids: 50
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+
+  # Node Exporter - Host Metrics
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: ziggie-node-exporter
+    restart: unless-stopped
+    ports:
+      - "9100:9100"
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    networks:
+      - ziggie-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 128M
+          pids: 20
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+
+  # ===========================================================================
+  # CI/CD & GITHUB INTEGRATION
+  # ===========================================================================
+
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: ziggie-watchtower
+    restart: unless-stopped
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_POLL_INTERVAL=600
+      - WATCHTOWER_INCLUDE_STOPPED=true
+      - WATCHTOWER_REVIVE_STOPPED=true
+      - WATCHTOWER_NOTIFICATIONS=slack
+      - WATCHTOWER_NOTIFICATION_SLACK_HOOK_URL=${SLACK_WEBHOOK_URL}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - ziggie-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.05'
+          memory: 128M
+          pids: 20
+        reservations:
+          cpus: '0.02'
+          memory: 64M
+
+  github-runner:
+    image: myoung34/github-runner:latest
+    container_name: ziggie-github-runner
+    restart: unless-stopped
+    environment:
+      - REPO_URL=${GITHUB_REPO_URL}
+      - RUNNER_TOKEN=${GITHUB_RUNNER_TOKEN}
+      - RUNNER_NAME=ziggie-vps-runner
+      - RUNNER_WORKDIR=/tmp/github-runner
+      - LABELS=self-hosted,linux,ziggie
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - github_runner_data:/tmp/github-runner
+    networks:
+      - ziggie-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 1G
+          pids: 100
+        reservations:
+          cpus: '0.1'
+          memory: 256M
+
+# =============================================================================
+# NETWORKS
+# =============================================================================
+
+networks:
+  ziggie-network:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: br-ziggie
+      com.docker.network.driver.mtu: 1500
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+          ip_range: 172.28.5.0/24
+          gateway: 172.28.5.254
+    enable_ipv6: false
+
+# =============================================================================
+# VOLUMES
+# =============================================================================
+
+volumes:
+  portainer_data:
+  n8n_data:
+  ollama_data:
+  flowise_data:
+  open_webui_data:
+  postgres_data:
+  mongodb_data:
+  redis_data:
+  sim_studio_data:
+  certbot_data:
+  certbot_certs:
+  prometheus_data:
+  grafana_data:
+  loki_data:
+  github_runner_data:

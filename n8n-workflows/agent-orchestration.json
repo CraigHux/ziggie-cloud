@@ -1,0 +1,266 @@
+{
+  "name": "Agent Orchestration Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "orchestrate-agents",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "orchestrate-webhook",
+      "name": "Orchestrate Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "orchestrate-agents-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Agent Orchestration Input Validation\n// Validates: agents, task, priority, deadline\n\nconst input = $input.first().json;\n\n// Validate required fields\nif (!input.task) {\n  throw new Error('Missing required field: task');\n}\n\n// Define available agents and their capabilities\nconst agentRegistry = {\n  // Elite Art Team\n  'ARTEMIS': { team: 'art', role: 'Art Director', skills: ['visual_direction', 'style_guides', 'art_review'] },\n  'LEONIDAS': { team: 'art', role: 'Character Artist', skills: ['character_design', 'animations', 'sprite_sheets'] },\n  'GAIA': { team: 'art', role: 'Environment Artist', skills: ['terrain', 'buildings', 'props', 'biomes'] },\n  'VULCAN': { team: 'art', role: 'VFX Artist', skills: ['particles', 'effects', 'shaders', 'lighting'] },\n  \n  // Elite Technical Team\n  'HEPHAESTUS': { team: 'technical', role: 'Tech Art Director', skills: ['optimization', 'lod', 'performance', 'pipelines'] },\n  'DAEDALUS': { team: 'technical', role: 'Pipeline Architect', skills: ['ci_cd', 'automation', 'tooling'] },\n  'ARGUS': { team: 'technical', role: 'QA Lead', skills: ['testing', 'validation', 'quality_gates'] },\n  \n  // Elite Design Team\n  'TERRA': { team: 'design', role: 'Level Designer', skills: ['map_layouts', 'objectives', 'progression'] },\n  'PROMETHEUS': { team: 'design', role: 'Balance Designer', skills: ['game_mechanics', 'economy', 'tuning'] },\n  'IRIS': { team: 'design', role: 'UI/UX Designer', skills: ['interfaces', 'player_experience', 'accessibility'] },\n  'MYTHOS': { team: 'design', role: 'Narrative Designer', skills: ['lore', 'dialogue', 'worldbuilding'] },\n  \n  // Elite Production Team\n  'MAXIMUS': { team: 'production', role: 'Executive Producer', skills: ['vision', 'strategy', 'stakeholder_mgmt'] },\n  'FORGE': { team: 'production', role: 'Technical Producer', skills: ['risk_mgmt', 'blockers', 'dependencies'] },\n  'ATLAS': { team: 'production', role: 'Asset Production Manager', skills: ['pipeline_velocity', 'asset_tracking', 'scheduling'] }\n};\n\n// Get requested agents (default to auto-select based on task)\nlet requestedAgents = input.agents || [];\n\n// If no agents specified, auto-select based on task keywords\nif (requestedAgents.length === 0) {\n  const taskLower = input.task.toLowerCase();\n  \n  if (taskLower.includes('asset') || taskLower.includes('sprite') || taskLower.includes('character')) {\n    requestedAgents = ['ARTEMIS', 'LEONIDAS', 'HEPHAESTUS'];\n  } else if (taskLower.includes('environment') || taskLower.includes('terrain') || taskLower.includes('building')) {\n    requestedAgents = ['ARTEMIS', 'GAIA', 'HEPHAESTUS'];\n  } else if (taskLower.includes('effect') || taskLower.includes('vfx') || taskLower.includes('particle')) {\n    requestedAgents = ['VULCAN', 'HEPHAESTUS'];\n  } else if (taskLower.includes('quality') || taskLower.includes('test') || taskLower.includes('review')) {\n    requestedAgents = ['ARGUS', 'HEPHAESTUS'];\n  } else if (taskLower.includes('pipeline') || taskLower.includes('automation')) {\n    requestedAgents = ['DAEDALUS', 'FORGE'];\n  } else if (taskLower.includes('balance') || taskLower.includes('mechanic')) {\n    requestedAgents = ['PROMETHEUS', 'TERRA'];\n  } else {\n    // Default to production team for general tasks\n    requestedAgents = ['MAXIMUS', 'FORGE', 'ATLAS'];\n  }\n}\n\n// Validate requested agents exist\nconst invalidAgents = requestedAgents.filter(a => !agentRegistry[a]);\nif (invalidAgents.length > 0) {\n  throw new Error(`Invalid agents: ${invalidAgents.join(', ')}. Available: ${Object.keys(agentRegistry).join(', ')}`);\n}\n\n// Build deployment plan\nconst orchestrationId = `orch_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;\nconst deploymentPlan = requestedAgents.map((agentId, index) => ({\n  agentId: agentId,\n  ...agentRegistry[agentId],\n  deploymentOrder: index + 1,\n  status: 'pending',\n  assignedTask: input.task\n}));\n\n// Priority mapping\nconst priorityLevels = ['low', 'normal', 'high', 'critical'];\nconst priority = input.priority || 'normal';\nif (!priorityLevels.includes(priority)) {\n  throw new Error(`Invalid priority. Must be one of: ${priorityLevels.join(', ')}`);\n}\n\nreturn {\n  json: {\n    orchestrationId: orchestrationId,\n    task: input.task,\n    priority: priority,\n    deadline: input.deadline || null,\n    deploymentPlan: deploymentPlan,\n    totalAgents: deploymentPlan.length,\n    teamsInvolved: [...new Set(deploymentPlan.map(a => a.team))],\n    startTime: new Date().toISOString(),\n    requestMetadata: {\n      requestId: $input.first().json.headers?.['x-request-id'] || orchestrationId,\n      source: $input.first().json.headers?.['user-agent'] || 'n8n-internal'\n    }\n  }\n};"
+      },
+      "id": "validate-orchestration",
+      "name": "Validate Orchestration Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "deploymentPlan",
+        "options": {
+          "include": "allOtherFields"
+        }
+      },
+      "id": "split-agents",
+      "name": "Split Agents",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare individual agent deployment\n\nconst orchestration = $input.first().json;\nconst agent = orchestration.deploymentPlan;\n\nreturn {\n  json: {\n    orchestrationId: orchestration.orchestrationId,\n    task: orchestration.task,\n    priority: orchestration.priority,\n    agent: {\n      id: agent.agentId,\n      team: agent.team,\n      role: agent.role,\n      skills: agent.skills,\n      order: agent.deploymentOrder\n    },\n    deploymentPayload: {\n      agentId: agent.agentId,\n      task: orchestration.task,\n      priority: orchestration.priority,\n      deadline: orchestration.deadline,\n      context: {\n        orchestrationId: orchestration.orchestrationId,\n        totalAgents: orchestration.totalAgents,\n        teamsInvolved: orchestration.teamsInvolved\n      }\n    }\n  }\n};"
+      },
+      "id": "prepare-agent-deployment",
+      "name": "Prepare Agent Deployment",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://sim-studio:8001/api/agents/deploy",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.deploymentPayload) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "deploy-to-sim-studio",
+      "name": "Deploy to Sim Studio",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process deployment result\n\nconst deploymentResult = $input.first().json;\nconst agentData = $('Prepare Agent Deployment').first().json;\n\nreturn {\n  json: {\n    orchestrationId: agentData.orchestrationId,\n    agentId: agentData.agent.id,\n    agentRole: agentData.agent.role,\n    agentTeam: agentData.agent.team,\n    deploymentOrder: agentData.agent.order,\n    success: deploymentResult.success !== false,\n    simStudioTaskId: deploymentResult.taskId || null,\n    status: deploymentResult.status || 'deployed',\n    error: deploymentResult.error || null,\n    deployedAt: new Date().toISOString()\n  }\n};"
+      },
+      "id": "process-deployment-result",
+      "name": "Process Deployment Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1340, 300]
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "deployments",
+        "include": "allFieldsExcept",
+        "fieldsToExclude": "error"
+      },
+      "id": "aggregate-deployments",
+      "name": "Aggregate Deployments",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [1560, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build orchestration summary\n\nconst deployments = $input.first().json.deployments;\nconst orchestrationId = deployments[0]?.orchestrationId || 'unknown';\n\n// Calculate success metrics\nconst successfulDeployments = deployments.filter(d => d.success);\nconst failedDeployments = deployments.filter(d => !d.success);\n\n// Group by team\nconst teamSummary = {};\ndeployments.forEach(d => {\n  if (!teamSummary[d.agentTeam]) {\n    teamSummary[d.agentTeam] = { deployed: 0, failed: 0, agents: [] };\n  }\n  if (d.success) {\n    teamSummary[d.agentTeam].deployed++;\n  } else {\n    teamSummary[d.agentTeam].failed++;\n  }\n  teamSummary[d.agentTeam].agents.push(d.agentId);\n});\n\nreturn {\n  json: {\n    orchestrationId: orchestrationId,\n    status: failedDeployments.length === 0 ? 'success' : 'partial_failure',\n    summary: {\n      totalAgents: deployments.length,\n      deployed: successfulDeployments.length,\n      failed: failedDeployments.length,\n      successRate: `${((successfulDeployments.length / deployments.length) * 100).toFixed(1)}%`\n    },\n    teamSummary: teamSummary,\n    deployments: deployments.map(d => ({\n      agentId: d.agentId,\n      role: d.agentRole,\n      team: d.agentTeam,\n      status: d.status,\n      taskId: d.simStudioTaskId\n    })),\n    failedDeployments: failedDeployments.map(d => ({\n      agentId: d.agentId,\n      error: d.error\n    })),\n    completedAt: new Date().toISOString()\n  }\n};"
+      },
+      "id": "build-orchestration-summary",
+      "name": "Build Orchestration Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1780, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.DISCORD_WEBHOOK_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"embeds\": [{\n    \"title\": \"Agent Orchestration {{ $json.status === 'success' ? 'Complete' : 'Partial Failure' }}\",\n    \"color\": {{ $json.status === 'success' ? 5763719 : 16744448 }},\n    \"fields\": [\n      {\n        \"name\": \"Orchestration ID\",\n        \"value\": \"{{ $json.orchestrationId }}\",\n        \"inline\": true\n      },\n      {\n        \"name\": \"Success Rate\",\n        \"value\": \"{{ $json.summary.successRate }}\",\n        \"inline\": true\n      },\n      {\n        \"name\": \"Agents\",\n        \"value\": \"{{ $json.summary.deployed }}/{{ $json.summary.totalAgents }} deployed\",\n        \"inline\": true\n      },\n      {\n        \"name\": \"Teams Involved\",\n        \"value\": \"{{ Object.keys($json.teamSummary).join(', ') }}\"\n      },\n      {\n        \"name\": \"Deployed Agents\",\n        \"value\": \"{{ $json.deployments.map(d => d.agentId + ' (' + d.role + ')').join('\\\\n').substring(0, 1000) }}\"\n      }\n    ],\n    \"footer\": {\n      \"text\": \"Ziggie Agent Orchestration\"\n    },\n    \"timestamp\": \"{{ $json.completedAt }}\"\n  }]\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "discord-orchestration-notify",
+      "name": "Discord Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2000, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "orchestration-response",
+      "name": "Orchestration Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2220, 300]
+    }
+  ],
+  "connections": {
+    "Orchestrate Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Orchestration Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Orchestration Request": {
+      "main": [
+        [
+          {
+            "node": "Split Agents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Agents": {
+      "main": [
+        [
+          {
+            "node": "Prepare Agent Deployment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Agent Deployment": {
+      "main": [
+        [
+          {
+            "node": "Deploy to Sim Studio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deploy to Sim Studio": {
+      "main": [
+        [
+          {
+            "node": "Process Deployment Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Deployment Result": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Deployments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Deployments": {
+      "main": [
+        [
+          {
+            "node": "Build Orchestration Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Orchestration Summary": {
+      "main": [
+        [
+          {
+            "node": "Discord Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Orchestration Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "ziggie-agent-orchestration"
+  },
+  "pinData": {},
+  "versionId": "1.0.0",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "name": "agent-orchestration",
+      "id": "tag-orchestration"
+    },
+    {
+      "name": "sim-studio",
+      "id": "tag-sim-studio"
+    },
+    {
+      "name": "elite-teams",
+      "id": "tag-elite"
+    }
+  ]
+}

@@ -1,0 +1,399 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                      AGENT PROCESS LIFECYCLE FLOW                            ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  1. SPAWN AGENT                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    spawn_agent(request)
+           │
+           ├─→ Update state: SPAWNING
+           │
+           ├─→ Create agent directory
+           │
+           ├─→ Write prompt file
+           │
+           ├─→ Prepare environment vars
+           │
+           ├─→ Create log files (stdout/stderr)
+           │
+           ├─→ subprocess.Popen()
+           │       │
+           │       ├─→ start_new_session=True (process group)
+           │       ├─→ stdout → stdout.log
+           │       └─→ stderr → stderr.log
+           │
+           ├─→ Wait 100ms for startup
+           │
+           ├─→ Verify: process.poll() == None?
+           │       │
+           │       ├─→ NO → RuntimeError → FAIL
+           │       └─→ YES → Continue
+           │
+           ├─→ Verify: psutil.Process(pid).is_running()?
+           │       │
+           │       ├─→ NO → RuntimeError → FAIL
+           │       └─→ YES → Continue
+           │
+           ├─→ Store in self.processes[agent_id]
+           │
+           ├─→ Store in self.agent_info[agent_id]
+           │
+           ├─→ Update state: RUNNING (with PID)
+           │
+           └─→ Return DeploymentResponse(RUNNING, pid)
+
+    ERROR HANDLING:
+    ├─→ subprocess.SubprocessError → _handle_spawn_failure()
+    ├─→ psutil.Error → _handle_spawn_failure()
+    ├─→ OSError → _handle_spawn_failure()
+    └─→ Exception → _handle_spawn_failure()
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  2. MONITOR HEALTH                                                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    get_agent_status(agent_id)
+           │
+           ├─→ Get process from self.processes[agent_id]
+           │
+           ├─→ Check: process.poll()
+           │       │
+           │       ├─→ None (running)
+           │       │       │
+           │       │       ├─→ psutil.Process(pid)
+           │       │       │       │
+           │       │       │       ├─→ Check status (zombie?)
+           │       │       │       │       │
+           │       │       │       │       ├─→ YES → is_zombie = True
+           │       │       │       │       └─→ NO → Continue
+           │       │       │       │
+           │       │       │       ├─→ Get CPU usage (100ms sample)
+           │       │       │       ├─→ Get memory usage (RSS)
+           │       │       │       ├─→ Calculate runtime
+           │       │       │       ├─→ Get thread count
+           │       │       │       └─→ Get command line
+           │       │       │
+           │       │       └─→ process_alive = True
+           │       │
+           │       └─→ Exit code (terminated)
+           │               │
+           │               ├─→ process_alive = False
+           │               ├─→ exit_code = returncode
+           │               │
+           │               └─→ Update state:
+           │                       ├─→ exit_code == 0 → COMPLETED
+           │                       └─→ exit_code != 0 → FAILED
+           │
+           ├─→ Load file-based status (status.json)
+           │
+           ├─→ Load persistent state (state_manager)
+           │
+           └─→ Determine health:
+                   ├─→ is_zombie → "zombie"
+                   ├─→ process_alive → "healthy"
+                   ├─→ exit_code == 0 → "completed"
+                   ├─→ exit_code != 0 → "failed"
+                   └─→ else → "unknown"
+
+    RETURN STATUS:
+    {
+        "agent_id": str,
+        "process_alive": bool,
+        "process_status": str,
+        "exit_code": int | None,
+        "is_zombie": bool,
+        "cpu_percent": float,
+        "memory_mb": float,
+        "runtime_seconds": int,
+        "num_threads": int,
+        "health": str
+    }
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  3. GRACEFUL CLEANUP                                                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    cleanup(agent_id, force=False)
+           │
+           ├─→ Get process from self.processes[agent_id]
+           │
+           ├─→ Check if already exited: process.poll()
+           │       │
+           │       ├─→ Exited
+           │       │       │
+           │       │       ├─→ Update state based on exit_code
+           │       │       │       ├─→ 0 → COMPLETED
+           │       │       │       └─→ != 0 → FAILED
+           │       │       │
+           │       │       └─→ Remove from self.processes
+           │       │
+           │       └─→ Still running → Continue to termination
+           │
+           ├─→ Get psutil.Process(pid)
+           │
+           ├─→ Check if zombie
+           │       │
+           │       ├─→ YES (STATUS_ZOMBIE)
+           │       │       │
+           │       │       ├─→ process.wait(timeout=1)  # Reap
+           │       │       └─→ Remove from self.processes
+           │       │
+           │       └─→ NO → Continue to termination
+           │
+           ├─→ Get child processes (recursive)
+           │
+           ├─→ Terminate parent process:
+           │       │
+           │       ├─→ force=True?
+           │       │       │
+           │       │       └─→ YES → proc.kill() → wait(5s) → Done
+           │       │
+           │       └─→ force=False (graceful):
+           │               │
+           │               ├─→ STAGE 1: SIGTERM
+           │               │       │
+           │               │       ├─→ proc.terminate()
+           │               │       ├─→ wait(timeout=10)
+           │               │       │       │
+           │               │       │       ├─→ Success → Done
+           │               │       │       └─→ Timeout → Stage 2
+           │               │
+           │               ├─→ STAGE 2: SIGTERM (again)
+           │               │       │
+           │               │       ├─→ proc.terminate()
+           │               │       ├─→ wait(timeout=5)
+           │               │       │       │
+           │               │       │       ├─→ Success → Done
+           │               │       │       └─→ Timeout → Stage 3
+           │               │
+           │               └─→ STAGE 3: SIGKILL
+           │                       │
+           │                       ├─→ proc.kill()
+           │                       ├─→ wait(timeout=5)
+           │                       │       │
+           │                       │       ├─→ Success → Done
+           │                       │       └─→ Timeout → ERROR (log)
+           │
+           ├─→ Cleanup child processes:
+           │       │
+           │       └─→ For each child:
+           │               ├─→ child.terminate()
+           │               ├─→ wait(timeout=3)
+           │               │       │
+           │               │       ├─→ Success → Continue
+           │               │       └─→ Timeout → child.kill()
+           │
+           ├─→ Update state: CANCELLED
+           │
+           └─→ Remove from self.processes[agent_id]
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  4. ZOMBIE REAPING                                                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    reap_zombies()
+           │
+           └─→ For each agent_id, process in self.processes:
+                   │
+                   ├─→ Get psutil.Process(pid)
+                   │
+                   ├─→ Check: proc.status() == STATUS_ZOMBIE?
+                   │       │
+                   │       ├─→ NO → Continue to next
+                   │       │
+                   │       └─→ YES (zombie found)
+                   │               │
+                   │               ├─→ process.wait(timeout=1)  # Reap
+                   │               │
+                   │               ├─→ Get exit_code
+                   │               │
+                   │               ├─→ Update state:
+                   │               │       ├─→ exit_code == 0 → COMPLETED
+                   │               │       └─→ exit_code != 0 → FAILED
+                   │               │
+                   │               ├─→ Remove from self.processes
+                   │               │
+                   │               └─→ Add to reaped list
+                   │
+                   └─→ Return reaped list
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  5. ERROR HANDLING                                                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    _handle_spawn_failure(request, error_msg, process, agent_dir)
+           │
+           ├─→ Kill process if exists:
+           │       │
+           │       └─→ process.poll() == None?
+           │               │
+           │               ├─→ YES (running)
+           │               │       │
+           │               │       ├─→ process.kill()
+           │               │       └─→ wait(timeout=5)
+           │               │
+           │               └─→ NO → Skip
+           │
+           ├─→ Update state: FAILED (with error message)
+           │
+           └─→ Write error log to agent_dir/error.log
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                           STATE TRANSITIONS                                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+    SPAWNING → RUNNING → COMPLETED
+                  │
+                  ├──→ FAILED (exit code != 0)
+                  │
+                  └──→ CANCELLED (manual cleanup)
+
+    SPAWNING → FAILED (spawn error)
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                          PROCESS HEALTH STATES                               ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+    ┌──────────┐
+    │ HEALTHY  │  process_alive=True, status=running, not zombie
+    └──────────┘
+         │
+         ├──→ Time passes → HEALTHY (continues)
+         │
+         ├──→ Graceful exit → COMPLETED (exit_code=0)
+         │
+         ├──→ Error exit → FAILED (exit_code!=0)
+         │
+         ├──→ Parent dies → ZOMBIE (status=STATUS_ZOMBIE)
+         │
+         └──→ Manual kill → CANCELLED
+
+    ┌──────────┐
+    │  ZOMBIE  │  process_alive=False, status=zombie
+    └──────────┘
+         │
+         └──→ process.wait() → REAPED → COMPLETED or FAILED
+
+    ┌────────────┐
+    │ COMPLETED  │  exit_code=0, process terminated successfully
+    └────────────┘
+
+    ┌──────────┐
+    │  FAILED  │  exit_code!=0, process crashed or error
+    └──────────┘
+
+    ┌────────────┐
+    │ CANCELLED  │  Manual termination via cleanup()
+    └────────────┘
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                         MONITORING UTILITIES                                 ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+    check_process_health(agent_id)
+    │
+    ├─→ Quick check: process.poll() == None?
+    └─→ psutil check: is_running() and not zombie?
+
+    Return: bool (True = healthy, False = not healthy)
+
+    ───────────────────────────────────────────────────────────────
+
+    monitor_all_agents()
+    │
+    └─→ For each agent_id in self.processes:
+            └─→ status = get_agent_status(agent_id)
+
+    Return: Dict[agent_id, status]
+
+    ───────────────────────────────────────────────────────────────
+
+    get_process_summary()
+    │
+    └─→ Aggregate:
+            ├─→ Count by health status
+            ├─→ Sum CPU usage
+            ├─→ Sum memory usage
+            └─→ List all agents
+
+    Return: {
+        "total_agents": int,
+        "running": int,
+        "zombie": int,
+        "completed": int,
+        "failed": int,
+        "total_memory_mb": float,
+        "total_cpu_percent": float,
+        "agents": [...]
+    }
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                      RESOURCE MONITORING FLOW                                ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+    psutil.Process(pid)
+           │
+           ├─→ cpu_percent(interval=0.1)      → CPU usage %
+           ├─→ memory_info().rss              → Memory bytes
+           ├─→ create_time()                  → Start timestamp
+           ├─→ num_threads()                  → Thread count
+           ├─→ cmdline()                      → Command line args
+           ├─→ status()                       → Process status
+           ├─→ is_running()                   → Running bool
+           └─→ children(recursive=True)       → Child processes
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                            TIMING DIAGRAM                                    ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+    Graceful Cleanup Timeline:
+
+    T=0s    ├─→ SIGTERM sent
+    T=0-10s │   [Process cleans up resources, flushes buffers]
+    T=10s   ├─→ Timeout → Check if alive
+            │
+            ├─→ SIGTERM sent again
+    T=10-15s│   [Process gets another chance]
+    T=15s   ├─→ Timeout → Check if alive
+            │
+            ├─→ SIGKILL sent (force)
+    T=15-20s│   [OS terminates immediately]
+    T=20s   └─→ Done (or ERROR if still alive)
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                        TYPICAL USAGE FLOW                                    ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+    1. Coordinator receives deployment request
+            ↓
+    2. spawner.spawn_agent(request)
+            ↓
+    3. Process spawned, PID tracked
+            ↓
+    4. Periodic monitoring:
+       - spawner.get_agent_status(agent_id)
+       - spawner.check_process_health(agent_id)
+            ↓
+    5. Agent completes work
+            ↓
+    6. Process exits (detected via poll())
+            ↓
+    7. State updated: COMPLETED
+            ↓
+    8. (Optional) spawner.cleanup() to clean up resources
+
+    OR
+
+    5. Need to stop agent
+            ↓
+    6. spawner.cleanup(agent_id)
+            ↓
+    7. Three-stage termination
+            ↓
+    8. State updated: CANCELLED
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                           END OF FLOW DIAGRAM                                ║
+╚══════════════════════════════════════════════════════════════════════════════╝

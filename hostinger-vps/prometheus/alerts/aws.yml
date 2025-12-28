@@ -1,0 +1,250 @@
+# =============================================================================
+# AWS CLOUDWATCH ALERT RULES
+# =============================================================================
+# Critical alerts for AWS resources (S3, Lambda, Secrets Manager)
+# Metrics collected via YACE CloudWatch Exporter
+# =============================================================================
+
+groups:
+  - name: aws
+    interval: 60s  # CloudWatch metrics have 1-minute resolution
+    rules:
+      # =========================================================================
+      # AWS S3 ALERTS
+      # =========================================================================
+
+      - alert: AWSS3BucketSizeHigh
+        expr: aws_s3_bucket_size_bytes{bucket=~"ziggie-.*"} > 50 * 1024 * 1024 * 1024  # 50GB
+        for: 30m
+        labels:
+          severity: warning
+          tier: cloud
+          service: s3
+        annotations:
+          summary: "S3 bucket {{ $labels.bucket }} size high"
+          description: "Bucket size is {{ $value | humanize }}B. Consider cleanup or archival."
+
+      - alert: AWSS3BucketSizeCritical
+        expr: aws_s3_bucket_size_bytes{bucket=~"ziggie-.*"} > 100 * 1024 * 1024 * 1024  # 100GB
+        for: 30m
+        labels:
+          severity: critical
+          tier: cloud
+          service: s3
+        annotations:
+          summary: "S3 bucket {{ $labels.bucket }} size critical"
+          description: "Bucket size is {{ $value | humanize }}B. Immediate action required."
+
+      - alert: AWSS3BucketObjectCountHigh
+        expr: aws_s3_number_of_objects{bucket=~"ziggie-.*"} > 100000
+        for: 1h
+        labels:
+          severity: warning
+          tier: cloud
+          service: s3
+        annotations:
+          summary: "High object count in S3 bucket {{ $labels.bucket }}"
+          description: "Bucket has {{ $value }} objects. Consider lifecycle policies."
+
+      - alert: AWSS34xxErrors
+        expr: rate(aws_s3_4xx_errors_total{bucket=~"ziggie-.*"}[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+          tier: cloud
+          service: s3
+        annotations:
+          summary: "High S3 4xx error rate for {{ $labels.bucket }}"
+          description: "{{ $value | printf \"%.1f\" }} 4xx errors per second"
+
+      - alert: AWSS35xxErrors
+        expr: rate(aws_s3_5xx_errors_total{bucket=~"ziggie-.*"}[5m]) > 1
+        for: 5m
+        labels:
+          severity: critical
+          tier: cloud
+          service: s3
+        annotations:
+          summary: "S3 5xx errors for {{ $labels.bucket }}"
+          description: "S3 is returning server errors. {{ $value | printf \"%.1f\" }} errors per second"
+
+      # =========================================================================
+      # AWS LAMBDA ALERTS
+      # =========================================================================
+
+      - alert: AWSLambdaErrors
+        expr: rate(aws_lambda_errors_total{function_name=~"ziggie-.*"}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          tier: cloud
+          service: lambda
+        annotations:
+          summary: "Lambda {{ $labels.function_name }} errors"
+          description: "{{ $value | printf \"%.2f\" }} errors per second"
+
+      - alert: AWSLambdaCriticalErrors
+        expr: rate(aws_lambda_errors_total{function_name=~"ziggie-.*"}[5m]) > 1
+        for: 2m
+        labels:
+          severity: critical
+          tier: cloud
+          service: lambda
+        annotations:
+          summary: "Critical Lambda {{ $labels.function_name }} errors"
+          description: "High error rate: {{ $value | printf \"%.1f\" }} errors per second"
+
+      - alert: AWSLambdaThrottled
+        expr: rate(aws_lambda_throttles_total{function_name=~"ziggie-.*"}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          tier: cloud
+          service: lambda
+        annotations:
+          summary: "Lambda {{ $labels.function_name }} being throttled"
+          description: "{{ $value | printf \"%.2f\" }} throttles per second"
+
+      - alert: AWSLambdaHighDuration
+        expr: aws_lambda_duration_seconds{function_name=~"ziggie-.*",quantile="0.95"} > 10
+        for: 10m
+        labels:
+          severity: warning
+          tier: cloud
+          service: lambda
+        annotations:
+          summary: "Long Lambda {{ $labels.function_name }} execution"
+          description: "95th percentile duration is {{ $value | printf \"%.1f\" }}s"
+
+      - alert: AWSLambdaHighConcurrency
+        expr: aws_lambda_concurrent_executions{function_name=~"ziggie-.*"} > 100
+        for: 5m
+        labels:
+          severity: warning
+          tier: cloud
+          service: lambda
+        annotations:
+          summary: "High Lambda {{ $labels.function_name }} concurrency"
+          description: "{{ $value }} concurrent executions"
+
+      - alert: AWSLambdaColdStarts
+        expr: rate(aws_lambda_cold_starts_total{function_name=~"ziggie-.*"}[5m]) > 5
+        for: 10m
+        labels:
+          severity: info
+          tier: cloud
+          service: lambda
+        annotations:
+          summary: "High cold start rate for {{ $labels.function_name }}"
+          description: "{{ $value | printf \"%.1f\" }} cold starts per second. Consider provisioned concurrency."
+
+      # =========================================================================
+      # AWS SECRETS MANAGER ALERTS
+      # =========================================================================
+
+      - alert: AWSSecretsManagerErrors
+        expr: rate(aws_secretsmanager_api_errors_total{secret_id=~"ziggie/.*"}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          tier: cloud
+          service: secrets-manager
+        annotations:
+          summary: "Secrets Manager API errors for {{ $labels.secret_id }}"
+          description: "{{ $value | printf \"%.2f\" }} errors per second"
+
+      - alert: AWSSecretsManagerSecretExpiring
+        expr: aws_secretsmanager_secret_days_until_rotation < 7
+        for: 1h
+        labels:
+          severity: warning
+          tier: cloud
+          service: secrets-manager
+        annotations:
+          summary: "Secret {{ $labels.secret_id }} rotation due"
+          description: "Secret will expire in {{ $value }} days"
+
+      - alert: AWSSecretsManagerSecretExpired
+        expr: aws_secretsmanager_secret_days_until_rotation < 0
+        for: 0m
+        labels:
+          severity: critical
+          tier: cloud
+          service: secrets-manager
+        annotations:
+          summary: "Secret {{ $labels.secret_id }} has expired"
+          description: "Secret is past rotation date. Immediate rotation required."
+
+      # =========================================================================
+      # AWS COST ALERTS
+      # =========================================================================
+
+      - alert: AWSCostBudget50Percent
+        expr: aws_billing_estimated_charges_usd > 25  # 50% of $50 budget
+        for: 1h
+        labels:
+          severity: info
+          tier: cloud
+          service: billing
+        annotations:
+          summary: "AWS costs at 50% of budget"
+          description: "Current estimated charges: ${{ $value | printf \"%.2f\" }}"
+
+      - alert: AWSCostBudget80Percent
+        expr: aws_billing_estimated_charges_usd > 40  # 80% of $50 budget
+        for: 1h
+        labels:
+          severity: warning
+          tier: cloud
+          service: billing
+        annotations:
+          summary: "AWS costs at 80% of budget"
+          description: "Current estimated charges: ${{ $value | printf \"%.2f\" }}. Review usage."
+
+      - alert: AWSCostBudgetExceeded
+        expr: aws_billing_estimated_charges_usd > 50
+        for: 1h
+        labels:
+          severity: critical
+          tier: cloud
+          service: billing
+        annotations:
+          summary: "AWS budget exceeded"
+          description: "Current estimated charges: ${{ $value | printf \"%.2f\" }}. Immediate action required."
+
+      # =========================================================================
+      # AWS GPU INSTANCE ALERTS
+      # =========================================================================
+
+      - alert: AWSGPUInstanceIdle
+        expr: aws_ec2_cpu_utilization{instance_type=~"g4dn.*|p3.*|p4d.*"} < 5
+        for: 30m
+        labels:
+          severity: warning
+          tier: cloud
+          service: ec2
+        annotations:
+          summary: "GPU instance {{ $labels.instance_id }} is idle"
+          description: "CPU utilization is {{ $value | printf \"%.1f\" }}% for 30 minutes. Consider shutdown."
+
+      - alert: AWSGPUInstanceRunningLong
+        expr: aws_ec2_instance_running_hours{instance_type=~"g4dn.*|p3.*|p4d.*"} > 4
+        for: 0m
+        labels:
+          severity: warning
+          tier: cloud
+          service: ec2
+        annotations:
+          summary: "GPU instance {{ $labels.instance_id }} running for {{ $value }} hours"
+          description: "Consider shutting down if not in use. Hourly cost: ~$0.50-3.00"
+
+      - alert: AWSSpotInstanceInterruption
+        expr: aws_ec2_spot_instance_interruption_warning == 1
+        for: 0m
+        labels:
+          severity: critical
+          tier: cloud
+          service: ec2
+        annotations:
+          summary: "Spot instance {{ $labels.instance_id }} interruption warning"
+          description: "Instance will be terminated in 2 minutes. Save work immediately."

@@ -1,0 +1,11 @@
+{
+  "agent_id": "L1.OVERWATCH.1",
+  "status": "completed",
+  "started_at": "2025-11-09T23:07:46.032027",
+  "pid": 34264,
+  "progress": 100,
+  "last_updated": "2025-11-09T23:08:10.513002",
+  "stop_reason": "end_turn",
+  "input_tokens": 1094,
+  "output_tokens": 1347
+}

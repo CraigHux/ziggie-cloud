@@ -1,0 +1,180 @@
+# =============================================================================
+# AWS SNS INTEGRATION FOR ALERTMANAGER
+# =============================================================================
+# Integration configuration for routing alerts to AWS SNS topics
+# Requires: alertmanager-sns-forwarder sidecar container
+# =============================================================================
+
+# SNS Forwarder Configuration (webhook receiver in Alertmanager)
+# Add to alertmanager.yml receivers section:
+
+# Example receiver configuration:
+# - name: 'sns-critical'
+#   webhook_configs:
+#     - url: 'http://alertmanager-sns-forwarder:9087/alert/critical'
+#       send_resolved: true
+
+# - name: 'sns-warning'
+#   webhook_configs:
+#     - url: 'http://alertmanager-sns-forwarder:9087/alert/warning'
+#       send_resolved: true
+
+---
+# Docker Compose Service Definition
+# Add to docker-compose.yml:
+
+# alertmanager-sns-forwarder:
+#   image: datareply/alertmanager-sns-forwarder:latest
+#   container_name: ziggie-sns-forwarder
+#   restart: unless-stopped
+#   ports:
+#     - "9087:9087"
+#   environment:
+#     - AWS_REGION=eu-north-1
+#     - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+#     - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+#     - SNS_FORWARDER_ARN_PREFIX=arn:aws:sns:eu-north-1:${AWS_ACCOUNT_ID}:ziggie-
+#   volumes:
+#     - ./alertmanager/sns-topics.json:/etc/sns-forwarder/topics.json:ro
+#   networks:
+#     - ziggie-network
+#   depends_on:
+#     - alertmanager
+
+---
+# SNS Topics Mapping (sns-topics.json)
+{
+  "critical": "arn:aws:sns:eu-north-1:${AWS_ACCOUNT_ID}:ziggie-critical-alerts",
+  "warning": "arn:aws:sns:eu-north-1:${AWS_ACCOUNT_ID}:ziggie-warning-alerts",
+  "database": "arn:aws:sns:eu-north-1:${AWS_ACCOUNT_ID}:ziggie-database-alerts",
+  "infrastructure": "arn:aws:sns:eu-north-1:${AWS_ACCOUNT_ID}:ziggie-infrastructure-alerts",
+  "application": "arn:aws:sns:eu-north-1:${AWS_ACCOUNT_ID}:ziggie-application-alerts"
+}
+
+---
+# AWS SNS Topic Creation (Terraform)
+# File: aws-config/sns-topics.tf
+
+# resource "aws_sns_topic" "ziggie_critical_alerts" {
+#   name              = "ziggie-critical-alerts"
+#   display_name      = "Ziggie Critical Alerts"
+#   kms_master_key_id = "alias/aws/sns"
+#
+#   tags = {
+#     Environment = "production"
+#     Project     = "ziggie"
+#     Tier        = "monitoring"
+#   }
+# }
+
+# resource "aws_sns_topic_subscription" "critical_email" {
+#   topic_arn = aws_sns_topic.ziggie_critical_alerts.arn
+#   protocol  = "email"
+#   endpoint  = "team@ziggie.cloud"
+# }
+
+# resource "aws_sns_topic_subscription" "critical_sms" {
+#   topic_arn = aws_sns_topic.ziggie_critical_alerts.arn
+#   protocol  = "sms"
+#   endpoint  = "+1234567890"  # Replace with actual phone
+# }
+
+# Repeat for warning, database, infrastructure, application topics
+
+---
+# Alternative: Direct SNS Integration (Python Lambda)
+# Deploy Lambda function triggered by CloudWatch Events from Prometheus
+
+# import boto3
+# import json
+# import os
+#
+# sns_client = boto3.client('sns', region_name='eu-north-1')
+#
+# def lambda_handler(event, context):
+#     """
+#     Forward Prometheus alerts to SNS topics based on severity
+#     """
+#     alert_data = json.loads(event['body'])
+#
+#     for alert in alert_data.get('alerts', []):
+#         severity = alert['labels'].get('severity', 'warning')
+#         service = alert['labels'].get('service', 'unknown')
+#         summary = alert['annotations'].get('summary', 'No summary')
+#         description = alert['annotations'].get('description', 'No description')
+#
+#         # Determine SNS topic
+#         topic_arn = get_topic_arn(severity, service)
+#
+#         # Format message
+#         message = format_sns_message(alert)
+#
+#         # Publish to SNS
+#         sns_client.publish(
+#             TopicArn=topic_arn,
+#             Subject=f"[{severity.upper()}] {summary}",
+#             Message=message,
+#             MessageAttributes={
+#                 'severity': {'DataType': 'String', 'StringValue': severity},
+#                 'service': {'DataType': 'String', 'StringValue': service}
+#             }
+#         )
+#
+#     return {'statusCode': 200, 'body': 'Alerts forwarded'}
+#
+# def get_topic_arn(severity, service):
+#     topics = {
+#         'critical': os.environ['SNS_TOPIC_CRITICAL'],
+#         'warning': os.environ['SNS_TOPIC_WARNING'],
+#         'database': os.environ['SNS_TOPIC_DATABASE'],
+#     }
+#     return topics.get(severity, topics['warning'])
+#
+# def format_sns_message(alert):
+#     return f"""
+# Alert: {alert['annotations']['summary']}
+# Severity: {alert['labels']['severity']}
+# Service: {alert['labels'].get('service', 'N/A')}
+# Description: {alert['annotations']['description']}
+# Started: {alert['startsAt']}
+# Status: {alert['status']}
+# """
+
+---
+# Deployment Steps:
+
+# 1. Create SNS Topics in AWS Console or via Terraform
+#    - ziggie-critical-alerts
+#    - ziggie-warning-alerts
+#    - ziggie-database-alerts
+#    - ziggie-infrastructure-alerts
+#    - ziggie-application-alerts
+
+# 2. Subscribe endpoints to topics:
+#    - Email: team@ziggie.cloud (all topics)
+#    - SMS: critical-alerts only
+#    - Lambda: for custom routing/enrichment
+
+# 3. Deploy alertmanager-sns-forwarder sidecar:
+#    docker compose up -d alertmanager-sns-forwarder
+
+# 4. Update alertmanager.yml receivers:
+#    Add webhook_configs pointing to forwarder
+
+# 5. Reload Alertmanager:
+#    docker exec ziggie-alertmanager kill -HUP 1
+
+# 6. Test alert:
+#    curl -X POST http://localhost:9093/api/v1/alerts -d '[...]'
+
+---
+# Environment Variables Required:
+
+# AWS_REGION=eu-north-1
+# AWS_ACCESS_KEY_ID=<from secrets manager>
+# AWS_SECRET_ACCESS_KEY=<from secrets manager>
+# AWS_ACCOUNT_ID=<your account ID>
+
+# Slack Integration (fallback if SNS fails):
+# SLACK_WEBHOOK_URL=<webhook URL>
+# SLACK_CHANNEL=#ziggie-critical

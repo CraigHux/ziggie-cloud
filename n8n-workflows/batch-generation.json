@@ -1,0 +1,341 @@
+{
+  "name": "Batch Asset Generation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "batch-generate",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "batch-webhook",
+      "name": "Batch Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "batch-generate-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Batch Validation Node\n// Expects: { assets: [{ asset_type, prompt, faction_color, output_format }, ...] }\n\nconst input = $input.first().json;\n\n// Validate assets array exists\nif (!input.assets || !Array.isArray(input.assets)) {\n  throw new Error('Missing or invalid \"assets\" array in request body');\n}\n\nif (input.assets.length === 0) {\n  throw new Error('Assets array cannot be empty');\n}\n\n// Maximum batch size\nconst MAX_BATCH_SIZE = 50;\nif (input.assets.length > MAX_BATCH_SIZE) {\n  throw new Error(`Batch size exceeds maximum of ${MAX_BATCH_SIZE}. Received: ${input.assets.length}`);\n}\n\n// Valid values\nconst validAssetTypes = ['unit_sprite', 'building', 'terrain_tile', 'hero', 'effect', 'prop'];\nconst validFactions = ['red', 'blue', 'green', 'gold', 'neutral'];\nconst validFormats = ['png', 'webp', 'jpg'];\n\n// Validate each asset in the batch\nconst validatedAssets = input.assets.map((asset, index) => {\n  // Required field check\n  if (!asset.asset_type || !asset.prompt) {\n    throw new Error(`Asset at index ${index} missing required fields (asset_type, prompt)`);\n  }\n  \n  // Validate asset_type\n  if (!validAssetTypes.includes(asset.asset_type)) {\n    throw new Error(`Asset at index ${index} has invalid asset_type: ${asset.asset_type}`);\n  }\n  \n  // Apply defaults\n  const factionColor = asset.faction_color || 'neutral';\n  const outputFormat = asset.output_format || 'png';\n  \n  if (!validFactions.includes(factionColor)) {\n    throw new Error(`Asset at index ${index} has invalid faction_color: ${factionColor}`);\n  }\n  \n  if (!validFormats.includes(outputFormat)) {\n    throw new Error(`Asset at index ${index} has invalid output_format: ${outputFormat}`);\n  }\n  \n  return {\n    index: index,\n    assetType: asset.asset_type,\n    prompt: asset.prompt,\n    factionColor: factionColor,\n    outputFormat: outputFormat,\n    width: asset.width || 1024,\n    height: asset.height || 1024,\n    negativePrompt: asset.negative_prompt || 'blurry, low quality, distorted, watermark, text'\n  };\n});\n\n// Generate batch ID\nconst batchId = `batch_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;\n\nreturn {\n  json: {\n    batchId: batchId,\n    totalAssets: validatedAssets.length,\n    assets: validatedAssets,\n    startTime: new Date().toISOString(),\n    priority: input.priority || 'normal',\n    notifyOnComplete: input.notify_on_complete !== false\n  }\n};"
+      },
+      "id": "validate-batch",
+      "name": "Validate Batch",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "assets",
+        "options": {
+          "include": "allOtherFields"
+        }
+      },
+      "id": "split-assets",
+      "name": "Split Assets",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare individual asset for generation\n\nconst batchData = $input.first().json;\nconst asset = batchData.assets;\n\n// Build enhanced prompt based on asset type\nconst assetTypePromptAdditions = {\n  'unit_sprite': ', isometric view, game sprite, transparent background, pixel perfect edges',\n  'building': ', isometric view, game building asset, detailed architecture, transparent background',\n  'terrain_tile': ', seamless tileable texture, top-down isometric view, game terrain',\n  'hero': ', detailed character art, isometric view, game hero sprite, transparent background',\n  'effect': ', VFX effect, transparent background, particle effect, game ready',\n  'prop': ', game prop asset, isometric view, detailed, transparent background'\n};\n\nconst enhancedPrompt = asset.prompt + (assetTypePromptAdditions[asset.assetType] || '');\n\n// Generate unique asset ID\nconst assetId = `${asset.assetType}_${Date.now()}_${asset.index}_${Math.random().toString(36).substr(2, 6)}`;\n\nreturn {\n  json: {\n    batchId: batchData.batchId,\n    assetIndex: asset.index,\n    totalAssets: batchData.totalAssets,\n    assetId: assetId,\n    assetType: asset.assetType,\n    originalPrompt: asset.prompt,\n    enhancedPrompt: enhancedPrompt,\n    factionColor: asset.factionColor,\n    outputFormat: asset.outputFormat,\n    width: asset.width,\n    height: asset.height,\n    negativePrompt: asset.negativePrompt,\n    priority: batchData.priority,\n    notifyOnComplete: batchData.notifyOnComplete\n  }\n};"
+      },
+      "id": "prepare-asset",
+      "name": "Prepare Asset",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:5678/webhook/generate-asset",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"asset_type\": \"{{ $json.assetType }}\",\n  \"prompt\": \"{{ $json.originalPrompt }}\",\n  \"faction_color\": \"{{ $json.factionColor }}\",\n  \"output_format\": \"{{ $json.outputFormat }}\",\n  \"width\": {{ $json.width }},\n  \"height\": {{ $json.height }},\n  \"negative_prompt\": \"{{ $json.negativePrompt }}\"\n}",
+        "options": {
+          "timeout": 180000,
+          "batching": {
+            "batch": {
+              "batchSize": 3,
+              "batchInterval": 5000
+            }
+          }
+        }
+      },
+      "id": "call-generation-pipeline",
+      "name": "Call Generation Pipeline",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect generation results\n\nconst result = $input.first().json;\nconst assetData = $('Prepare Asset').first().json;\n\nreturn {\n  json: {\n    batchId: assetData.batchId,\n    assetIndex: assetData.assetIndex,\n    totalAssets: assetData.totalAssets,\n    assetId: result.assetId || assetData.assetId,\n    assetType: assetData.assetType,\n    success: result.success === true,\n    assetUrl: result.assetUrl || null,\n    error: result.error || null,\n    metadata: result.metadata || null,\n    notifyOnComplete: assetData.notifyOnComplete\n  }\n};"
+      },
+      "id": "collect-result",
+      "name": "Collect Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1340, 300]
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "results",
+        "include": "allFieldsExcept",
+        "fieldsToExclude": "notifyOnComplete"
+      },
+      "id": "aggregate-results",
+      "name": "Aggregate Results",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [1560, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build batch summary\n\nconst items = $input.first().json.results;\n\nconst batchId = items[0]?.batchId || 'unknown';\nconst totalAssets = items[0]?.totalAssets || items.length;\n\n// Calculate success/failure counts\nconst successCount = items.filter(item => item.success).length;\nconst failureCount = items.filter(item => !item.success).length;\n\n// Collect all asset URLs\nconst successfulAssets = items\n  .filter(item => item.success)\n  .map(item => ({\n    assetId: item.assetId,\n    assetType: item.assetType,\n    assetUrl: item.assetUrl\n  }));\n\n// Collect failed assets with errors\nconst failedAssets = items\n  .filter(item => !item.success)\n  .map(item => ({\n    assetId: item.assetId,\n    assetType: item.assetType,\n    assetIndex: item.assetIndex,\n    error: item.error\n  }));\n\nreturn {\n  json: {\n    batchId: batchId,\n    summary: {\n      total: totalAssets,\n      successful: successCount,\n      failed: failureCount,\n      successRate: `${((successCount / totalAssets) * 100).toFixed(1)}%`\n    },\n    successfulAssets: successfulAssets,\n    failedAssets: failedAssets,\n    completedAt: new Date().toISOString(),\n    notifyOnComplete: items[0]?.notifyOnComplete !== false\n  }\n};"
+      },
+      "id": "build-summary",
+      "name": "Build Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1780, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "notify-check",
+              "leftValue": "={{ $json.notifyOnComplete }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "should-notify",
+      "name": "Should Notify?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [2000, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.DISCORD_WEBHOOK_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"embeds\": [{\n    \"title\": \"Batch Generation Complete\",\n    \"color\": {{ $json.summary.failed > 0 ? 16744448 : 5763719 }},\n    \"fields\": [\n      {\n        \"name\": \"Batch ID\",\n        \"value\": \"{{ $json.batchId }}\",\n        \"inline\": true\n      },\n      {\n        \"name\": \"Success Rate\",\n        \"value\": \"{{ $json.summary.successRate }}\",\n        \"inline\": true\n      },\n      {\n        \"name\": \"Statistics\",\n        \"value\": \"Total: {{ $json.summary.total }} | Success: {{ $json.summary.successful }} | Failed: {{ $json.summary.failed }}\"\n      }\n    ],\n    \"footer\": {\n      \"text\": \"Ziggie Batch Pipeline\"\n    },\n    \"timestamp\": \"{{ $json.completedAt }}\"\n  }]\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "discord-batch-notify",
+      "name": "Discord Batch Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2220, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "batch-response",
+      "name": "Batch Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2440, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pass through without notification\nreturn $input.all();"
+      },
+      "id": "skip-notify",
+      "name": "Skip Notification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2220, 400]
+    }
+  ],
+  "connections": {
+    "Batch Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Batch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Batch": {
+      "main": [
+        [
+          {
+            "node": "Split Assets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Assets": {
+      "main": [
+        [
+          {
+            "node": "Prepare Asset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Asset": {
+      "main": [
+        [
+          {
+            "node": "Call Generation Pipeline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Generation Pipeline": {
+      "main": [
+        [
+          {
+            "node": "Collect Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Result": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Results": {
+      "main": [
+        [
+          {
+            "node": "Build Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Summary": {
+      "main": [
+        [
+          {
+            "node": "Should Notify?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should Notify?": {
+      "main": [
+        [
+          {
+            "node": "Discord Batch Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Skip Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Discord Batch Notification": {
+      "main": [
+        [
+          {
+            "node": "Batch Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Skip Notification": {
+      "main": [
+        [
+          {
+            "node": "Batch Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "ziggie-batch-pipeline"
+  },
+  "pinData": {},
+  "versionId": "1.0.0",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "name": "batch-processing",
+      "id": "tag-batch"
+    },
+    {
+      "name": "asset-generation",
+      "id": "tag-asset-gen"
+    }
+  ]
+}

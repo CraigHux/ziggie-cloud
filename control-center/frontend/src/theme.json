@@ -1,0 +1,799 @@
+{
+  "version": "1.0.0",
+  "name": "Ziggie Control Center Theme",
+  "description": "Professional dark theme with cat-themed touches for the Ziggie Control Center Dashboard",
+  "author": "Art Director Agent (L1.1)",
+  "created": "2025-11-07",
+
+  "colors": {
+    "primary": {
+      "main": "#FF8C42",
+      "dark": "#CC6600",
+      "light": "#FFB366",
+      "contrastText": "#FFFFFF"
+    },
+    "secondary": {
+      "main": "#4169E1",
+      "dark": "#2952CC",
+      "light": "#6B8AFF",
+      "contrastText": "#FFFFFF"
+    },
+    "success": {
+      "main": "#10B981",
+      "dark": "#059669",
+      "light": "#34D399",
+      "contrastText": "#FFFFFF"
+    },
+    "warning": {
+      "main": "#F59E0B",
+      "dark": "#D97706",
+      "light": "#FBBF24",
+      "contrastText": "#FFFFFF"
+    },
+    "error": {
+      "main": "#EF4444",
+      "dark": "#DC2626",
+      "light": "#F87171",
+      "contrastText": "#FFFFFF"
+    },
+    "info": {
+      "main": "#3B82F6",
+      "dark": "#2563EB",
+      "light": "#60A5FA",
+      "contrastText": "#FFFFFF"
+    },
+    "accent": {
+      "main": "#FFD700",
+      "dark": "#DAA520",
+      "light": "#FFE44D",
+      "contrastText": "#1A2332"
+    }
+  },
+
+  "darkTheme": {
+    "palette": {
+      "mode": "dark",
+      "primary": {
+        "main": "#FF8C42",
+        "dark": "#CC6600",
+        "light": "#FFB366",
+        "contrastText": "#FFFFFF"
+      },
+      "secondary": {
+        "main": "#4169E1",
+        "dark": "#2952CC",
+        "light": "#6B8AFF",
+        "contrastText": "#FFFFFF"
+      },
+      "success": {
+        "main": "#10B981",
+        "dark": "#059669",
+        "light": "#34D399",
+        "contrastText": "#FFFFFF"
+      },
+      "warning": {
+        "main": "#F59E0B",
+        "dark": "#D97706",
+        "light": "#FBBF24",
+        "contrastText": "#FFFFFF"
+      },
+      "error": {
+        "main": "#EF4444",
+        "dark": "#DC2626",
+        "light": "#F87171",
+        "contrastText": "#FFFFFF"
+      },
+      "info": {
+        "main": "#3B82F6",
+        "dark": "#2563EB",
+        "light": "#60A5FA",
+        "contrastText": "#FFFFFF"
+      },
+      "background": {
+        "default": "#0A1929",
+        "paper": "#1A2332",
+        "elevated": "#243447"
+      },
+      "text": {
+        "primary": "#E7EBF0",
+        "secondary": "#C7CFD8",
+        "disabled": "#8B96A5"
+      },
+      "divider": "#2D3F52",
+      "action": {
+        "active": "#E7EBF0",
+        "hover": "rgba(231, 235, 240, 0.08)",
+        "selected": "rgba(255, 140, 66, 0.16)",
+        "disabled": "#6B7A90",
+        "disabledBackground": "rgba(107, 122, 144, 0.12)"
+      }
+    },
+    "typography": {
+      "fontFamily": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+      "fontFamilyMonospace": "'Fira Code', 'JetBrains Mono', 'Courier New', monospace",
+      "fontSize": 14,
+      "fontWeightLight": 300,
+      "fontWeightRegular": 400,
+      "fontWeightMedium": 500,
+      "fontWeightSemiBold": 600,
+      "fontWeightBold": 700,
+      "h1": {
+        "fontFamily": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        "fontSize": "2rem",
+        "fontWeight": 700,
+        "lineHeight": 1.25,
+        "letterSpacing": "-0.02em"
+      },
+      "h2": {
+        "fontFamily": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        "fontSize": "1.5rem",
+        "fontWeight": 600,
+        "lineHeight": 1.33,
+        "letterSpacing": "-0.01em"
+      },
+      "h3": {
+        "fontFamily": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        "fontSize": "1.25rem",
+        "fontWeight": 600,
+        "lineHeight": 1.4,
+        "letterSpacing": "0"
+      },
+      "h4": {
+        "fontFamily": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        "fontSize": "1.125rem",
+        "fontWeight": 600,
+        "lineHeight": 1.33,
+        "letterSpacing": "0"
+      },
+      "h5": {
+        "fontFamily": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        "fontSize": "1rem",
+        "fontWeight": 600,
+        "lineHeight": 1.5,
+        "letterSpacing": "0.01em"
+      },
+      "h6": {
+        "fontFamily": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        "fontSize": "0.875rem",
+        "fontWeight": 600,
+        "lineHeight": 1.43,
+        "letterSpacing": "0.01em"
+      },
+      "body1": {
+        "fontSize": "1rem",
+        "fontWeight": 400,
+        "lineHeight": 1.5,
+        "letterSpacing": "0"
+      },
+      "body2": {
+        "fontSize": "0.875rem",
+        "fontWeight": 400,
+        "lineHeight": 1.43,
+        "letterSpacing": "0"
+      },
+      "subtitle1": {
+        "fontSize": "1rem",
+        "fontWeight": 500,
+        "lineHeight": 1.5,
+        "letterSpacing": "0.01em"
+      },
+      "subtitle2": {
+        "fontSize": "0.875rem",
+        "fontWeight": 500,
+        "lineHeight": 1.43,
+        "letterSpacing": "0.01em"
+      },
+      "button": {
+        "fontSize": "0.875rem",
+        "fontWeight": 600,
+        "lineHeight": 1.43,
+        "letterSpacing": "0.02em",
+        "textTransform": "none"
+      },
+      "caption": {
+        "fontSize": "0.75rem",
+        "fontWeight": 400,
+        "lineHeight": 1.33,
+        "letterSpacing": "0.03em"
+      },
+      "overline": {
+        "fontSize": "0.75rem",
+        "fontWeight": 600,
+        "lineHeight": 2,
+        "letterSpacing": "0.1em",
+        "textTransform": "uppercase"
+      }
+    },
+    "shape": {
+      "borderRadius": 8
+    },
+    "spacing": 8,
+    "shadows": [
+      "none",
+      "0 1px 3px rgba(0, 0, 0, 0.4)",
+      "0 2px 4px rgba(0, 0, 0, 0.35)",
+      "0 4px 6px rgba(0, 0, 0, 0.3)",
+      "0 6px 8px rgba(0, 0, 0, 0.28)",
+      "0 8px 10px rgba(0, 0, 0, 0.26)",
+      "0 10px 15px rgba(0, 0, 0, 0.25)",
+      "0 12px 17px rgba(0, 0, 0, 0.24)",
+      "0 16px 20px rgba(0, 0, 0, 0.23)",
+      "0 20px 25px rgba(0, 0, 0, 0.2)",
+      "0 24px 30px rgba(0, 0, 0, 0.18)",
+      "0 28px 35px rgba(0, 0, 0, 0.16)",
+      "0 32px 40px rgba(0, 0, 0, 0.14)",
+      "0 36px 45px rgba(0, 0, 0, 0.12)",
+      "0 40px 50px rgba(0, 0, 0, 0.10)",
+      "0 44px 55px rgba(0, 0, 0, 0.09)",
+      "0 48px 60px rgba(0, 0, 0, 0.08)",
+      "0 52px 65px rgba(0, 0, 0, 0.07)",
+      "0 56px 70px rgba(0, 0, 0, 0.06)",
+      "0 60px 75px rgba(0, 0, 0, 0.05)",
+      "0 64px 80px rgba(0, 0, 0, 0.04)",
+      "0 68px 85px rgba(0, 0, 0, 0.03)",
+      "0 72px 90px rgba(0, 0, 0, 0.02)",
+      "0 76px 95px rgba(0, 0, 0, 0.01)",
+      "0 80px 100px rgba(0, 0, 0, 0.01)"
+    ],
+    "components": {
+      "MuiCssBaseline": {
+        "styleOverrides": {
+          "body": {
+            "scrollbarColor": "#6B7A90 #1A2332",
+            "scrollbarWidth": "thin",
+            "&::-webkit-scrollbar": {
+              "width": "8px",
+              "height": "8px"
+            },
+            "&::-webkit-scrollbar-track": {
+              "background": "#1A2332"
+            },
+            "&::-webkit-scrollbar-thumb": {
+              "background": "#6B7A90",
+              "borderRadius": "4px"
+            },
+            "&::-webkit-scrollbar-thumb:hover": {
+              "background": "#B2BAC2"
+            }
+          },
+          "*:focus-visible": {
+            "outline": "2px solid #3B82F6",
+            "outlineOffset": "2px",
+            "borderRadius": "4px"
+          },
+          "a:focus-visible, button:focus-visible, [role='button']:focus-visible": {
+            "outline": "2px solid #3B82F6",
+            "outlineOffset": "2px"
+          }
+        }
+      },
+      "MuiCard": {
+        "styleOverrides": {
+          "root": {
+            "borderRadius": 12,
+            "boxShadow": "0 4px 6px rgba(0, 0, 0, 0.3)",
+            "transition": "box-shadow 200ms ease-in-out, transform 150ms ease-out",
+            "&:hover": {
+              "boxShadow": "0 10px 15px rgba(0, 0, 0, 0.25)",
+              "transform": "translateY(-2px)"
+            }
+          }
+        }
+      },
+      "MuiButton": {
+        "styleOverrides": {
+          "root": {
+            "borderRadius": 8,
+            "textTransform": "none",
+            "fontWeight": 600,
+            "fontSize": "0.875rem",
+            "padding": "10px 20px",
+            "boxShadow": "0 1px 3px rgba(0, 0, 0, 0.4)",
+            "transition": "background-color 150ms ease-in-out, box-shadow 150ms ease-in-out, transform 100ms ease-out",
+            "&:hover": {
+              "boxShadow": "0 2px 4px rgba(0, 0, 0, 0.35)"
+            },
+            "&:active": {
+              "transform": "scale(0.98)"
+            },
+            "&:focus-visible": {
+              "outline": "2px solid #3B82F6",
+              "outlineOffset": "2px",
+              "boxShadow": "0 0 0 3px rgba(59, 130, 246, 0.3)"
+            }
+          },
+          "containedPrimary": {
+            "backgroundColor": "#FF8C42",
+            "&:hover": {
+              "backgroundColor": "#CC6600"
+            }
+          },
+          "containedSecondary": {
+            "backgroundColor": "#4169E1",
+            "&:hover": {
+              "backgroundColor": "#2952CC"
+            }
+          },
+          "outlined": {
+            "borderWidth": "1px",
+            "borderColor": "#FF8C42",
+            "color": "#FF8C42",
+            "&:hover": {
+              "borderColor": "#CC6600",
+              "backgroundColor": "rgba(255, 140, 66, 0.08)"
+            }
+          }
+        }
+      },
+      "MuiIconButton": {
+        "styleOverrides": {
+          "root": {
+            "borderRadius": 8,
+            "transition": "background-color 150ms ease-in-out, color 150ms ease-in-out, transform 150ms ease-out",
+            "&:hover": {
+              "backgroundColor": "rgba(231, 235, 240, 0.08)",
+              "transform": "scale(1.1)"
+            },
+            "&:focus-visible": {
+              "outline": "2px solid #3B82F6",
+              "outlineOffset": "2px",
+              "boxShadow": "0 0 0 3px rgba(59, 130, 246, 0.3)"
+            }
+          }
+        }
+      },
+      "MuiChip": {
+        "styleOverrides": {
+          "root": {
+            "borderRadius": 12,
+            "fontWeight": 600,
+            "fontSize": "0.75rem"
+          },
+          "filled": {
+            "backgroundColor": "#243447"
+          },
+          "filledSuccess": {
+            "backgroundColor": "#10B981",
+            "color": "#FFFFFF"
+          },
+          "filledWarning": {
+            "backgroundColor": "#F59E0B",
+            "color": "#FFFFFF"
+          },
+          "filledError": {
+            "backgroundColor": "#EF4444",
+            "color": "#FFFFFF"
+          },
+          "filledInfo": {
+            "backgroundColor": "#3B82F6",
+            "color": "#FFFFFF"
+          }
+        }
+      },
+      "MuiTextField": {
+        "styleOverrides": {
+          "root": {
+            "& .MuiOutlinedInput-root": {
+              "borderRadius": 8,
+              "backgroundColor": "#243447",
+              "transition": "border-color 200ms ease-in-out, box-shadow 200ms ease-in-out",
+              "& fieldset": {
+                "borderColor": "#2D3F52"
+              },
+              "&:hover fieldset": {
+                "borderColor": "#6B7A90"
+              },
+              "&.Mui-focused fieldset": {
+                "borderColor": "#4169E1",
+                "boxShadow": "0 0 0 3px rgba(65, 105, 225, 0.1)"
+              }
+            }
+          }
+        }
+      },
+      "MuiPaper": {
+        "styleOverrides": {
+          "root": {
+            "backgroundImage": "none"
+          },
+          "elevation1": {
+            "boxShadow": "0 1px 3px rgba(0, 0, 0, 0.4)"
+          },
+          "elevation2": {
+            "boxShadow": "0 2px 4px rgba(0, 0, 0, 0.35)"
+          },
+          "elevation3": {
+            "boxShadow": "0 4px 6px rgba(0, 0, 0, 0.3)"
+          },
+          "elevation4": {
+            "boxShadow": "0 10px 15px rgba(0, 0, 0, 0.25)"
+          }
+        }
+      },
+      "MuiAppBar": {
+        "styleOverrides": {
+          "root": {
+            "boxShadow": "0 1px 3px rgba(0, 0, 0, 0.4)",
+            "borderBottom": "1px solid #2D3F52"
+          }
+        }
+      },
+      "MuiDrawer": {
+        "styleOverrides": {
+          "paper": {
+            "backgroundColor": "#1A2332",
+            "borderRight": "1px solid #2D3F52"
+          }
+        }
+      },
+      "MuiListItemButton": {
+        "styleOverrides": {
+          "root": {
+            "borderRadius": 8,
+            "margin": "4px 8px",
+            "transition": "background-color 150ms ease-in-out, color 150ms ease-in-out",
+            "&:hover": {
+              "backgroundColor": "#243447"
+            },
+            "&.Mui-selected": {
+              "backgroundColor": "rgba(255, 140, 66, 0.16)",
+              "borderLeft": "3px solid #FF8C42",
+              "color": "#FF8C42",
+              "&:hover": {
+                "backgroundColor": "rgba(255, 140, 66, 0.24)"
+              }
+            }
+          }
+        }
+      },
+      "MuiTooltip": {
+        "styleOverrides": {
+          "tooltip": {
+            "backgroundColor": "#243447",
+            "fontSize": "0.75rem",
+            "borderRadius": 6,
+            "boxShadow": "0 4px 6px rgba(0, 0, 0, 0.3)"
+          }
+        }
+      },
+      "MuiTableCell": {
+        "styleOverrides": {
+          "root": {
+            "borderBottom": "1px solid #2D3F52"
+          },
+          "head": {
+            "fontWeight": 600,
+            "backgroundColor": "#243447",
+            "color": "#E7EBF0"
+          }
+        }
+      },
+      "MuiDivider": {
+        "styleOverrides": {
+          "root": {
+            "borderColor": "#2D3F52"
+          }
+        }
+      },
+      "MuiAlert": {
+        "styleOverrides": {
+          "root": {
+            "borderRadius": 8
+          },
+          "standardSuccess": {
+            "backgroundColor": "#10B981",
+            "color": "#FFFFFF"
+          },
+          "standardWarning": {
+            "backgroundColor": "#F59E0B",
+            "color": "#FFFFFF"
+          },
+          "standardError": {
+            "backgroundColor": "#EF4444",
+            "color": "#FFFFFF"
+          },
+          "standardInfo": {
+            "backgroundColor": "#3B82F6",
+            "color": "#FFFFFF"
+          }
+        }
+      },
+      "MuiLinearProgress": {
+        "styleOverrides": {
+          "root": {
+            "borderRadius": 2,
+            "height": 4,
+            "backgroundColor": "#2D3F52"
+          },
+          "barColorPrimary": {
+            "backgroundColor": "#FF8C42"
+          }
+        }
+      },
+      "MuiCircularProgress": {
+        "styleOverrides": {
+          "colorPrimary": {
+            "color": "#FF8C42"
+          }
+        }
+      }
+    }
+  },
+
+  "lightTheme": {
+    "palette": {
+      "mode": "light",
+      "primary": {
+        "main": "#FF8C42",
+        "dark": "#CC6600",
+        "light": "#FFB366",
+        "contrastText": "#FFFFFF"
+      },
+      "secondary": {
+        "main": "#4169E1",
+        "dark": "#2952CC",
+        "light": "#6B8AFF",
+        "contrastText": "#FFFFFF"
+      },
+      "success": {
+        "main": "#10B981",
+        "dark": "#059669",
+        "light": "#34D399",
+        "contrastText": "#FFFFFF"
+      },
+      "warning": {
+        "main": "#F59E0B",
+        "dark": "#D97706",
+        "light": "#FBBF24",
+        "contrastText": "#FFFFFF"
+      },
+      "error": {
+        "main": "#EF4444",
+        "dark": "#DC2626",
+        "light": "#F87171",
+        "contrastText": "#FFFFFF"
+      },
+      "info": {
+        "main": "#3B82F6",
+        "dark": "#2563EB",
+        "light": "#60A5FA",
+        "contrastText": "#FFFFFF"
+      },
+      "background": {
+        "default": "#F5F7FA",
+        "paper": "#FFFFFF",
+        "elevated": "#F0F2F5"
+      },
+      "text": {
+        "primary": "#1A2332",
+        "secondary": "#4A5568",
+        "disabled": "#A0AEC0"
+      },
+      "divider": "#E0E4E8",
+      "action": {
+        "active": "#1A2332",
+        "hover": "rgba(26, 35, 50, 0.04)",
+        "selected": "rgba(255, 140, 66, 0.12)",
+        "disabled": "#A0AEC0",
+        "disabledBackground": "rgba(160, 174, 192, 0.12)"
+      }
+    },
+    "typography": {
+      "fontFamily": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+      "fontFamilyMonospace": "'Fira Code', 'JetBrains Mono', 'Courier New', monospace",
+      "fontSize": 14,
+      "fontWeightLight": 300,
+      "fontWeightRegular": 400,
+      "fontWeightMedium": 500,
+      "fontWeightSemiBold": 600,
+      "fontWeightBold": 700,
+      "h1": {
+        "fontFamily": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        "fontSize": "2rem",
+        "fontWeight": 700,
+        "lineHeight": 1.25,
+        "letterSpacing": "-0.02em"
+      },
+      "h2": {
+        "fontFamily": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        "fontSize": "1.5rem",
+        "fontWeight": 600,
+        "lineHeight": 1.33,
+        "letterSpacing": "-0.01em"
+      },
+      "h3": {
+        "fontFamily": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        "fontSize": "1.25rem",
+        "fontWeight": 600,
+        "lineHeight": 1.4,
+        "letterSpacing": "0"
+      },
+      "h4": {
+        "fontFamily": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        "fontSize": "1.125rem",
+        "fontWeight": 600,
+        "lineHeight": 1.33,
+        "letterSpacing": "0"
+      },
+      "h5": {
+        "fontFamily": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        "fontSize": "1rem",
+        "fontWeight": 600,
+        "lineHeight": 1.5,
+        "letterSpacing": "0.01em"
+      },
+      "h6": {
+        "fontFamily": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        "fontSize": "0.875rem",
+        "fontWeight": 600,
+        "lineHeight": 1.43,
+        "letterSpacing": "0.01em"
+      },
+      "body1": {
+        "fontSize": "1rem",
+        "fontWeight": 400,
+        "lineHeight": 1.5,
+        "letterSpacing": "0"
+      },
+      "body2": {
+        "fontSize": "0.875rem",
+        "fontWeight": 400,
+        "lineHeight": 1.43,
+        "letterSpacing": "0"
+      },
+      "button": {
+        "fontSize": "0.875rem",
+        "fontWeight": 600,
+        "lineHeight": 1.43,
+        "letterSpacing": "0.02em",
+        "textTransform": "none"
+      }
+    },
+    "shape": {
+      "borderRadius": 8
+    },
+    "spacing": 8,
+    "shadows": [
+      "none",
+      "0 1px 3px rgba(0, 0, 0, 0.12)",
+      "0 2px 4px rgba(0, 0, 0, 0.1)",
+      "0 4px 8px rgba(0, 0, 0, 0.08)",
+      "0 6px 10px rgba(0, 0, 0, 0.07)",
+      "0 8px 12px rgba(0, 0, 0, 0.06)",
+      "0 8px 16px rgba(0, 0, 0, 0.06)",
+      "0 10px 18px rgba(0, 0, 0, 0.05)",
+      "0 12px 20px rgba(0, 0, 0, 0.05)",
+      "0 16px 24px rgba(0, 0, 0, 0.04)",
+      "0 20px 28px rgba(0, 0, 0, 0.04)",
+      "0 24px 32px rgba(0, 0, 0, 0.04)",
+      "0 28px 36px rgba(0, 0, 0, 0.03)",
+      "0 32px 40px rgba(0, 0, 0, 0.03)",
+      "0 36px 44px rgba(0, 0, 0, 0.03)",
+      "0 40px 48px rgba(0, 0, 0, 0.02)",
+      "0 44px 52px rgba(0, 0, 0, 0.02)",
+      "0 48px 56px rgba(0, 0, 0, 0.02)",
+      "0 52px 60px rgba(0, 0, 0, 0.02)",
+      "0 56px 64px rgba(0, 0, 0, 0.02)",
+      "0 60px 68px rgba(0, 0, 0, 0.01)",
+      "0 64px 72px rgba(0, 0, 0, 0.01)",
+      "0 68px 76px rgba(0, 0, 0, 0.01)",
+      "0 72px 80px rgba(0, 0, 0, 0.01)",
+      "0 76px 84px rgba(0, 0, 0, 0.01)"
+    ],
+    "components": {
+      "MuiCard": {
+        "styleOverrides": {
+          "root": {
+            "borderRadius": 12,
+            "boxShadow": "0 2px 4px rgba(0, 0, 0, 0.1)",
+            "border": "1px solid #E0E4E8",
+            "transition": "box-shadow 200ms ease-in-out, transform 150ms ease-out",
+            "&:hover": {
+              "boxShadow": "0 4px 8px rgba(0, 0, 0, 0.08)",
+              "transform": "translateY(-2px)"
+            }
+          }
+        }
+      },
+      "MuiButton": {
+        "styleOverrides": {
+          "root": {
+            "borderRadius": 8,
+            "textTransform": "none",
+            "fontWeight": 600,
+            "fontSize": "0.875rem",
+            "padding": "10px 20px",
+            "boxShadow": "0 1px 3px rgba(0, 0, 0, 0.12)",
+            "transition": "background-color 150ms ease-in-out, box-shadow 150ms ease-in-out, transform 100ms ease-out",
+            "&:hover": {
+              "boxShadow": "0 2px 4px rgba(0, 0, 0, 0.1)"
+            },
+            "&:active": {
+              "transform": "scale(0.98)"
+            }
+          }
+        }
+      },
+      "MuiTextField": {
+        "styleOverrides": {
+          "root": {
+            "& .MuiOutlinedInput-root": {
+              "borderRadius": 8,
+              "backgroundColor": "#FFFFFF",
+              "transition": "border-color 200ms ease-in-out, box-shadow 200ms ease-in-out",
+              "&.Mui-focused fieldset": {
+                "borderColor": "#4169E1",
+                "boxShadow": "0 0 0 3px rgba(65, 105, 225, 0.1)"
+              }
+            }
+          }
+        }
+      },
+      "MuiDrawer": {
+        "styleOverrides": {
+          "paper": {
+            "backgroundColor": "#FFFFFF",
+            "borderRight": "1px solid #E0E4E8"
+          }
+        }
+      }
+    }
+  },
+
+  "semantic": {
+    "agents": {
+      "color": "#FF8C42",
+      "icon": "smart_toy"
+    },
+    "services": {
+      "color": "#10B981",
+      "icon": "cloud"
+    },
+    "knowledgeBase": {
+      "color": "#8B5CF6",
+      "icon": "book"
+    },
+    "docker": {
+      "color": "#2396ED",
+      "icon": "inventory_2"
+    },
+    "apis": {
+      "color": "#F59E0B",
+      "icon": "api"
+    },
+    "monitoring": {
+      "color": "#3B82F6",
+      "icon": "monitor_heart"
+    },
+    "catTheme": {
+      "color": "#FFD700",
+      "icon": "pets"
+    }
+  },
+
+  "layout": {
+    "sidebar": {
+      "width": 240,
+      "collapsedWidth": 64
+    },
+    "header": {
+      "height": 64
+    },
+    "containerMaxWidth": 1440,
+    "spacing": {
+      "xs": 4,
+      "sm": 8,
+      "md": 16,
+      "lg": 24,
+      "xl": 32
+    }
+  },
+
+  "borderRadius": {
+    "sm": 4,
+    "md": 8,
+    "lg": 12,
+    "xl": 16,
+    "full": 9999
+  }
+}

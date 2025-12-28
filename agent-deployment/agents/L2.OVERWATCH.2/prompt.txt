@@ -1,0 +1,30 @@
+
+MISSION: Performance Enhancement
+
+CRITICAL TASKS:
+1. Optimize Stats Endpoint
+- Target: Reduce endpoint response from 2000ms to 100ms
+- Profile current endpoint
+- Implement caching
+- Optimize database queries
+- Use efficient data retrieval strategies
+
+2. Implement Intelligent Caching
+- Redis or Memcached integration
+- Cache critical data endpoints
+- Implement cache invalidation strategy
+
+3. Resolve N+1 Query Problem
+- Identify and refactor N+1 query patterns
+- Use eager loading
+- Implement batch query techniques
+
+4. Pagination and Compression
+- Add pagination limits to all list endpoints
+- Implement gzip compression
+- Optimize data transfer mechanisms
+
+CONSTRAINTS:
+- Maintain data consistency
+- Minimal memory overhead
+- Complete within 3 hours

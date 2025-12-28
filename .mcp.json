@@ -1,0 +1,122 @@
+{
+  "mcpServers": {
+    "chrome-devtools": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "chrome-devtools-mcp@latest"],
+      "env": {
+        "SystemRoot": "C:\\Windows",
+        "PROGRAMFILES": "C:\\Program Files"
+      }
+    },
+    "filesystem": {
+      "command": "cmd",
+      "args": [
+        "/c", "node",
+        "C:/Users/minin/AppData/Roaming/npm/node_modules/@modelcontextprotocol/server-filesystem/dist/index.js",
+        "C:/Ziggie",
+        "C:/ai-game-dev-system",
+        "C:/meowping-rts",
+        "C:/team-ziggie"
+      ]
+    },
+    "memory": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@modelcontextprotocol/server-memory"],
+      "env": {}
+    },
+    "comfyui": {
+      "command": "cmd",
+      "args": [
+        "/c", "cd", "/d", "C:\\ai-game-dev-system\\mcp-servers\\comfyui-mcp",
+        "&&", "python", "server.py"
+      ],
+      "env": {
+        "COMFYUI_HOST": "127.0.0.1",
+        "COMFYUI_PORT": "8188",
+        "COMFYUI_DIR": "C:/ComfyUI/ComfyUI",
+        "OUTPUT_DIR": "C:/ai-game-dev-system/assets/ai-generated"
+      }
+    },
+    "hub": {
+      "command": "cmd",
+      "args": [
+        "/c", "cd", "/d", "C:\\ai-game-dev-system\\mcp-servers\\hub",
+        "&&", "uv", "run", "--with", "mcp", "--with", "aiohttp", "python", "mcp_hub_server.py"
+      ],
+      "env": {
+        "UNITY_MCP_URL": "http://localhost:8080",
+        "UNREAL_MCP_URL": "http://localhost:8081",
+        "GODOT_MCP_URL": "http://localhost:6005",
+        "COMFYUI_URL": "http://localhost:8188",
+        "LM_STUDIO_URL": "http://localhost:1234"
+      }
+    },
+    "unity-mcp": {
+      "command": "cmd",
+      "args": [
+        "/c", "cd", "/d", "C:\\ai-game-dev-system\\mcp-servers\\unity-mcp\\server",
+        "&&", "node", "dist/index.js"
+      ],
+      "env": {
+        "MCP_TRANSPORT": "stdio",
+        "UNITY_MCP_PORT": "8080"
+      },
+      "disabled": true,
+      "_comment": "Enable when Unity Editor is installed with MCP Bridge package"
+    },
+    "mcp-unity": {
+      "command": "cmd",
+      "args": [
+        "/c", "cd", "/d", "C:\\ai-game-dev-system\\mcp-servers\\mcp-unity\\Server~",
+        "&&", "npx", "-y", "mcp-unity@1.2.0"
+      ],
+      "env": {
+        "MCP_TRANSPORT": "stdio"
+      },
+      "disabled": true,
+      "_comment": "CoderGamester's MCP Unity (recommended) - Enable when Unity Editor is installed"
+    },
+    "unreal-mcp": {
+      "command": "cmd",
+      "args": [
+        "/c", "cd", "/d", "C:\\ai-game-dev-system\\mcp-servers\\unreal-mcp",
+        "&&", "uv", "run", "python", "src/unreal_mcp_server.py"
+      ],
+      "env": {
+        "UNREAL_HOST": "127.0.0.1",
+        "UNREAL_PORT": "8081"
+      },
+      "disabled": true,
+      "_comment": "Enable when Unreal Engine 5.5+ is installed with UnrealMCP plugin"
+    },
+    "godot-mcp": {
+      "command": "cmd",
+      "args": [
+        "/c", "cd", "/d", "C:\\ai-game-dev-system\\mcp-servers\\godot-mcp\\server",
+        "&&", "node", "dist/index.js"
+      ],
+      "env": {
+        "MCP_TRANSPORT": "stdio",
+        "GODOT_MCP_PORT": "6005",
+        "GODOT_PROJECT_PATH": "C:\\ai-game-dev-system\\projects\\godot\\AITestProject"
+      },
+      "_comment": "Godot 4.5.1 installed via winget, MCP addon in AITestProject"
+    },
+    "github": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": ""
+      },
+      "_comment": "Add your GitHub PAT to enable. Provides repo, issue, PR automation."
+    },
+    "postgres": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@modelcontextprotocol/server-postgres"],
+      "env": {
+        "POSTGRES_CONNECTION_STRING": "postgresql://meowping:meowping_dev@localhost:5432/meowping_rts"
+      },
+      "_comment": "PostgreSQL MCP for database operations. Update connection string as needed."
+    }
+  }
+}

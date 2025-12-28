@@ -1,0 +1,9 @@
+{
+  "request_id": "req_70a4320c",
+  "agent_id": "L1.OVERWATCH.1",
+  "status": "failed",
+  "pid": null,
+  "started_at": null,
+  "message": "Deployment failed",
+  "error": "Unexpected error: name 'logger' is not defined"
+}

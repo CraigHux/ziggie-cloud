@@ -1,0 +1,213 @@
+# =============================================================================
+# YACE (Yet Another CloudWatch Exporter) CONFIGURATION
+# =============================================================================
+# Export AWS CloudWatch metrics to Prometheus for Ziggie infrastructure
+# =============================================================================
+
+apiVersion: v1alpha1
+
+# Discovery settings
+discovery:
+  exportedTagsOnMetrics:
+    - Name
+    - Environment
+    - Project
+
+  jobs:
+    # =========================================================================
+    # S3 Bucket Metrics
+    # =========================================================================
+    - type: s3
+      regions:
+        - eu-north-1
+      searchTags:
+        - key: Project
+          value: ziggie
+      metrics:
+        - name: BucketSizeBytes
+          statistics: [Average]
+          period: 86400  # Daily
+          length: 172800
+        - name: NumberOfObjects
+          statistics: [Average]
+          period: 86400
+          length: 172800
+
+    # =========================================================================
+    # Lambda Function Metrics
+    # =========================================================================
+    - type: lambda
+      regions:
+        - eu-north-1
+      searchTags:
+        - key: Project
+          value: ziggie
+      metrics:
+        - name: Invocations
+          statistics: [Sum]
+          period: 60
+          length: 300
+        - name: Duration
+          statistics: [Average, p50, p95, p99]
+          period: 60
+          length: 300
+        - name: Errors
+          statistics: [Sum]
+          period: 60
+          length: 300
+        - name: Throttles
+          statistics: [Sum]
+          period: 60
+          length: 300
+        - name: ConcurrentExecutions
+          statistics: [Maximum]
+          period: 60
+          length: 300
+        - name: IteratorAge
+          statistics: [Maximum]
+          period: 60
+          length: 300
+
+    # =========================================================================
+    # EC2 Instance Metrics (GPU Instances)
+    # =========================================================================
+    - type: ec2
+      regions:
+        - eu-north-1
+      searchTags:
+        - key: Project
+          value: ziggie
+      metrics:
+        - name: CPUUtilization
+          statistics: [Average, Maximum]
+          period: 60
+          length: 300
+        - name: NetworkIn
+          statistics: [Sum]
+          period: 60
+          length: 300
+        - name: NetworkOut
+          statistics: [Sum]
+          period: 60
+          length: 300
+        - name: DiskReadBytes
+          statistics: [Sum]
+          period: 60
+          length: 300
+        - name: DiskWriteBytes
+          statistics: [Sum]
+          period: 60
+          length: 300
+        - name: StatusCheckFailed
+          statistics: [Maximum]
+          period: 60
+          length: 300
+
+    # =========================================================================
+    # Secrets Manager Metrics
+    # =========================================================================
+    - type: secretsmanager
+      regions:
+        - eu-north-1
+      metrics:
+        - name: CallCount
+          statistics: [Sum]
+          period: 300
+          length: 900
+
+    # =========================================================================
+    # API Gateway Metrics (if used)
+    # =========================================================================
+    - type: apigateway
+      regions:
+        - eu-north-1
+      searchTags:
+        - key: Project
+          value: ziggie
+      metrics:
+        - name: Count
+          statistics: [Sum]
+          period: 60
+          length: 300
+        - name: Latency
+          statistics: [Average, p50, p95, p99]
+          period: 60
+          length: 300
+        - name: 4XXError
+          statistics: [Sum]
+          period: 60
+          length: 300
+        - name: 5XXError
+          statistics: [Sum]
+          period: 60
+          length: 300
+
+    # =========================================================================
+    # CloudWatch Billing Metrics
+    # =========================================================================
+    - type: billing
+      regions:
+        - us-east-1  # Billing metrics are only in us-east-1
+      metrics:
+        - name: EstimatedCharges
+          statistics: [Maximum]
+          period: 21600  # 6 hours
+          length: 86400
+
+# Static metrics configuration
+static:
+  - namespace: AWS/S3
+    name: ziggie-s3-assets
+    regions:
+      - eu-north-1
+    dimensions:
+      - name: BucketName
+        value: ziggie-assets-prod
+      - name: StorageType
+        value: StandardStorage
+    metrics:
+      - name: BucketSizeBytes
+        statistics: [Average]
+        period: 86400
+        length: 172800
+      - name: NumberOfObjects
+        statistics: [Average]
+        period: 86400
+        length: 172800
+
+  - namespace: AWS/S3
+    name: ziggie-s3-backups
+    regions:
+      - eu-north-1
+    dimensions:
+      - name: BucketName
+        value: ziggie-backups-prod
+      - name: StorageType
+        value: StandardStorage
+    metrics:
+      - name: BucketSizeBytes
+        statistics: [Average]
+        period: 86400
+        length: 172800
+
+  # GPU Auto-shutdown Lambda
+  - namespace: AWS/Lambda
+    name: ziggie-gpu-shutdown
+    regions:
+      - eu-north-1
+    dimensions:
+      - name: FunctionName
+        value: ziggie-gpu-auto-shutdown
+    metrics:
+      - name: Invocations
+        statistics: [Sum]
+        period: 300
+        length: 900
+      - name: Errors
+        statistics: [Sum]
+        period: 300
+        length: 900
+      - name: Duration
+        statistics: [Average, Maximum]
+        period: 300
+        length: 900

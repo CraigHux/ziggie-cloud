@@ -1,0 +1,8 @@
+{
+    "MonitorName": "ziggie-cost-anomaly-monitor",
+    "MonitorType": "DIMENSIONAL",
+    "MonitorDimension": "SERVICE",
+    "MonitorSpecification": {
+        "DimensionalValueCount": 10
+    }
+}

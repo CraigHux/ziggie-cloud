@@ -1,0 +1,16 @@
+{
+    "api_key": "",
+    "base_url": "https://api.meshy.ai",
+    "output_formats": ["glb", "fbx", "obj", "stl"],
+    "default_format": "glb",
+    "quality_preset": "medium",
+    "timeout": 300,
+    "max_retries": 3,
+    "output_dir": "C:/Ziggie/assets/3d_models",
+    "enable_texture": true,
+    "enable_pbr": true,
+    "requests_per_minute": 10,
+    "max_concurrent": 3,
+    "aws_region": "eu-north-1",
+    "secret_name": "ziggie/meshy-api-key"
+}

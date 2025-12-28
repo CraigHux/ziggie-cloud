@@ -1,0 +1,9 @@
+{
+  "request_id": "req_df06976b",
+  "agent_id": "L1.OVERWATCH.1",
+  "status": "running",
+  "pid": 44852,
+  "started_at": "2025-11-09T23:03:29.367488",
+  "message": "Agent L1.OVERWATCH.1 deployed successfully (PID: 44852)",
+  "error": null
+}

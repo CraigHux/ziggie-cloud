@@ -1,0 +1,425 @@
+# Ziggie - Unified .gitignore
+# Generated: 2025-11-07
+
+# ============================================
+# ENVIRONMENT & SECRETS
+# ============================================
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.cert
+secrets/
+credentials/
+api_keys.json
+
+# ============================================
+# PYTHON
+# ============================================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# ============================================
+# NODE.JS / JAVASCRIPT
+# ============================================
+# Dependencies
+node_modules/
+jspm_packages/
+bower_components/
+
+# Production builds
+dist/
+build/
+.next/
+out/
+
+# Testing
+coverage/
+
+# Misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+.idea
+*.swp
+*.swo
+*~
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.vs/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Package lock (optional - uncomment if needed)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# ============================================
+# DATABASES
+# ============================================
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Database backups
+*.sql.gz
+*.dump
+data/databases/*.db
+!data/databases/.gitkeep
+
+# ============================================
+# LOGS & MONITORING
+# ============================================
+logs/
+*.log
+*.log.*
+data/logs/
+!data/logs/.gitkeep
+
+# Error reports
+error_reports/
+crash_dumps/
+
+# ============================================
+# AI/ML SPECIFIC
+# ============================================
+# Model files (large)
+*.ckpt
+*.safetensors
+*.pt
+*.pth
+*.onnx
+*.pb
+*.h5
+*.hdf5
+
+# Model directories
+models/
+checkpoints/
+weights/
+control-center/ComfyUI/models/*
+!control-center/ComfyUI/models/.gitkeep
+
+# ComfyUI specific
+control-center/ComfyUI/output/
+control-center/ComfyUI/temp/
+control-center/ComfyUI/input/
+control-center/ComfyUI/custom_nodes/
+
+# Generated assets
+game/assets/generated/
+game/assets/sprites/
+game/assets/sprite_sheets/
+*.glb
+*.gltf
+*.fbx
+*.obj
+
+# Training data
+datasets/
+training_data/
+
+# Cache
+.transformers_cache/
+.cache/
+cache/
+data/cache/
+!data/cache/.gitkeep
+
+# ============================================
+# KNOWLEDGE BASE
+# ============================================
+# Large knowledge files
+agents/knowledge-base/temp/
+agents/knowledge-base/logs/*.log
+agents/knowledge-base/downloads/
+
+# Transcripts (can be large)
+agents/knowledge-base/transcripts/
+
+# Processed data
+agents/knowledge-base/processed/
+
+# Keep structure
+!agents/knowledge-base/temp/.gitkeep
+!agents/knowledge-base/logs/.gitkeep
+
+# ============================================
+# CONTROL CENTER
+# ============================================
+# Backend cache
+control-center/backend/.cache/
+control-center/backend/__pycache__/
+
+# Frontend build
+control-center/frontend/dist/
+control-center/frontend/build/
+control-center/frontend/.vite/
+
+# Database
+control-center/backend/*.db
+control-center/backend/control-center.db
+
+# ============================================
+# GAME ASSETS
+# ============================================
+# Generated game assets
+game/assets/generated/
+game/assets/temp/
+game/frontend/public/assets/generated/
+
+# Asset cache
+game/assets/.cache/
+
+# Keep directories
+!game/assets/.gitkeep
+!game/assets/generated/.gitkeep
+
+# ============================================
+# DOCKER
+# ============================================
+# Docker volumes
+docker-volumes/
+.docker/
+
+# Docker compose overrides (personal)
+docker-compose.override.yml
+docker-compose.local.yml
+
+# ============================================
+# TESTING
+# ============================================
+# Test outputs
+tests/output/
+tests/screenshots/
+tests/recordings/
+tests/.pytest_cache/
+tests/coverage/
+
+# Test databases
+tests/test_*.db
+
+# ============================================
+# AUTOMATION & SCRIPTS
+# ============================================
+# Temporary script outputs
+shared/automation/temp/
+shared/automation/logs/
+*.pid
+
+# ============================================
+# DOCUMENTATION
+# ============================================
+# Build artifacts
+docs/_build/
+docs/.doctrees/
+site/
+
+# Generated API docs
+docs/api/generated/
+
+# ============================================
+# OPERATING SYSTEMS
+# ============================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.directory
+.Trash-*
+.nfs*
+
+# ============================================
+# BACKUPS
+# ============================================
+*.bak
+*.backup
+*.old
+*.orig
+*.swp
+*~
+backup/
+backups/
+
+# ============================================
+# EXPORTS & TEMPORARY
+# ============================================
+data/exports/*.zip
+data/exports/*.tar.gz
+data/exports/*.json
+!data/exports/.gitkeep
+
+temp/
+tmp/
+*.tmp
+*.temp
+
+# ============================================
+# PROJECT SPECIFIC
+# ============================================
+# Large generated files
+LARGE_FILES/
+
+# Personal notes (not for repo)
+NOTES_PERSONAL.md
+TODO_PERSONAL.md
+.scratch/
+
+# CI/CD artifacts
+.github/workflows/artifacts/
+
+# Local development configs
+*.local.json
+*.local.yaml
+*.local.yml
+
+# ============================================
+# KEEP THESE FILES
+# ============================================
+# Example and template files should be kept
+!.env.example
+!config.example.json
+!docker-compose.example.yml
+
+# Keep .gitkeep files
+!.gitkeep
+
+# Keep README files
+!README.md
+!*/README.md

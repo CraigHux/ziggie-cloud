@@ -1,0 +1,467 @@
+{
+  "name": "Meshy.ai Image-to-3D Pipeline",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "b5d5e3f0-1234-4567-8901-abcdef123456",
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "path": "meshy-convert",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "webhook-trigger-001",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 500],
+      "webhookId": "meshy-convert-webhook"
+    },
+    {
+      "parameters": {
+        "operation": "getSecretValue",
+        "secretId": "ziggie/meshy-api-key",
+        "options": {
+          "region": "eu-north-1"
+        }
+      },
+      "id": "aws-secrets-001",
+      "name": "Get Meshy API Key",
+      "type": "n8n-nodes-base.awsSecretsManager",
+      "typeVersion": 1,
+      "position": [450, 300],
+      "credentials": {
+        "aws": {
+          "id": "aws-credentials",
+          "name": "AWS Ziggie"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Parse AWS Secrets Manager response\nconst secretString = items[0].json.SecretString;\nconst secret = JSON.parse(secretString);\n\n// Store API key for use in subsequent nodes\nitems[0].json.apiKey = secret.api_key || secret.MESHY_API_KEY;\n\nreturn items;"
+      },
+      "id": "parse-secret-001",
+      "name": "Parse API Key",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.meshy.ai/v1/image-to-3d",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.apiKey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "image_url",
+              "value": "={{ $json.image_url }}"
+            },
+            {
+              "name": "mode",
+              "value": "={{ $json.mode || 'preview' }}"
+            },
+            {
+              "name": "ai_model",
+              "value": "meshy-4"
+            },
+            {
+              "name": "topology",
+              "value": "quad"
+            },
+            {
+              "name": "target_polycount",
+              "value": "30000"
+            },
+            {
+              "name": "enable_texture",
+              "value": "true"
+            },
+            {
+              "name": "enable_pbr",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "create-task-001",
+      "name": "Create Meshy Task",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extract task ID from response\nconst taskId = items[0].json.result || items[0].json.id;\nitems[0].json.taskId = taskId;\nitems[0].json.pollCount = 0;\nitems[0].json.maxPolls = 60; // 5 minutes at 5s intervals\n\nreturn items;"
+      },
+      "id": "extract-task-id",
+      "name": "Extract Task ID",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.meshy.ai/v1/image-to-3d/{{ $json.taskId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.apiKey }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "poll-status-001",
+      "name": "Poll Task Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "operation": "equals",
+              "value2": "SUCCEEDED"
+            }
+          ]
+        }
+      },
+      "id": "check-complete-001",
+      "name": "Check Complete",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "operation": "equals",
+              "value2": "FAILED"
+            }
+          ]
+        }
+      },
+      "id": "check-failed-001",
+      "name": "Check Failed",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1650, 500]
+    },
+    {
+      "parameters": {
+        "amount": 5
+      },
+      "id": "wait-001",
+      "name": "Wait 5 Seconds",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [1650, 700]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Prepare success response with model URLs\nconst result = {\n  success: true,\n  taskId: items[0].json.id,\n  status: items[0].json.status,\n  modelUrls: items[0].json.model_urls,\n  thumbnailUrl: items[0].json.thumbnail_url,\n  creditsUsed: items[0].json.credits_used || 0,\n  progress: 100\n};\n\nitems[0].json = result;\nreturn items;"
+      },
+      "id": "success-response-001",
+      "name": "Success Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1650, 100]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Handle failure\nconst result = {\n  success: false,\n  taskId: items[0].json.id,\n  status: items[0].json.status,\n  error: items[0].json.message || 'Task failed'\n};\n\nitems[0].json = result;\nreturn items;"
+      },
+      "id": "error-response-001",
+      "name": "Error Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1850, 400]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.modelUrls.glb }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "download-model-001",
+      "name": "Download GLB Model",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1850, 100]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "ziggie-assets-prod",
+        "fileName": "=game-assets/3d-models/{{ $json.taskId }}.glb",
+        "options": {
+          "region": "eu-north-1"
+        }
+      },
+      "id": "s3-upload-001",
+      "name": "Upload to S3",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 1,
+      "position": [2050, 100],
+      "credentials": {
+        "aws": {
+          "id": "aws-credentials",
+          "name": "AWS Ziggie"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}"
+      },
+      "id": "webhook-response-001",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2250, 100]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Increment poll count and check max\nitems[0].json.pollCount = (items[0].json.pollCount || 0) + 1;\n\nif (items[0].json.pollCount >= items[0].json.maxPolls) {\n  items[0].json.status = 'FAILED';\n  items[0].json.message = 'Timeout: max poll attempts reached';\n}\n\nreturn items;"
+      },
+      "id": "increment-poll-001",
+      "name": "Increment Poll Count",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1850, 700]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Get Meshy API Key",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Meshy API Key",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Meshy API Key": {
+      "main": [
+        [
+          {
+            "node": "Parse API Key",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse API Key": {
+      "main": [
+        [
+          {
+            "node": "Create Meshy Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Meshy Task": {
+      "main": [
+        [
+          {
+            "node": "Extract Task ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Task ID": {
+      "main": [
+        [
+          {
+            "node": "Poll Task Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Poll Task Status": {
+      "main": [
+        [
+          {
+            "node": "Check Complete",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Complete": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check Failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Failed": {
+      "main": [
+        [
+          {
+            "node": "Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait 5 Seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 5 Seconds": {
+      "main": [
+        [
+          {
+            "node": "Increment Poll Count",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Increment Poll Count": {
+      "main": [
+        [
+          {
+            "node": "Poll Task Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Success Response": {
+      "main": [
+        [
+          {
+            "node": "Download GLB Model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download GLB Model": {
+      "main": [
+        [
+          {
+            "node": "Upload to S3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to S3": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "meshy",
+      "createdAt": "2025-12-27T00:00:00.000Z",
+      "updatedAt": "2025-12-27T00:00:00.000Z"
+    },
+    {
+      "name": "3d-generation",
+      "createdAt": "2025-12-27T00:00:00.000Z",
+      "updatedAt": "2025-12-27T00:00:00.000Z"
+    },
+    {
+      "name": "asset-pipeline",
+      "createdAt": "2025-12-27T00:00:00.000Z",
+      "updatedAt": "2025-12-27T00:00:00.000Z"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2025-12-27T00:00:00.000Z",
+  "versionId": "1.0.0"
+}

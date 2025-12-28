@@ -1,0 +1,430 @@
+# =============================================================================
+# ZIGGIE COMMAND CENTER - Security Scanning Workflow
+# =============================================================================
+# Comprehensive security scanning: Trivy, Snyk, SAST, secrets detection
+# Runs on schedule and on-demand
+# =============================================================================
+# Author: DAEDALUS (Pipeline Architect - Elite Technical Team)
+# Created: 2025-12-28
+# =============================================================================
+
+name: Security Scan
+
+on:
+  schedule:
+    # Run daily at 3 AM UTC
+    - cron: '0 3 * * *'
+  push:
+    branches:
+      - main
+    paths:
+      - '**.py'
+      - '**.js'
+      - '**.ts'
+      - '**.json'
+      - '**/Dockerfile*'
+      - '**/docker-compose*.yml'
+      - 'requirements*.txt'
+      - 'package*.json'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      full_scan:
+        description: 'Run full comprehensive scan (slower)'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '18'
+
+jobs:
+  # ===========================================================================
+  # SECRET DETECTION
+  # ===========================================================================
+  secrets-scan:
+    name: Secret Detection
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Scan for hardcoded secrets
+        run: |
+          echo "=========================================="
+          echo "SCANNING FOR EXPOSED SECRETS"
+          echo "=========================================="
+
+          VIOLATIONS=0
+
+          # Pattern definitions
+          declare -A PATTERNS=(
+            ["OpenAI API Key"]='sk-[a-zA-Z0-9]{48}'
+            ["Anthropic API Key"]='sk-ant-[a-zA-Z0-9-]+'
+            ["GitHub PAT"]='ghp_[a-zA-Z0-9]{36}'
+            ["GitHub OAuth"]='gho_[a-zA-Z0-9]{36}'
+            ["AWS Access Key"]='AKIA[A-Z0-9]{16}'
+            ["AWS Secret Key"]='"[a-zA-Z0-9/+]{40}"'
+            ["Private Key"]='-----BEGIN (RSA|OPENSSH|EC|DSA) PRIVATE KEY-----'
+            ["Generic Password"]='password\s*[:=]\s*["\x27][^"\x27]{8,}["\x27]'
+            ["JWT Token"]='eyJ[a-zA-Z0-9_-]*\.eyJ[a-zA-Z0-9_-]*\.'
+          )
+
+          for name in "${!PATTERNS[@]}"; do
+            pattern="${PATTERNS[$name]}"
+            echo "Checking for: $name"
+
+            MATCHES=$(grep -rE "$pattern" \
+              --include="*.py" \
+              --include="*.js" \
+              --include="*.ts" \
+              --include="*.json" \
+              --include="*.yml" \
+              --include="*.yaml" \
+              --include="*.env.*" \
+              --exclude-dir=node_modules \
+              --exclude-dir=.git \
+              --exclude="*.example" \
+              --exclude=".env.example" \
+              . 2>/dev/null || true)
+
+            if [ -n "$MATCHES" ]; then
+              echo "::error::SECURITY VIOLATION - $name detected:"
+              echo "$MATCHES" | head -10
+              VIOLATIONS=$((VIOLATIONS + 1))
+            fi
+          done
+
+          if [ $VIOLATIONS -gt 0 ]; then
+            echo ""
+            echo "=========================================="
+            echo "CRITICAL: $VIOLATIONS secret type(s) exposed!"
+            echo "=========================================="
+            echo ""
+            echo "Action Required:"
+            echo "1. Remove secrets from code immediately"
+            echo "2. Rotate ALL exposed credentials"
+            echo "3. Use GitHub Secrets or AWS Secrets Manager"
+            exit 1
+          fi
+
+          echo ""
+          echo "No secrets detected in codebase"
+
+      - name: TruffleHog scan
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --only-verified
+
+  # ===========================================================================
+  # DEPENDENCY VULNERABILITY SCAN
+  # ===========================================================================
+  dependency-scan:
+    name: Dependency Vulnerabilities
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install safety for Python
+        run: pip install safety
+
+      - name: Scan Python dependencies
+        continue-on-error: true
+        run: |
+          echo "=== Python Dependency Scan ==="
+
+          REQUIREMENTS_FILES=$(find . -name "requirements*.txt" -not -path "./node_modules/*" 2>/dev/null)
+
+          for req_file in $REQUIREMENTS_FILES; do
+            echo "Scanning $req_file..."
+            safety check -r "$req_file" --output json > "safety_$(basename $req_file .txt).json" 2>&1 || true
+            safety check -r "$req_file" || echo "::warning::Vulnerabilities found in $req_file"
+          done
+
+      - name: Scan npm dependencies
+        continue-on-error: true
+        run: |
+          echo "=== npm Dependency Scan ==="
+
+          # Find all package.json files
+          PACKAGE_FILES=$(find . -name "package.json" -not -path "./node_modules/*" 2>/dev/null)
+
+          for pkg_file in $PACKAGE_FILES; do
+            DIR=$(dirname "$pkg_file")
+            echo "Scanning $DIR..."
+            cd "$DIR"
+            npm audit --json > npm_audit.json 2>&1 || true
+            npm audit || echo "::warning::Vulnerabilities found in $DIR"
+            cd - > /dev/null
+          done
+
+      - name: Upload vulnerability reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: vulnerability-reports
+          path: |
+            safety_*.json
+            **/npm_audit.json
+          retention-days: 30
+
+  # ===========================================================================
+  # CONTAINER IMAGE SCAN (TRIVY)
+  # ===========================================================================
+  container-scan:
+    name: Container Security
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        dockerfile:
+          - path: control-center/backend
+            name: ziggie-api
+          - path: mcp-gateway
+            name: mcp-gateway
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build image for scanning
+        run: |
+          if [ -f "${{ matrix.dockerfile.path }}/Dockerfile" ]; then
+            docker build -t ${{ matrix.dockerfile.name }}:scan ${{ matrix.dockerfile.path }}
+          else
+            echo "::warning::No Dockerfile found at ${{ matrix.dockerfile.path }}"
+            exit 0
+          fi
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '${{ matrix.dockerfile.name }}:scan'
+          format: 'sarif'
+          output: 'trivy-${{ matrix.dockerfile.name }}.sarif'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+          timeout: '10m'
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-${{ matrix.dockerfile.name }}.sarif'
+
+      - name: Run Trivy (table format for visibility)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '${{ matrix.dockerfile.name }}:scan'
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '0'
+
+  # ===========================================================================
+  # STATIC APPLICATION SECURITY TESTING (SAST)
+  # ===========================================================================
+  sast-scan:
+    name: SAST - Code Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Bandit
+        run: pip install bandit
+
+      - name: Run Bandit (Python SAST)
+        continue-on-error: true
+        run: |
+          echo "=== Python SAST with Bandit ==="
+
+          # Find Python directories
+          PYTHON_DIRS="control-center/backend coordinator integrations"
+
+          for dir in $PYTHON_DIRS; do
+            if [ -d "$dir" ]; then
+              echo "Scanning $dir..."
+              bandit -r "$dir" -f json -o "bandit_$(basename $dir).json" 2>&1 || true
+              bandit -r "$dir" -ll || echo "::warning::Security issues found in $dir"
+            fi
+          done
+
+      - name: Semgrep SAST scan
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/python
+            p/javascript
+            p/typescript
+            p/docker
+            p/secrets
+          generateSarif: true
+
+      - name: Upload Semgrep results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: semgrep.sarif
+
+      - name: Upload SAST reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: sast-reports
+          path: |
+            bandit_*.json
+            semgrep.sarif
+          retention-days: 30
+
+  # ===========================================================================
+  # DOCKER CONFIGURATION SECURITY
+  # ===========================================================================
+  docker-security:
+    name: Docker Configuration Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Hadolint
+        run: |
+          curl -sL -o hadolint "https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-x86_64"
+          chmod +x hadolint
+          sudo mv hadolint /usr/local/bin/
+
+      - name: Lint Dockerfiles
+        run: |
+          echo "=== Docker Best Practices Check ==="
+
+          ISSUES=0
+
+          find . -name "Dockerfile*" -not -path "./node_modules/*" | while read dockerfile; do
+            echo "Checking $dockerfile..."
+
+            # Run hadolint
+            hadolint "$dockerfile" --format json > "hadolint_$(basename $dockerfile).json" 2>&1 || true
+            hadolint "$dockerfile" || ISSUES=$((ISSUES + 1))
+
+            # Custom checks
+            echo "  Custom checks for $dockerfile:"
+
+            # Check for :latest tag
+            if grep -q 'FROM.*:latest' "$dockerfile"; then
+              echo "::warning::$dockerfile uses :latest tag - pin to specific version"
+            fi
+
+            # Check for root user
+            if ! grep -q '^USER' "$dockerfile"; then
+              echo "::warning::$dockerfile runs as root - add USER instruction"
+            fi
+
+            # Check for HEALTHCHECK
+            if ! grep -q '^HEALTHCHECK' "$dockerfile"; then
+              echo "::warning::$dockerfile missing HEALTHCHECK instruction"
+            fi
+
+            # Check for COPY vs ADD
+            if grep -q '^ADD' "$dockerfile"; then
+              echo "::warning::$dockerfile uses ADD - prefer COPY unless extracting archives"
+            fi
+          done
+
+      - name: Check docker-compose security
+        run: |
+          echo "=== Docker Compose Security Check ==="
+
+          find . -name "docker-compose*.yml" | while read compose_file; do
+            echo "Checking $compose_file..."
+
+            # Check for privileged containers
+            if grep -q 'privileged: true' "$compose_file"; then
+              echo "::warning::$compose_file has privileged container - security risk"
+            fi
+
+            # Check for host network mode
+            if grep -q 'network_mode: host' "$compose_file"; then
+              echo "::warning::$compose_file uses host network mode"
+            fi
+
+            # Check for exposed sensitive ports
+            if grep -qE 'ports:.*"?22:|ports:.*"?3306:|ports:.*"?5432:' "$compose_file"; then
+              echo "::warning::$compose_file exposes sensitive database/SSH ports"
+            fi
+
+            # Check for inline secrets
+            if grep -qE 'password.*:.*[^${}]' "$compose_file"; then
+              echo "::error::$compose_file may contain hardcoded passwords"
+            fi
+          done
+
+      - name: Upload Docker reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-security-reports
+          path: hadolint_*.json
+          retention-days: 30
+
+  # ===========================================================================
+  # SECURITY SUMMARY
+  # ===========================================================================
+  summary:
+    name: Security Summary
+    runs-on: ubuntu-latest
+    needs: [secrets-scan, dependency-scan, container-scan, sast-scan, docker-security]
+    if: always()
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Scan Date**: $(date -Iseconds)" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Scan Type | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Secret Detection | ${{ needs.secrets-scan.result == 'success' && 'PASSED' || 'FAILED' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dependency Scan | ${{ needs.dependency-scan.result == 'success' && 'PASSED' || 'REVIEW NEEDED' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Container Scan | ${{ needs.container-scan.result == 'success' && 'PASSED' || 'REVIEW NEEDED' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| SAST Analysis | ${{ needs.sast-scan.result == 'success' && 'PASSED' || 'REVIEW NEEDED' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Docker Security | ${{ needs.docker-security.result == 'success' && 'PASSED' || 'REVIEW NEEDED' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ needs.secrets-scan.result }}" = "failure" ]; then
+            echo "### CRITICAL: Secrets Detected" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Exposed secrets were found in the codebase. This is a P0 security issue." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Immediate Actions Required:**" >> $GITHUB_STEP_SUMMARY
+            echo "1. Rotate ALL exposed credentials immediately" >> $GITHUB_STEP_SUMMARY
+            echo "2. Remove secrets from code" >> $GITHUB_STEP_SUMMARY
+            echo "3. Use AWS Secrets Manager or GitHub Secrets" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Fail if secrets detected
+        if: needs.secrets-scan.result == 'failure'
+        run: |
+          echo "::error::Security scan failed due to exposed secrets"
+          exit 1

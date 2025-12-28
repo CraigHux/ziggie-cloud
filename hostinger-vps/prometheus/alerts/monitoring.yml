@@ -1,0 +1,181 @@
+# =============================================================================
+# MONITORING STACK ALERT RULES
+# =============================================================================
+# Alerts for monitoring infrastructure itself
+# =============================================================================
+
+groups:
+  - name: monitoring
+    interval: 30s
+    rules:
+      # =========================================================================
+      # PROMETHEUS ALERTS
+      # =========================================================================
+
+      - alert: PrometheusDown
+        expr: up{job="prometheus"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          tier: monitoring
+          service: prometheus
+        annotations:
+          summary: "Prometheus is down"
+          description: "Prometheus monitoring system is not responding. All alerting is disabled."
+
+      - alert: PrometheusHighStorageUsage
+        expr: 100 - ((prometheus_tsdb_storage_blocks_bytes / prometheus_tsdb_storage_blocks_bytes_total) * 100) < 10
+        for: 5m
+        labels:
+          severity: warning
+          tier: monitoring
+          service: prometheus
+        annotations:
+          summary: "Prometheus storage running low"
+          description: "Only {{ $value | printf \"%.1f\" }}% storage remaining"
+
+      - alert: PrometheusTSDBCompactionsFailing
+        expr: rate(prometheus_tsdb_compactions_failed_total[5m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+          tier: monitoring
+          service: prometheus
+        annotations:
+          summary: "Prometheus TSDB compactions failing"
+          description: "{{ $value | printf \"%.2f\" }} compactions failing per second"
+
+      - alert: PrometheusRuleEvaluationSlow
+        expr: prometheus_rule_group_last_duration_seconds > 60
+        for: 5m
+        labels:
+          severity: warning
+          tier: monitoring
+          service: prometheus
+        annotations:
+          summary: "Slow Prometheus rule evaluation"
+          description: "Rule group {{ $labels.rule_group }} taking {{ $value | printf \"%.1f\" }}s to evaluate"
+
+      - alert: PrometheusScrapeFailures
+        expr: rate(prometheus_target_scrapes_exceeded_sample_limit_total[5m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+          tier: monitoring
+          service: prometheus
+        annotations:
+          summary: "Prometheus scrape failures"
+          description: "Target {{ $labels.job }} exceeding sample limit"
+
+      # =========================================================================
+      # GRAFANA ALERTS
+      # =========================================================================
+
+      - alert: GrafanaDown
+        expr: up{job="grafana"} == 0
+        for: 2m
+        labels:
+          severity: warning
+          tier: monitoring
+          service: grafana
+        annotations:
+          summary: "Grafana is down"
+          description: "Grafana dashboard service is not responding"
+
+      # =========================================================================
+      # LOKI ALERTS
+      # =========================================================================
+
+      - alert: LokiDown
+        expr: up{job="loki"} == 0
+        for: 2m
+        labels:
+          severity: warning
+          tier: monitoring
+          service: loki
+        annotations:
+          summary: "Loki is down"
+          description: "Loki log aggregation service is not responding"
+
+      - alert: LokiHighIngestionRate
+        expr: rate(loki_ingester_chunks_created_total[5m]) > 10000
+        for: 5m
+        labels:
+          severity: warning
+          tier: monitoring
+          service: loki
+        annotations:
+          summary: "High Loki ingestion rate"
+          description: "Loki ingesting {{ $value | printf \"%.0f\" }} chunks/s"
+
+      - alert: LokiIngesterReachingCapacity
+        expr: (loki_ingester_memory_chunks / loki_ingester_memory_chunks_total) > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          tier: monitoring
+          service: loki
+        annotations:
+          summary: "Loki ingester reaching capacity"
+          description: "Ingester at {{ $value | printf \"%.0f\" }}% capacity"
+
+      # =========================================================================
+      # ALERTMANAGER ALERTS
+      # =========================================================================
+
+      - alert: AlertmanagerDown
+        expr: up{job="alertmanager"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          tier: monitoring
+          service: alertmanager
+        annotations:
+          summary: "Alertmanager is down"
+          description: "Alertmanager is not responding. No alerts will be delivered."
+
+      - alert: AlertmanagerConfigReloadFailed
+        expr: alertmanager_config_last_reload_successful == 0
+        for: 5m
+        labels:
+          severity: warning
+          tier: monitoring
+          service: alertmanager
+        annotations:
+          summary: "Alertmanager config reload failed"
+          description: "Alertmanager failed to reload configuration"
+
+      - alert: AlertmanagerNotificationsFailing
+        expr: rate(alertmanager_notifications_failed_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          tier: monitoring
+          service: alertmanager
+        annotations:
+          summary: "Alertmanager notifications failing"
+          description: "{{ $value | printf \"%.2f\" }} notifications per second failing for {{ $labels.integration }}"
+
+      # =========================================================================
+      # EXPORTERS HEALTH
+      # =========================================================================
+
+      - alert: ExporterDown
+        expr: up{job=~".*-exporter"} == 0
+        for: 2m
+        labels:
+          severity: warning
+          tier: monitoring
+        annotations:
+          summary: "Exporter {{ $labels.job }} is down"
+          description: "Metrics exporter has been down for 2 minutes"
+
+      - alert: HighExporterScrapeDuration
+        expr: scrape_duration_seconds > 10
+        for: 5m
+        labels:
+          severity: warning
+          tier: monitoring
+        annotations:
+          summary: "Exporter scrape taking too long"
+          description: "{{ $labels.job }} taking {{ $value | printf \"%.1f\" }}s to scrape"

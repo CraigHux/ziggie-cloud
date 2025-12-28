@@ -1,0 +1,37 @@
+
+Implement security hardening for Control Center:
+
+ISSUE #6 - MISSING SECURITY HEADERS (MEDIUM):
+Location: backend/main.py
+Task: Add security headers middleware
+- X-Content-Type-Options: nosniff
+- X-Frame-Options: DENY
+- X-XSS-Protection: 1; mode=block
+- Content-Security-Policy: default-src 'self'
+Code example in action plan
+
+ISSUE #9 - DEPENDENCY AUDITING (MEDIUM):
+Location: backend/requirements.txt, CI/CD
+Task: Setup vulnerability scanning
+- Install pip-audit in requirements-dev.txt
+- Run initial audit: pip-audit
+- Document findings
+- Create GitHub Action for automated audits (.github/workflows/security.yml)
+
+ISSUE #14 - CORS TOO PERMISSIVE (LOW):
+Location: backend/main.py:35-41
+Task: Tighten CORS for production
+- Change allow_methods from ["*"] to ["GET", "POST", "PUT", "DELETE"]
+- Change allow_headers from ["*"] to specific headers
+- Add comment: "Development: permissive, Production: restricted"
+
+ISSUE #17 - COMMAND INJECTION (LOW):
+Task: Document safeguards
+- Create SECURITY.md
+- Document: Service commands are hardcoded (safe)
+- Warning: Never make service commands user-editable
+
+DELIVERABLE:
+- Create completion report: C:/Ziggie/agent-reports/L2.2.4_HARDENING_FIX_REPORT.md
+- Document: Security improvements, audit findings
+    

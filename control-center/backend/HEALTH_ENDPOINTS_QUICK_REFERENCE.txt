@@ -1,0 +1,188 @@
+================================================================================
+HEALTH CHECK ENDPOINTS - QUICK REFERENCE
+================================================================================
+
+ENDPOINTS CREATED FOR CONTROL CENTER BACKEND MONITORING
+Issue #18 Resolution: No health check endpoints for system monitoring
+
+================================================================================
+ENDPOINTS OVERVIEW
+================================================================================
+
+1. GET /health
+   - Basic health check
+   - Response Time: 4-5ms
+   - Use: Simple liveness probe
+   - Response: {"status": "healthy", "timestamp": "...", "version": "1.0.0"}
+
+2. GET /health/detailed
+   - Full system metrics and monitoring
+   - Response Time: 4-5ms
+   - Use: Monitoring dashboards
+   - Includes: CPU, Memory, Disk usage in GB and percentages
+   - Status Levels: healthy, warning (>90% usage), critical (>95% usage)
+
+3. GET /health/ready
+   - Kubernetes readiness probe
+   - Response Time: 5-6ms
+   - Use: Verify service accepts traffic
+   - Checks: service, system resources
+
+4. GET /health/live
+   - Kubernetes liveness probe
+   - Response Time: 3-4ms
+   - Use: Detect if process is running
+   - Response: {"alive": true, "timestamp": "..."}
+
+5. GET /health/startup
+   - Kubernetes startup probe
+   - Response Time: 3-4ms
+   - Use: Monitor initialization completion
+   - Response: {"startup_complete": true, ...}
+
+================================================================================
+FILES CREATED
+================================================================================
+
+C:/Ziggie/control-center/backend/api/health.py
+- New health check module
+- 5 health check endpoints
+- System metrics collection
+- Health status calculation
+
+================================================================================
+FILES MODIFIED
+================================================================================
+
+C:/Ziggie/control-center/backend/main.py
+- Added: from api import ... health
+- Added: app.include_router(health.router)
+
+C:/Ziggie/control-center/backend/api/__init__.py
+- Added health to imports and exports
+
+C:/Ziggie/control-center/backend/api/system.py
+- Added missing: from middleware.rate_limit import limiter
+- Added missing: Request import
+
+C:/Ziggie/control-center/backend/api/comfyui.py
+C:/Ziggie/control-center/backend/api/docker.py
+C:/Ziggie/control-center/backend/api/usage.py
+- Added missing: from middleware.rate_limit import limiter
+- Added missing: Request import
+
+================================================================================
+PERFORMANCE METRICS
+================================================================================
+
+All endpoints respond in <50ms (exceeds requirement):
+
+Endpoint             | Avg Response | Status
+---------------------|--------------|--------
+/health              | 4.26ms      | PASS
+/health/detailed     | 4.27ms      | PASS
+/health/ready        | 5.71ms      | PASS
+/health/live         | 3.49ms      | PASS
+/health/startup      | 3.41ms      | PASS
+
+================================================================================
+KUBERNETES INTEGRATION
+================================================================================
+
+Example deployment configuration:
+
+livenessProbe:
+  httpGet:
+    path: /health/live
+    port: 8000
+  initialDelaySeconds: 10
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /health/ready
+    port: 8000
+  initialDelaySeconds: 5
+  periodSeconds: 5
+
+startupProbe:
+  httpGet:
+    path: /health/startup
+    port: 8000
+  failureThreshold: 30
+  periodSeconds: 1
+
+================================================================================
+SAMPLE RESPONSES
+================================================================================
+
+GET /health/detailed Response:
+{
+  "status": "healthy",
+  "timestamp": "2025-11-10T00:32:23.820675",
+  "version": "1.0.0",
+  "system": {
+    "cpu_percent": 23.3,
+    "cpu_count": 16,
+    "memory_percent": 84.2,
+    "memory_used_gb": 12.94,
+    "memory_available_gb": 2.42,
+    "memory_total_gb": 15.36,
+    "disk_percent": 58.2,
+    "disk_used_gb": 276.85,
+    "disk_free_gb": 198.57,
+    "disk_total_gb": 475.42
+  },
+  "python_version": "3.13.9 ...",
+  "process_id": 47776,
+  "working_directory": "C:\Ziggie\control-center\backend"
+}
+
+GET /health/ready Response:
+{
+  "ready": true,
+  "status": "ready",
+  "checks": {
+    "service": true,
+    "system": true
+  },
+  "timestamp": "2025-11-10T00:32:23.825240"
+}
+
+================================================================================
+CURL EXAMPLES
+================================================================================
+
+# Check service is alive
+curl http://localhost:8000/health/live
+
+# Check service is ready for traffic
+curl http://localhost:8000/health/ready
+
+# Get detailed system metrics
+curl http://localhost:8000/health/detailed
+
+# Monitor startup
+curl http://localhost:8000/health/startup
+
+# Basic health check
+curl http://localhost:8000/health
+
+================================================================================
+SUCCESS CRITERIA - ALL MET
+================================================================================
+
+[X] Health endpoints return 200 OK status codes
+[X] Kubernetes compatible (liveness, readiness, startup probes)
+[X] System metrics included (CPU, memory, disk)
+[X] Response time <50ms (actual: 3-6ms)
+[X] Health status levels (healthy, warning, critical)
+[X] Resource availability checks
+[X] Proper error handling with HTTP 500 on failures
+[X] Timestamps in ISO 8601 format
+[X] Process ID and working directory tracking
+[X] All endpoints tested and verified
+
+================================================================================
+STATUS: COMPLETE AND READY FOR PRODUCTION
+================================================================================

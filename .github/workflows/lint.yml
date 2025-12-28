@@ -1,0 +1,342 @@
+# =============================================================================
+# ZIGGIE COMMAND CENTER - Code Linting Workflow
+# =============================================================================
+# Comprehensive code quality checks: Python, JavaScript, YAML, Docker
+# =============================================================================
+# Author: DAEDALUS (Pipeline Architect - Elite Technical Team)
+# Created: 2025-12-28
+# =============================================================================
+
+name: Code Quality (Lint)
+
+on:
+  push:
+    branches:
+      - main
+      - 'feature/**'
+      - 'fix/**'
+    paths:
+      - '**.py'
+      - '**.js'
+      - '**.ts'
+      - '**.tsx'
+      - '**.yml'
+      - '**.yaml'
+      - '**/Dockerfile*'
+      - '**/docker-compose*.yml'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '18'
+
+jobs:
+  # ===========================================================================
+  # PYTHON LINTING
+  # ===========================================================================
+  python-lint:
+    name: Python Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install linting tools
+        run: |
+          pip install flake8 black isort pylint mypy
+
+      - name: Find Python directories
+        id: find_python
+        run: |
+          PYTHON_DIRS=""
+          for dir in control-center/backend coordinator integrations mcp-gateway; do
+            if [ -d "$dir" ]; then
+              PYTHON_DIRS="$PYTHON_DIRS $dir"
+            fi
+          done
+          echo "dirs=$PYTHON_DIRS" >> $GITHUB_OUTPUT
+
+      - name: Run flake8 (syntax errors)
+        run: |
+          echo "=== Flake8: Critical Errors ==="
+          flake8 ${{ steps.find_python.outputs.dirs }} \
+            --count \
+            --select=E9,F63,F7,F82 \
+            --show-source \
+            --statistics
+
+      - name: Run flake8 (style checks)
+        continue-on-error: true
+        run: |
+          echo "=== Flake8: Style Checks ==="
+          flake8 ${{ steps.find_python.outputs.dirs }} \
+            --count \
+            --max-complexity=10 \
+            --max-line-length=127 \
+            --statistics \
+            --exit-zero
+
+      - name: Check formatting with black
+        continue-on-error: true
+        run: |
+          echo "=== Black: Formatting Check ==="
+          black --check --diff ${{ steps.find_python.outputs.dirs }} || \
+            echo "::warning::Python files need formatting with black"
+
+      - name: Check import sorting with isort
+        continue-on-error: true
+        run: |
+          echo "=== isort: Import Sorting ==="
+          isort --check-only --diff ${{ steps.find_python.outputs.dirs }} || \
+            echo "::warning::Python imports need sorting with isort"
+
+      - name: Run pylint
+        continue-on-error: true
+        run: |
+          echo "=== Pylint: Code Analysis ==="
+          pylint ${{ steps.find_python.outputs.dirs }} \
+            --output-format=colorized \
+            --disable=C0114,C0115,C0116 \
+            --exit-zero
+
+      - name: Type checking with mypy
+        continue-on-error: true
+        run: |
+          echo "=== MyPy: Type Checking ==="
+          for dir in ${{ steps.find_python.outputs.dirs }}; do
+            if [ -f "$dir/py.typed" ] || [ -f "$dir/mypy.ini" ]; then
+              mypy "$dir" --ignore-missing-imports || true
+            fi
+          done
+
+  # ===========================================================================
+  # JAVASCRIPT/TYPESCRIPT LINTING
+  # ===========================================================================
+  javascript-lint:
+    name: JavaScript Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Find JavaScript projects
+        id: find_js
+        run: |
+          JS_DIRS=$(find . -name "package.json" -not -path "./node_modules/*" -exec dirname {} \;)
+          echo "dirs=$JS_DIRS" >> $GITHUB_OUTPUT
+
+      - name: Lint JavaScript projects
+        run: |
+          echo "=== JavaScript/TypeScript Linting ==="
+
+          for dir in ${{ steps.find_js.outputs.dirs }}; do
+            echo ""
+            echo "Checking $dir..."
+            cd "$dir"
+
+            # Install dependencies
+            if [ -f "package-lock.json" ]; then
+              npm ci --ignore-scripts
+            else
+              npm install --ignore-scripts
+            fi
+
+            # Run ESLint if configured
+            if [ -f ".eslintrc" ] || [ -f ".eslintrc.js" ] || [ -f ".eslintrc.json" ] || [ -f "eslint.config.js" ]; then
+              npx eslint . --ext .js,.ts,.tsx || echo "::warning::ESLint issues in $dir"
+            else
+              echo "No ESLint config found in $dir"
+            fi
+
+            # Run Prettier check if configured
+            if [ -f ".prettierrc" ] || [ -f ".prettierrc.js" ] || [ -f "prettier.config.js" ]; then
+              npx prettier --check . || echo "::warning::Prettier issues in $dir"
+            fi
+
+            cd - > /dev/null
+          done
+
+  # ===========================================================================
+  # YAML LINTING
+  # ===========================================================================
+  yaml-lint:
+    name: YAML Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install yamllint
+        run: pip install yamllint
+
+      - name: Lint YAML files
+        run: |
+          echo "=== YAML Linting ==="
+
+          # Find all YAML files (excluding node_modules)
+          find . \( -name "*.yml" -o -name "*.yaml" \) \
+            -not -path "./node_modules/*" \
+            -not -path "./.git/*" | while read file; do
+              yamllint -d relaxed "$file" || echo "::warning::YAML issues in $file"
+          done
+
+      - name: Validate GitHub Actions workflows
+        run: |
+          echo "=== GitHub Actions Workflow Validation ==="
+
+          # Check workflow syntax
+          for workflow in .github/workflows/*.yml; do
+            if [ -f "$workflow" ]; then
+              echo "Validating $workflow..."
+              # Basic YAML validity
+              python -c "import yaml; yaml.safe_load(open('$workflow'))" || \
+                echo "::error::Invalid YAML in $workflow"
+            fi
+          done
+
+  # ===========================================================================
+  # DOCKER LINTING
+  # ===========================================================================
+  docker-lint:
+    name: Docker Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Hadolint
+        run: |
+          curl -sL -o hadolint "https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-x86_64"
+          chmod +x hadolint
+          sudo mv hadolint /usr/local/bin/
+
+      - name: Lint Dockerfiles
+        run: |
+          echo "=== Dockerfile Linting ==="
+
+          find . -name "Dockerfile*" -not -path "./node_modules/*" | while read dockerfile; do
+            echo "Checking $dockerfile..."
+            hadolint "$dockerfile" --format tty || echo "::warning::Issues in $dockerfile"
+          done
+
+      - name: Validate Docker Compose files
+        run: |
+          echo "=== Docker Compose Validation ==="
+
+          find . -name "docker-compose*.yml" -not -path "./node_modules/*" | while read compose; do
+            echo "Validating $compose..."
+            docker compose -f "$compose" config --quiet || echo "::error::Invalid $compose"
+          done
+
+  # ===========================================================================
+  # MARKDOWN LINTING
+  # ===========================================================================
+  markdown-lint:
+    name: Documentation Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install markdownlint
+        run: npm install -g markdownlint-cli
+
+      - name: Lint Markdown files
+        continue-on-error: true
+        run: |
+          echo "=== Markdown Linting ==="
+          markdownlint '**/*.md' \
+            --ignore node_modules \
+            --ignore .git \
+            --disable MD013 MD033 MD041 || \
+            echo "::warning::Markdown style issues found"
+
+  # ===========================================================================
+  # SHELL SCRIPT LINTING
+  # ===========================================================================
+  shell-lint:
+    name: Shell Script Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install shellcheck
+        run: sudo apt-get install -y shellcheck
+
+      - name: Lint shell scripts
+        run: |
+          echo "=== Shell Script Linting ==="
+
+          find . \( -name "*.sh" -o -name "*.bash" \) \
+            -not -path "./node_modules/*" \
+            -not -path "./.git/*" | while read script; do
+              echo "Checking $script..."
+              shellcheck "$script" || echo "::warning::Issues in $script"
+          done
+
+  # ===========================================================================
+  # SUMMARY
+  # ===========================================================================
+  summary:
+    name: Lint Summary
+    runs-on: ubuntu-latest
+    needs: [python-lint, javascript-lint, yaml-lint, docker-lint, markdown-lint, shell-lint]
+    if: always()
+    steps:
+      - name: Generate lint summary
+        run: |
+          echo "## Code Quality Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Run Date**: $(date -Iseconds)" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Linting Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Category | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Python (flake8, black, pylint) | ${{ needs.python-lint.result == 'success' && 'PASSED' || 'REVIEW NEEDED' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| JavaScript (ESLint, Prettier) | ${{ needs.javascript-lint.result == 'success' && 'PASSED' || 'REVIEW NEEDED' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| YAML (yamllint) | ${{ needs.yaml-lint.result == 'success' && 'PASSED' || 'REVIEW NEEDED' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Docker (Hadolint) | ${{ needs.docker-lint.result == 'success' && 'PASSED' || 'REVIEW NEEDED' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Markdown | ${{ needs.markdown-lint.result == 'success' && 'PASSED' || 'REVIEW NEEDED' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Shell Scripts | ${{ needs.shell-lint.result == 'success' && 'PASSED' || 'REVIEW NEEDED' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Determine overall status
+          CRITICAL_FAILED=0
+          if [ "${{ needs.python-lint.result }}" = "failure" ]; then
+            CRITICAL_FAILED=1
+          fi
+          if [ "${{ needs.yaml-lint.result }}" = "failure" ]; then
+            CRITICAL_FAILED=1
+          fi
+          if [ "${{ needs.docker-lint.result }}" = "failure" ]; then
+            CRITICAL_FAILED=1
+          fi
+
+          if [ $CRITICAL_FAILED -eq 1 ]; then
+            echo "### Action Required" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Critical linting issues were found. Please review and fix before merging." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### Quality Gate: PASSED" >> $GITHUB_STEP_SUMMARY
+          fi

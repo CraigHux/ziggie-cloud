@@ -1,0 +1,481 @@
+{
+  "protocol_version": "1.3",
+  "description": "Communication schemas for hierarchical agent deployment",
+  "created": "2025-11-09",
+  "status": "DESIGN SPECIFICATION",
+
+  "schemas": {
+    "mission_payload": {
+      "direction": "Ziggie (L0) → Overwatch (L1)",
+      "format": "JSON",
+      "when": "Phase 6 - Overwatch Deployment",
+      "purpose": "Complete mission briefing with all deployment parameters",
+
+      "example": {
+        "mission_id": "MISSION-20251109-001",
+        "mission_description": "Fix Control Center Services error preventing frontend from connecting to backend API",
+        "protocol_version": "1.3",
+
+        "system_context": {
+          "cpu_cores": 8,
+          "ram_available_gb": 16,
+          "disk_available_gb": 250,
+          "system_health": "GREEN",
+          "current_load_percentage": 35,
+          "heavy_processes_running": 12
+        },
+
+        "workload_analysis": {
+          "total_tasks": 6,
+          "total_instances": 6,
+          "task_type": "File Operations",
+          "complexity": "Medium",
+          "estimated_duration_minutes": 2,
+          "files_to_create": 1,
+          "files_to_edit": 1,
+          "files_to_verify": 0,
+          "operations_to_perform": 4
+        },
+
+        "load_balance": {
+          "workers_planned": 3,
+          "ideal_load_per_agent": 2.0,
+          "max_load_per_agent_percentage": 40,
+          "max_load_per_agent_tasks": 2.4,
+          "target_variance_ratio": "2:1",
+
+          "agents": {
+            "L2.10.1": {
+              "agent_id": "L2.10.1",
+              "agent_name": "Configuration Fixer",
+              "model": "haiku",
+              "assigned_tasks": [
+                {
+                  "task_id": "TASK-001",
+                  "task_description": "Create .env file with correct port configuration",
+                  "task_type": "file_create",
+                  "estimated_duration_seconds": 10,
+                  "priority": 1,
+                  "dependencies": []
+                },
+                {
+                  "task_id": "TASK-002",
+                  "task_description": "Fix docker-compose.yml environment variables",
+                  "task_type": "file_edit",
+                  "estimated_duration_seconds": 15,
+                  "priority": 2,
+                  "dependencies": []
+                }
+              ],
+              "total_task_count": 2,
+              "workload_percentage": 33.3,
+              "estimated_duration_seconds": 25
+            },
+            "L2.10.2": {
+              "agent_id": "L2.10.2",
+              "agent_name": "Service Verifier",
+              "model": "haiku",
+              "assigned_tasks": [
+                {
+                  "task_id": "TASK-003",
+                  "task_description": "Verify backend health endpoint responding",
+                  "task_type": "verification",
+                  "estimated_duration_seconds": 10,
+                  "priority": 1,
+                  "dependencies": []
+                },
+                {
+                  "task_id": "TASK-004",
+                  "task_description": "Test API endpoint /api/services for 200 OK response",
+                  "task_type": "verification",
+                  "estimated_duration_seconds": 10,
+                  "priority": 2,
+                  "dependencies": ["TASK-003"]
+                }
+              ],
+              "total_task_count": 2,
+              "workload_percentage": 33.3,
+              "estimated_duration_seconds": 20
+            },
+            "L2.10.3": {
+              "agent_id": "L2.10.3",
+              "agent_name": "Container Operator",
+              "model": "haiku",
+              "assigned_tasks": [
+                {
+                  "task_id": "TASK-005",
+                  "task_description": "Restart frontend container to apply new environment variables",
+                  "task_type": "container_operation",
+                  "estimated_duration_seconds": 60,
+                  "priority": 1,
+                  "dependencies": ["TASK-001", "TASK-002"]
+                },
+                {
+                  "task_id": "TASK-006",
+                  "task_description": "Test WebSocket endpoint ws://localhost:54112/ws/system",
+                  "task_type": "verification",
+                  "estimated_duration_seconds": 10,
+                  "priority": 2,
+                  "dependencies": ["TASK-005"]
+                }
+              ],
+              "total_task_count": 2,
+              "workload_percentage": 33.3,
+              "estimated_duration_seconds": 70
+            }
+          }
+        },
+
+        "requirements": {
+          "real_time_logging": true,
+          "time_tracking": true,
+          "mandatory_agent_reports": true,
+          "target_score": 100,
+          "max_variance_ratio": "2:1",
+          "protocol_compliance": "v1.2"
+        },
+
+        "validation_criteria": {
+          "work_completion": "All 6 tasks must complete successfully",
+          "quality_accuracy": "All 3 agent reports required, no rework needed",
+          "load_balance": "Variance must be <2:1 ratio, no agent >40%",
+          "documentation": "Real-time logs + Overwatch final report required",
+          "efficiency": "Execution time tracked per-agent and overall, reasonable duration"
+        },
+
+        "deployment_timestamp": "2025-11-09T14:53:00Z",
+        "approved_by_user": true,
+        "user_confirmation_message": "Yes, proceed with 3 Haiku agents"
+      },
+
+      "required_fields": [
+        "mission_id",
+        "mission_description",
+        "protocol_version",
+        "system_context",
+        "workload_analysis",
+        "load_balance",
+        "requirements",
+        "deployment_timestamp",
+        "approved_by_user"
+      ]
+    },
+
+    "task_assignment": {
+      "direction": "Overwatch (L1) → L2 Worker",
+      "format": "JSON",
+      "when": "Phase 6b - L2 Worker Deployment",
+      "purpose": "Detailed task assignment for individual L2 worker",
+
+      "example": {
+        "assignment_id": "ASSIGN-L2.10.1-20251109145325",
+        "agent_id": "L2.10.1",
+        "agent_name": "Configuration Fixer",
+        "model": "haiku",
+        "mission_id": "MISSION-20251109-001",
+
+        "tasks": [
+          {
+            "task_id": "TASK-001",
+            "task_description": "Create .env file with correct port configuration",
+            "task_type": "file_create",
+            "priority": 1,
+            "estimated_duration_seconds": 10,
+            "inputs": {
+              "file_path": "C:\\Ziggie\\control-center\\control-center\\frontend\\.env",
+              "content": "# Frontend Environment Configuration\nVITE_API_URL=http://localhost:54112/api\nVITE_WS_URL=ws://localhost:54112/ws\nVITE_API_TIMEOUT=30000\nVITE_ENABLE_LOGGING=true"
+            },
+            "validation": {
+              "verify_file_exists": true,
+              "verify_content_correct": true,
+              "verify_permissions": false
+            },
+            "dependencies": []
+          },
+          {
+            "task_id": "TASK-002",
+            "task_description": "Fix docker-compose.yml environment variables",
+            "task_type": "file_edit",
+            "priority": 2,
+            "estimated_duration_seconds": 15,
+            "inputs": {
+              "file_path": "C:\\Ziggie\\docker-compose.yml",
+              "edit_operations": [
+                {
+                  "operation": "replace_line",
+                  "line_number": 62,
+                  "old_value": "VITE_API_BASE_URL: http://localhost:54112",
+                  "new_value": "VITE_API_URL: http://localhost:54112/api"
+                },
+                {
+                  "operation": "insert_after",
+                  "line_number": 62,
+                  "new_value": "VITE_WS_URL: ws://localhost:54112/ws"
+                }
+              ]
+            },
+            "validation": {
+              "verify_changes_applied": true,
+              "verify_yaml_valid": true,
+              "verify_no_syntax_errors": true
+            },
+            "dependencies": []
+          }
+        ],
+
+        "workload_percentage": 33.3,
+        "total_tasks": 2,
+        "estimated_total_duration_seconds": 25,
+
+        "reporting_requirements": {
+          "completion_report_required": true,
+          "report_format": "markdown",
+          "report_location": "C:\\Ziggie\\agent-reports\\L2.10.1_COMPLETION_REPORT.md",
+          "required_sections": [
+            "Agent ID and Task Description",
+            "Execution Metrics (start, end, duration)",
+            "Detailed Results Breakdown",
+            "Files Processed / Operations Performed",
+            "Issues Encountered",
+            "Final Status Verification"
+          ]
+        },
+
+        "status_reporting": {
+          "report_start": true,
+          "report_progress_milestones": [25, 50, 75, 100],
+          "report_completion": true,
+          "report_errors_immediately": true,
+          "update_format": "json",
+          "update_destination": "overwatch_monitoring"
+        },
+
+        "assigned_timestamp": "2025-11-09T14:53:25Z"
+      },
+
+      "required_fields": [
+        "assignment_id",
+        "agent_id",
+        "agent_name",
+        "model",
+        "mission_id",
+        "tasks",
+        "workload_percentage",
+        "total_tasks",
+        "reporting_requirements",
+        "assigned_timestamp"
+      ]
+    },
+
+    "status_update": {
+      "direction": "L2 Worker → Overwatch (L1)",
+      "format": "JSON",
+      "when": "During execution (start, progress milestones, completion, errors)",
+      "purpose": "Real-time status reporting for monitoring and logging",
+
+      "examples": {
+        "started": {
+          "update_id": "UPDATE-L2.10.1-001",
+          "agent_id": "L2.10.1",
+          "mission_id": "MISSION-20251109-001",
+          "update_type": "started",
+          "status": "in_progress",
+          "current_task_id": "TASK-001",
+          "progress_percentage": 0,
+          "tasks_completed": 0,
+          "tasks_total": 2,
+          "elapsed_seconds": 0,
+          "estimated_remaining_seconds": 25,
+          "message": "Agent L2.10.1 started. Beginning TASK-001: Create .env file.",
+          "warnings": [],
+          "errors": [],
+          "timestamp": "2025-11-09T14:53:26Z"
+        },
+
+        "progress": {
+          "update_id": "UPDATE-L2.10.1-002",
+          "agent_id": "L2.10.1",
+          "mission_id": "MISSION-20251109-001",
+          "update_type": "progress",
+          "status": "in_progress",
+          "current_task_id": "TASK-002",
+          "progress_percentage": 50,
+          "tasks_completed": 1,
+          "tasks_total": 2,
+          "elapsed_seconds": 12,
+          "estimated_remaining_seconds": 13,
+          "message": "50% complete. TASK-001 finished successfully. Starting TASK-002.",
+          "warnings": [],
+          "errors": [],
+          "timestamp": "2025-11-09T14:53:38Z"
+        },
+
+        "completed": {
+          "update_id": "UPDATE-L2.10.1-003",
+          "agent_id": "L2.10.1",
+          "mission_id": "MISSION-20251109-001",
+          "update_type": "completed",
+          "status": "completed",
+          "current_task_id": "TASK-002",
+          "progress_percentage": 100,
+          "tasks_completed": 2,
+          "tasks_total": 2,
+          "elapsed_seconds": 22,
+          "estimated_remaining_seconds": 0,
+          "message": "All tasks completed successfully. Completion report created.",
+          "warnings": [],
+          "errors": [],
+          "timestamp": "2025-11-09T14:53:48Z"
+        },
+
+        "error": {
+          "update_id": "UPDATE-L2.10.3-005",
+          "agent_id": "L2.10.3",
+          "mission_id": "MISSION-20251109-001",
+          "update_type": "error",
+          "status": "failed",
+          "current_task_id": "TASK-005",
+          "progress_percentage": 50,
+          "tasks_completed": 0,
+          "tasks_total": 2,
+          "elapsed_seconds": 75,
+          "estimated_remaining_seconds": 0,
+          "message": "TASK-005 failed: Container restart error.",
+          "warnings": [],
+          "errors": [
+            {
+              "error_code": "CONTAINER_RESTART_FAILED",
+              "error_message": "Docker container 'ziggie-frontend' failed to restart: timeout after 60 seconds",
+              "task_id": "TASK-005",
+              "severity": "critical",
+              "timestamp": "2025-11-09T14:54:41Z"
+            }
+          ],
+          "timestamp": "2025-11-09T14:54:41Z"
+        }
+      },
+
+      "update_types": {
+        "started": "Agent began work on first task",
+        "progress": "Progress milestone reached (25%, 50%, 75%)",
+        "completed": "All tasks finished successfully",
+        "error": "Error encountered, may be critical",
+        "warning": "Warning issued, non-critical"
+      },
+
+      "status_values": {
+        "initializing": "Agent starting up",
+        "in_progress": "Actively working on tasks",
+        "completed": "All tasks done successfully",
+        "failed": "Critical error, cannot continue",
+        "partial": "Some tasks completed, some failed"
+      },
+
+      "required_fields": [
+        "update_id",
+        "agent_id",
+        "mission_id",
+        "update_type",
+        "status",
+        "progress_percentage",
+        "tasks_completed",
+        "tasks_total",
+        "elapsed_seconds",
+        "message",
+        "timestamp"
+      ]
+    },
+
+    "completion_report": {
+      "direction": "L2 Worker → Overwatch (L1)",
+      "format": "Markdown file",
+      "when": "After all tasks completed (or failed)",
+      "purpose": "Detailed completion report for audit trail and verification",
+      "file_location": "C:\\Ziggie\\agent-reports\\[AGENT_ID]_COMPLETION_REPORT.md",
+
+      "template": "# [AGENT_ID] COMPLETION REPORT\n\n**Agent:** [Agent ID] - [Agent Name]\n**Task:** [Brief description]\n**Status:** SUCCESS / FAILED / PARTIAL\n\n**Execution Metrics:**\n- Start Time: [HH:MM:SS]\n- End Time: [HH:MM:SS]\n- Duration: [X minutes Y seconds]\n- Files Processed: [X/Y]\n- Operations Performed: [X operations]\n\n**Results:**\n- [List of completed items with details]\n- [Verification status for each]\n\n**Issues Encountered:**\n- [None / List any issues with resolution]\n\n**Detailed Work Log:**\n\n### TASK-001: [Task Description]\n- **Status:** SUCCESS / FAILED\n- **Duration:** [X seconds]\n- **Operations:**\n  - [Operation 1 details]\n  - [Operation 2 details]\n- **Verification:** ✅ Verified correct / ❌ Failed validation\n- **Notes:** [Any relevant notes]\n\n### TASK-002: [Task Description]\n- **Status:** SUCCESS / FAILED\n- **Duration:** [X seconds]\n- **Operations:**\n  - [Operation 1 details]\n- **Verification:** ✅ Verified correct\n- **Notes:** [Any relevant notes]\n\n**Final Status:** VERIFIED COMPLETE / NEEDS REVIEW / FAILED\n\n**Report Generated:** [YYYY-MM-DD HH:MM:SS]\n**Signed:** [Agent ID]",
+
+      "required_sections": [
+        "Agent ID and Task Description",
+        "Execution Metrics (start, end, duration)",
+        "Detailed Results Breakdown",
+        "Files Processed / Operations Performed",
+        "Issues Encountered",
+        "Final Status Verification"
+      ]
+    },
+
+    "final_report": {
+      "direction": "Overwatch (L1) → Ziggie (L0)",
+      "format": "Markdown file",
+      "when": "Phase 9a - After all L2 workers complete",
+      "purpose": "Comprehensive final report with scoring and analysis",
+      "file_location": "C:\\Ziggie\\agent-reports\\OVERWATCH_FINAL_REPORT.md",
+
+      "template_reference": "See PROTOCOL_v1.3_HIERARCHICAL_INTEGRATION.md section 'Overwatch Agent Template' for complete template",
+
+      "required_sections": [
+        "Mission Briefing",
+        "Phase 6b: L2 Worker Deployment",
+        "Phase 7: Real-time Monitoring Log",
+        "Phase 8: Execution Time Tracking",
+        "Phase 8b: Agent Report Collection",
+        "Phase 9a: Overwatch Final Report",
+        "Work Completion Summary",
+        "Load Balance Analysis",
+        "Protocol v1.2 Compliance",
+        "Overwatch Scoring (0-100)",
+        "Lessons Learned",
+        "Mission Status"
+      ],
+
+      "scoring_breakdown": {
+        "work_completion": {
+          "points": 40,
+          "criteria": "All tasks completed, no errors, all verifications passed"
+        },
+        "quality_accuracy": {
+          "points": 25,
+          "criteria": "All reports created, excellent quality, no rework, all validations correct"
+        },
+        "load_balance": {
+          "points": 15,
+          "criteria": "Variance <2:1 ratio (10 pts), no agent >40% (5 pts)"
+        },
+        "documentation": {
+          "points": 10,
+          "criteria": "Real-time logging, final report, agent report compliance"
+        },
+        "efficiency": {
+          "points": 10,
+          "criteria": "Time tracking complete, benchmarks calculated, reasonable duration"
+        },
+        "total": 100
+      }
+    }
+  },
+
+  "usage_notes": {
+    "mission_payload": "Ziggie creates this after Phase 5 user confirmation. Contains ALL information Overwatch needs for autonomous deployment.",
+    "task_assignment": "Overwatch creates one per L2 worker during Phase 6b. Contains detailed task breakdown and reporting requirements.",
+    "status_update": "L2 workers send these during execution. Overwatch aggregates for real-time logging and monitoring.",
+    "completion_report": "L2 workers create markdown file upon completion. Overwatch verifies presence and quality.",
+    "final_report": "Overwatch creates comprehensive markdown report. Ziggie reads this for Phase 9 user summary."
+  },
+
+  "validation": {
+    "mission_payload": "Overwatch validates on receipt: check required fields, verify load balance sums to 100%, confirm agent IDs unique",
+    "task_assignment": "L2 worker validates on receipt: check required fields, verify task IDs match mission payload, confirm file paths valid",
+    "status_update": "Overwatch validates on receipt: check agent_id matches deployed agents, verify timestamp chronological, confirm progress percentage logical",
+    "completion_report": "Overwatch validates file exists and has all required sections",
+    "final_report": "Ziggie validates file exists and has scoring breakdown"
+  },
+
+  "error_handling": {
+    "invalid_mission_payload": "Overwatch reports error to Ziggie, cannot proceed with deployment",
+    "invalid_task_assignment": "L2 worker reports error to Overwatch, cannot start tasks",
+    "missing_status_update": "Overwatch detects timeout, logs warning, continues monitoring",
+    "missing_completion_report": "Overwatch deducts quality points, documents in final report",
+    "missing_final_report": "Ziggie reports protocol violation, cannot complete Phase 9"
+  }
+}

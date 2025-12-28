@@ -1,0 +1,227 @@
+{
+  "name": "Automated Backup Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 3 * * *"
+            }
+          ]
+        }
+      },
+      "id": "backup-schedule",
+      "name": "Daily Backup (3am)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate backup metadata\nconst timestamp = new Date().toISOString();\nconst dateString = timestamp.split('T')[0];\nconst backupId = `backup_${Date.now()}`;\n\nreturn {\n  json: {\n    backupId: backupId,\n    timestamp: timestamp,\n    dateString: dateString,\n    backupPath: `/tmp/ziggie-backups/${dateString}`,\n    s3Bucket: 'ziggie-backups',\n    s3Prefix: `backups/${dateString}/`,\n    targets: [\n      { name: 'mongodb', type: 'database', container: 'ziggie-mongodb' },\n      { name: 'postgres', type: 'database', container: 'ziggie-postgres' },\n      { name: 'n8n-workflows', type: 'files', path: '/home/node/.n8n/workflows' },\n      { name: 'redis-dump', type: 'database', container: 'ziggie-redis' }\n    ]\n  }\n};"
+      },
+      "id": "prepare-backup",
+      "name": "Prepare Backup",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "command": "=mkdir -p {{ $json.backupPath }}",
+        "options": {}
+      },
+      "id": "create-backup-dir",
+      "name": "Create Backup Directory",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "command": "=docker exec {{ $('Prepare Backup').first().json.targets[0].container }} mongodump --archive=/tmp/backup.archive --gzip",
+        "options": {}
+      },
+      "id": "backup-mongodb",
+      "name": "Backup MongoDB",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [900, 200]
+    },
+    {
+      "parameters": {
+        "command": "=docker exec {{ $('Prepare Backup').first().json.targets[1].container }} pg_dump -U ziggie -Fc ziggie > {{ $('Prepare Backup').first().json.backupPath }}/postgres.dump",
+        "options": {}
+      },
+      "id": "backup-postgres",
+      "name": "Backup PostgreSQL",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "command": "=docker cp ziggie-n8n:/home/node/.n8n/workflows {{ $('Prepare Backup').first().json.backupPath }}/n8n-workflows",
+        "options": {}
+      },
+      "id": "backup-workflows",
+      "name": "Backup n8n Workflows",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [900, 400]
+    },
+    {
+      "parameters": {
+        "command": "=docker exec {{ $('Prepare Backup').first().json.targets[3].container }} redis-cli --rdb /tmp/redis-backup.rdb SAVE",
+        "options": {}
+      },
+      "id": "backup-redis",
+      "name": "Backup Redis",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [900, 500]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "id": "merge-backups",
+      "name": "Merge Backup Results",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "command": "=tar -czf {{ $('Prepare Backup').first().json.backupPath }}.tar.gz -C /tmp/ziggie-backups {{ $('Prepare Backup').first().json.dateString }}",
+        "options": {}
+      },
+      "id": "compress-backup",
+      "name": "Compress Backup",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [1340, 300]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "={{ $('Prepare Backup').first().json.s3Bucket }}",
+        "fileName": "={{ $('Prepare Backup').first().json.s3Prefix }}ziggie-backup-{{ $('Prepare Backup').first().json.dateString }}.tar.gz",
+        "binaryPropertyName": "data",
+        "additionalFields": {
+          "storageClass": "STANDARD_IA",
+          "tagsUi": {
+            "tagsValues": [
+              {
+                "key": "backup_date",
+                "value": "={{ $('Prepare Backup').first().json.dateString }}"
+              },
+              {
+                "key": "backup_type",
+                "value": "automated_daily"
+              }
+            ]
+          }
+        }
+      },
+      "id": "upload-to-s3",
+      "name": "Upload to S3",
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [1560, 300],
+      "credentials": {
+        "s3": {
+          "id": "ziggie-aws-s3",
+          "name": "Ziggie AWS S3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "=rm -rf {{ $('Prepare Backup').first().json.backupPath }}*",
+        "options": {}
+      },
+      "id": "cleanup-local",
+      "name": "Cleanup Local Backups",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [1780, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.DISCORD_WEBHOOK_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"embeds\": [{\n    \"title\": \"Automated Backup Complete\",\n    \"color\": 5763719,\n    \"fields\": [\n      {\n        \"name\": \"Backup ID\",\n        \"value\": \"{{ $('Prepare Backup').first().json.backupId }}\",\n        \"inline\": true\n      },\n      {\n        \"name\": \"Date\",\n        \"value\": \"{{ $('Prepare Backup').first().json.dateString }}\",\n        \"inline\": true\n      },\n      {\n        \"name\": \"S3 Location\",\n        \"value\": \"s3://{{ $('Prepare Backup').first().json.s3Bucket }}/{{ $('Prepare Backup').first().json.s3Prefix }}\"\n      },\n      {\n        \"name\": \"Components Backed Up\",\n        \"value\": \"MongoDB, PostgreSQL, n8n Workflows, Redis\"\n      }\n    ],\n    \"footer\": {\n      \"text\": \"Ziggie Backup System\"\n    },\n    \"timestamp\": \"{{ $('Prepare Backup').first().json.timestamp }}\"\n  }]\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "discord-notify",
+      "name": "Discord Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2000, 300]
+    }
+  ],
+  "connections": {
+    "Daily Backup (3am)": {
+      "main": [[{ "node": "Prepare Backup", "type": "main", "index": 0 }]]
+    },
+    "Prepare Backup": {
+      "main": [[{ "node": "Create Backup Directory", "type": "main", "index": 0 }]]
+    },
+    "Create Backup Directory": {
+      "main": [
+        [
+          { "node": "Backup MongoDB", "type": "main", "index": 0 },
+          { "node": "Backup PostgreSQL", "type": "main", "index": 0 },
+          { "node": "Backup n8n Workflows", "type": "main", "index": 0 },
+          { "node": "Backup Redis", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Backup MongoDB": {
+      "main": [[{ "node": "Merge Backup Results", "type": "main", "index": 0 }]]
+    },
+    "Backup PostgreSQL": {
+      "main": [[{ "node": "Merge Backup Results", "type": "main", "index": 1 }]]
+    },
+    "Backup n8n Workflows": {
+      "main": [[{ "node": "Merge Backup Results", "type": "main", "index": 2 }]]
+    },
+    "Backup Redis": {
+      "main": [[{ "node": "Merge Backup Results", "type": "main", "index": 3 }]]
+    },
+    "Merge Backup Results": {
+      "main": [[{ "node": "Compress Backup", "type": "main", "index": 0 }]]
+    },
+    "Compress Backup": {
+      "main": [[{ "node": "Upload to S3", "type": "main", "index": 0 }]]
+    },
+    "Upload to S3": {
+      "main": [[{ "node": "Cleanup Local Backups", "type": "main", "index": 0 }]]
+    },
+    "Cleanup Local Backups": {
+      "main": [[{ "node": "Discord Notification", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "instanceId": "ziggie-automated-backup"
+  },
+  "tags": [
+    { "name": "backup", "id": "tag-backup" },
+    { "name": "scheduled", "id": "tag-scheduled" }
+  ]
+}

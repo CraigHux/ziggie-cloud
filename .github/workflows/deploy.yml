@@ -1,0 +1,469 @@
+# =============================================================================
+# ZIGGIE COMMAND CENTER - Main Deployment Workflow
+# =============================================================================
+# Triggers on push to main branch or manual dispatch
+# Deploys to Hostinger VPS using self-hosted runner
+# =============================================================================
+
+name: Deploy to Ziggie Cloud
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.gitignore'
+  workflow_dispatch:
+    inputs:
+      services:
+        description: 'Services to deploy (comma-separated, or "all")'
+        required: false
+        default: 'all'
+      skip_tests:
+        description: 'Skip pre-deployment tests'
+        required: false
+        default: 'false'
+        type: boolean
+
+# Prevent concurrent deployments
+concurrency:
+  group: deployment-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  DEPLOYMENT_DIR: /opt/ziggie
+  DOCKER_BUILDKIT: 1
+  COMPOSE_DOCKER_CLI_BUILD: 1
+
+jobs:
+  # ===========================================================================
+  # PRE-DEPLOYMENT VALIDATION
+  # ===========================================================================
+  validate:
+    name: Validate Configuration
+    runs-on: self-hosted
+    outputs:
+      should_deploy: ${{ steps.check.outputs.should_deploy }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check for deployment-relevant changes
+        id: check
+        run: |
+          # Check if this is a manual dispatch (always deploy)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+            echo "Manual dispatch - will deploy"
+            exit 0
+          fi
+
+          # Check for changes in deployment-relevant files
+          CHANGED=$(git diff --name-only HEAD~1 HEAD | grep -E '\.(yml|yaml|py|js|ts|json|sh|Dockerfile)$' || true)
+          if [ -n "$CHANGED" ]; then
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+            echo "Deployment-relevant changes detected:"
+            echo "$CHANGED"
+          else
+            echo "should_deploy=false" >> $GITHUB_OUTPUT
+            echo "No deployment-relevant changes"
+          fi
+
+      - name: Validate Docker Compose syntax
+        run: |
+          cd ${{ env.DEPLOYMENT_DIR }}
+          docker compose config --quiet
+          echo "Docker Compose configuration is valid"
+
+      - name: Check disk space
+        run: |
+          AVAILABLE=$(df -BG ${{ env.DEPLOYMENT_DIR }} | tail -1 | awk '{print $4}' | tr -d 'G')
+          if [ "$AVAILABLE" -lt 5 ]; then
+            echo "::error::Low disk space: ${AVAILABLE}GB available (need at least 5GB)"
+            exit 1
+          fi
+          echo "Disk space OK: ${AVAILABLE}GB available"
+
+  # ===========================================================================
+  # PRE-DEPLOYMENT TESTS
+  # ===========================================================================
+  test:
+    name: Pre-Deployment Tests
+    runs-on: self-hosted
+    needs: validate
+    if: needs.validate.outputs.should_deploy == 'true' && github.event.inputs.skip_tests != 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run health checks on existing services
+        run: |
+          echo "Checking current service health before deployment..."
+
+          # Check if services are running
+          RUNNING_SERVICES=$(docker ps --format '{{.Names}}' | grep -E '^ziggie-' | wc -l)
+          echo "Found $RUNNING_SERVICES running Ziggie services"
+
+          if [ "$RUNNING_SERVICES" -eq 0 ]; then
+            echo "::warning::No services currently running - fresh deployment"
+            exit 0
+          fi
+
+          # Check database connectivity
+          if docker ps --format '{{.Names}}' | grep -q 'ziggie-postgres'; then
+            docker exec ziggie-postgres pg_isready -U ziggie || echo "::warning::PostgreSQL not ready"
+          fi
+
+          if docker ps --format '{{.Names}}' | grep -q 'ziggie-redis'; then
+            docker exec ziggie-redis redis-cli ping || echo "::warning::Redis not responding"
+          fi
+
+  # ===========================================================================
+  # BACKUP BEFORE DEPLOYMENT
+  # ===========================================================================
+  backup:
+    name: Pre-Deployment Backup
+    runs-on: self-hosted
+    needs: [validate, test]
+    if: always() && needs.validate.outputs.should_deploy == 'true'
+    steps:
+      - name: Create backup directory
+        run: |
+          BACKUP_DIR="${{ env.DEPLOYMENT_DIR }}/backups/$(date +%Y%m%d_%H%M%S)"
+          mkdir -p "$BACKUP_DIR"
+          echo "BACKUP_DIR=$BACKUP_DIR" >> $GITHUB_ENV
+
+      - name: Backup current docker-compose.yml
+        run: |
+          if [ -f "${{ env.DEPLOYMENT_DIR }}/docker-compose.yml" ]; then
+            cp "${{ env.DEPLOYMENT_DIR }}/docker-compose.yml" "${{ env.BACKUP_DIR }}/"
+            echo "Backed up docker-compose.yml"
+          fi
+
+      - name: Backup database schemas (quick)
+        continue-on-error: true
+        run: |
+          if docker ps --format '{{.Names}}' | grep -q 'ziggie-postgres'; then
+            docker exec ziggie-postgres pg_dumpall -U ziggie --schema-only > "${{ env.BACKUP_DIR }}/postgres_schema.sql"
+            echo "Backed up PostgreSQL schema"
+          fi
+
+      - name: Store container states
+        run: |
+          docker ps -a --format 'table {{.Names}}\t{{.Status}}\t{{.Image}}' > "${{ env.BACKUP_DIR }}/container_states.txt"
+          echo "Stored container states"
+
+      - name: Cleanup old backups (keep last 5)
+        run: |
+          cd "${{ env.DEPLOYMENT_DIR }}/backups"
+          ls -dt */ | tail -n +6 | xargs -r rm -rf
+          echo "Cleaned up old backups"
+
+  # ===========================================================================
+  # MAIN DEPLOYMENT
+  # ===========================================================================
+  deploy:
+    name: Deploy Services
+    runs-on: self-hosted
+    needs: [validate, backup]
+    if: needs.validate.outputs.should_deploy == 'true'
+    environment:
+      name: production
+      url: https://${{ vars.VPS_DOMAIN }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Sync to deployment directory
+        run: |
+          echo "Syncing to ${{ env.DEPLOYMENT_DIR }}..."
+
+          # Preserve .env file (contains secrets not in repo)
+          rsync -av \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.env' \
+            --exclude='*.md' \
+            --exclude='backups' \
+            --exclude='node_modules' \
+            --exclude='__pycache__' \
+            --exclude='.pytest_cache' \
+            ./ ${{ env.DEPLOYMENT_DIR }}/
+
+          echo "Sync complete"
+
+      - name: Validate nginx configuration
+        run: |
+          if [ -f "${{ env.DEPLOYMENT_DIR }}/nginx/nginx.conf" ]; then
+            docker exec ziggie-nginx nginx -t || {
+              echo "::error::Nginx configuration is invalid"
+              exit 1
+            }
+            echo "Nginx configuration is valid"
+          fi
+
+      - name: Determine services to deploy
+        id: services
+        run: |
+          SERVICES="${{ github.event.inputs.services }}"
+          if [ -z "$SERVICES" ] || [ "$SERVICES" = "all" ]; then
+            SERVICES="ziggie-api mcp-gateway sim-studio"
+          fi
+          echo "services=$SERVICES" >> $GITHUB_OUTPUT
+          echo "Will deploy: $SERVICES"
+
+      - name: Build custom services
+        run: |
+          cd ${{ env.DEPLOYMENT_DIR }}
+
+          for SERVICE in ${{ steps.services.outputs.services }}; do
+            echo "Building $SERVICE..."
+            docker compose build --no-cache "$SERVICE" || {
+              echo "::error::Failed to build $SERVICE"
+              exit 1
+            }
+          done
+
+          echo "All services built successfully"
+
+      - name: Deploy services with rolling update
+        run: |
+          cd ${{ env.DEPLOYMENT_DIR }}
+
+          for SERVICE in ${{ steps.services.outputs.services }}; do
+            echo "Deploying $SERVICE..."
+
+            # Stop and remove old container
+            docker compose stop "$SERVICE" 2>/dev/null || true
+            docker compose rm -f "$SERVICE" 2>/dev/null || true
+
+            # Start new container
+            docker compose up -d "$SERVICE"
+
+            # Wait for container to be running
+            sleep 5
+
+            # Verify container is running
+            if ! docker compose ps "$SERVICE" | grep -q "Up"; then
+              echo "::error::$SERVICE failed to start"
+              docker compose logs "$SERVICE" --tail=50
+              exit 1
+            fi
+
+            echo "$SERVICE deployed successfully"
+          done
+
+      - name: Reload nginx if config changed
+        run: |
+          if git diff --name-only HEAD~1 HEAD | grep -q 'nginx/'; then
+            echo "Nginx config changed, reloading..."
+            docker exec ziggie-nginx nginx -s reload
+          fi
+
+      - name: Wait for services to stabilize
+        run: |
+          echo "Waiting 20 seconds for services to stabilize..."
+          sleep 20
+
+  # ===========================================================================
+  # POST-DEPLOYMENT VERIFICATION
+  # ===========================================================================
+  verify:
+    name: Verify Deployment
+    runs-on: self-hosted
+    needs: deploy
+    steps:
+      - name: Get container IPs
+        id: ips
+        run: |
+          API_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ziggie-api 2>/dev/null || echo "")
+          MCP_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ziggie-mcp-gateway 2>/dev/null || echo "")
+          SIM_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ziggie-sim-studio 2>/dev/null || echo "")
+
+          echo "api_ip=$API_IP" >> $GITHUB_OUTPUT
+          echo "mcp_ip=$MCP_IP" >> $GITHUB_OUTPUT
+          echo "sim_ip=$SIM_IP" >> $GITHUB_OUTPUT
+
+          echo "Container IPs:"
+          echo "  API: $API_IP"
+          echo "  MCP: $MCP_IP"
+          echo "  SIM: $SIM_IP"
+
+      - name: Health check - Ziggie API
+        run: |
+          API_IP="${{ steps.ips.outputs.api_ip }}"
+          if [ -n "$API_IP" ]; then
+            for i in {1..5}; do
+              if curl -sf "http://$API_IP:8000/health" > /dev/null; then
+                echo "Ziggie API: HEALTHY"
+                exit 0
+              fi
+              echo "Attempt $i failed, waiting..."
+              sleep 5
+            done
+            echo "::error::Ziggie API health check failed"
+            docker logs ziggie-api --tail=30
+            exit 1
+          else
+            echo "::warning::Ziggie API not running"
+          fi
+
+      - name: Health check - MCP Gateway
+        run: |
+          MCP_IP="${{ steps.ips.outputs.mcp_ip }}"
+          if [ -n "$MCP_IP" ]; then
+            for i in {1..5}; do
+              if curl -sf "http://$MCP_IP:8080/health" > /dev/null; then
+                echo "MCP Gateway: HEALTHY"
+                exit 0
+              fi
+              echo "Attempt $i failed, waiting..."
+              sleep 5
+            done
+            echo "::error::MCP Gateway health check failed"
+            docker logs ziggie-mcp-gateway --tail=30
+            exit 1
+          else
+            echo "::warning::MCP Gateway not running"
+          fi
+
+      - name: Health check - Sim Studio
+        run: |
+          SIM_IP="${{ steps.ips.outputs.sim_ip }}"
+          if [ -n "$SIM_IP" ]; then
+            for i in {1..5}; do
+              if curl -sf "http://$SIM_IP:8001/health" > /dev/null; then
+                echo "Sim Studio: HEALTHY"
+                exit 0
+              fi
+              echo "Attempt $i failed, waiting..."
+              sleep 5
+            done
+            echo "::error::Sim Studio health check failed"
+            docker logs ziggie-sim-studio --tail=30
+            exit 1
+          else
+            echo "::warning::Sim Studio not running"
+          fi
+
+      - name: Check database connectivity
+        run: |
+          echo "Checking database connectivity..."
+
+          # PostgreSQL
+          if docker exec ziggie-postgres pg_isready -U ziggie; then
+            echo "PostgreSQL: CONNECTED"
+          else
+            echo "::warning::PostgreSQL connectivity issue"
+          fi
+
+          # Redis
+          if docker exec ziggie-redis redis-cli ping | grep -q PONG; then
+            echo "Redis: CONNECTED"
+          else
+            echo "::warning::Redis connectivity issue"
+          fi
+
+          # MongoDB
+          if docker exec ziggie-mongodb mongosh --quiet --eval "db.runCommand('ping').ok"; then
+            echo "MongoDB: CONNECTED"
+          else
+            echo "::warning::MongoDB connectivity issue"
+          fi
+
+      - name: Generate deployment summary
+        run: |
+          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Service | Status | Container |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|--------|-----------|" >> $GITHUB_STEP_SUMMARY
+
+          for container in $(docker ps --format '{{.Names}}' | grep -E '^ziggie-' | sort); do
+            STATUS=$(docker inspect -f '{{.State.Status}}' "$container")
+            HEALTH=$(docker inspect -f '{{.State.Health.Status}}' "$container" 2>/dev/null || echo "N/A")
+            if [ "$STATUS" = "running" ]; then
+              echo "| $container | Running ($HEALTH) | $container |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| $container | $STATUS | $container |" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployed at**: $(date -Iseconds)" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+
+  # ===========================================================================
+  # CLEANUP
+  # ===========================================================================
+  cleanup:
+    name: Cleanup
+    runs-on: self-hosted
+    needs: verify
+    if: always()
+    steps:
+      - name: Prune Docker resources
+        run: |
+          echo "Pruning unused Docker resources..."
+          docker system prune -f --volumes=false
+
+          # Remove dangling images
+          docker image prune -f
+
+          echo "Cleanup complete"
+
+      - name: Report disk usage
+        run: |
+          echo "Disk usage after deployment:"
+          df -h ${{ env.DEPLOYMENT_DIR }}
+
+          echo ""
+          echo "Docker disk usage:"
+          docker system df
+
+  # ===========================================================================
+  # NOTIFICATION
+  # ===========================================================================
+  notify:
+    name: Send Notification
+    runs-on: self-hosted
+    needs: [deploy, verify]
+    if: always()
+    steps:
+      - name: Determine status
+        id: status
+        run: |
+          if [ "${{ needs.deploy.result }}" = "success" ] && [ "${{ needs.verify.result }}" = "success" ]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "emoji=:white_check_mark:" >> $GITHUB_OUTPUT
+            echo "color=good" >> $GITHUB_OUTPUT
+          else
+            echo "status=failure" >> $GITHUB_OUTPUT
+            echo "emoji=:x:" >> $GITHUB_OUTPUT
+            echo "color=danger" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Send Slack notification
+        if: env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{
+              \"attachments\": [{
+                \"color\": \"${{ steps.status.outputs.color }}\",
+                \"title\": \"${{ steps.status.outputs.emoji }} Ziggie Deployment ${{ steps.status.outputs.status }}\",
+                \"fields\": [
+                  {\"title\": \"Repository\", \"value\": \"${{ github.repository }}\", \"short\": true},
+                  {\"title\": \"Branch\", \"value\": \"${{ github.ref_name }}\", \"short\": true},
+                  {\"title\": \"Commit\", \"value\": \"\`${{ github.sha }}\`\", \"short\": true},
+                  {\"title\": \"Actor\", \"value\": \"${{ github.actor }}\", \"short\": true}
+                ],
+                \"footer\": \"GitHub Actions\",
+                \"ts\": $(date +%s)
+              }]
+            }" \
+            "$SLACK_WEBHOOK_URL" || echo "Slack notification failed"

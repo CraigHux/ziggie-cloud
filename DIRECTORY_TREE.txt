@@ -1,0 +1,906 @@
+C:\ZIGGIE - COMPLETE DIRECTORY TREE
+================================================================================
+Version: 1.0.0
+Last Updated: 2025-11-07
+Purpose: Complete visual reference of Ziggie directory structure
+================================================================================
+
+C:\Ziggie\
+│
+├── README.md                           # Main project overview
+├── QUICKSTART.md                       # 5-minute setup guide
+├── ARCHITECTURE.md                     # System architecture deep-dive
+├── DIRECTORY_STRUCTURE.md              # Detailed structure reference
+├── MIGRATION_GUIDE.md                  # Migration from old structure
+├── CHANGELOG.md                        # Version history
+├── DIRECTORY_TREE.txt                  # This file (visual reference)
+├── LICENSE                             # MIT License
+├── .gitignore                          # Git ignore rules
+├── .editorconfig                       # Editor configuration
+└── .prettierrc                         # Code formatting rules
+│
+├── agents/                             # AI AGENT SYSTEM (584 agents)
+│   │
+│   ├── L1-agents/                      # Level 1 - Primary Agents (8)
+│   │   ├── 01_ART_DIRECTOR_AGENT.md
+│   │   ├── 02_CHARACTER_PIPELINE_AGENT.md
+│   │   ├── 03_ENVIRONMENT_PIPELINE_AGENT.md
+│   │   ├── 04_GAME_SYSTEMS_DEVELOPER_AGENT.md
+│   │   ├── 05_UI_UX_DEVELOPER_AGENT.md
+│   │   ├── 06_CONTENT_DESIGNER_AGENT.md
+│   │   ├── 07_INTEGRATION_AGENT.md
+│   │   ├── 08_QA_TESTING_AGENT.md
+│   │   └── README.md
+│   │
+│   ├── L2-agents/                      # Level 2 - Specialized (64)
+│   │   ├── art-director/               # 8 agents under Art Director
+│   │   │   ├── 01_style_consistency.md
+│   │   │   ├── 02_color_palette.md
+│   │   │   ├── 03_asset_review.md
+│   │   │   ├── 04_proportion_check.md
+│   │   │   ├── 05_lighting_validation.md
+│   │   │   ├── 06_texture_quality.md
+│   │   │   ├── 07_animation_review.md
+│   │   │   ├── 08_final_approval.md
+│   │   │   └── README.md
+│   │   │
+│   │   ├── character-pipeline/         # 8 agents
+│   │   │   ├── 01_base_generation.md
+│   │   │   ├── 02_equipment_variations.md
+│   │   │   ├── 03_animation_poses.md
+│   │   │   ├── 04_size_progression.md
+│   │   │   ├── 05_multi_view_sheets.md
+│   │   │   ├── 06_facial_expressions.md
+│   │   │   ├── 07_combat_poses.md
+│   │   │   ├── 08_special_abilities.md
+│   │   │   └── README.md
+│   │   │
+│   │   ├── environment-pipeline/       # 8 agents
+│   │   ├── game-systems/               # 8 agents
+│   │   ├── ui-ux/                      # 8 agents
+│   │   ├── content-designer/           # 8 agents
+│   │   ├── integration/                # 8 agents
+│   │   ├── qa-testing/                 # 8 agents
+│   │   └── README.md
+│   │
+│   ├── L3-agents/                      # Level 3 - Micro Agents (512)
+│   │   ├── art-director/               # 64 agents (8 L2 × 8 L3 each)
+│   │   │   ├── style-consistency/      # 8 micro agents
+│   │   │   │   ├── 01_color_validation.md
+│   │   │   │   ├── 02_proportion_check.md
+│   │   │   │   ├── 03_line_weight.md
+│   │   │   │   ├── 04_detail_level.md
+│   │   │   │   ├── 05_style_matching.md
+│   │   │   │   ├── 06_reference_alignment.md
+│   │   │   │   ├── 07_art_bible_check.md
+│   │   │   │   ├── 08_final_validation.md
+│   │   │   │   └── README.md
+│   │   │   │
+│   │   │   ├── color-palette/          # 8 micro agents
+│   │   │   ├── asset-review/           # 8 micro agents
+│   │   │   ├── proportion-check/       # 8 micro agents
+│   │   │   ├── lighting-validation/    # 8 micro agents
+│   │   │   ├── texture-quality/        # 8 micro agents
+│   │   │   ├── animation-review/       # 8 micro agents
+│   │   │   ├── final-approval/         # 8 micro agents
+│   │   │   └── README.md
+│   │   │
+│   │   ├── character-pipeline/         # 64 agents
+│   │   ├── environment-pipeline/       # 64 agents
+│   │   ├── game-systems/               # 64 agents
+│   │   ├── ui-ux/                      # 64 agents
+│   │   ├── content-designer/           # 64 agents
+│   │   ├── integration/                # 64 agents
+│   │   ├── qa-testing/                 # 64 agents
+│   │   └── README.md
+│   │
+│   ├── knowledge-base/                 # KNOWLEDGE BASE PIPELINE
+│   │   │
+│   │   ├── L1-art-director/            # Art Director KB
+│   │   │   ├── style-guides/
+│   │   │   ├── color-theory/
+│   │   │   ├── composition/
+│   │   │   └── README.md
+│   │   │
+│   │   ├── L1-character-pipeline/      # Character Pipeline KB
+│   │   │   ├── comfyui-workflows/
+│   │   │   │   ├── instasd-insights.md
+│   │   │   │   └── workflow-settings.md
+│   │   │   ├── ip-adapter-knowledge/
+│   │   │   ├── prompt-engineering/
+│   │   │   ├── controlnet-techniques/
+│   │   │   └── README.md
+│   │   │
+│   │   ├── L1-environment-pipeline/    # Environment Pipeline KB
+│   │   ├── L1-game-systems/            # Game Systems KB
+│   │   ├── L1-ui-ux/                   # UI/UX KB
+│   │   ├── L1-content-designer/        # Content Designer KB
+│   │   ├── L1-integration/             # Integration KB
+│   │   ├── L1-qa-testing/              # QA Testing KB
+│   │   │
+│   │   ├── cross-agent-knowledge/      # Shared Knowledge
+│   │   │   ├── ai-tools-updates/
+│   │   │   ├── automation-patterns/
+│   │   │   ├── best-practices/
+│   │   │   ├── industry-news/
+│   │   │   └── README.md
+│   │   │
+│   │   ├── metadata/                   # KB System Config
+│   │   │   ├── creator-database.json   # 50+ YouTube creators
+│   │   │   ├── routing-rules.json      # Knowledge routing rules
+│   │   │   ├── scan-log.txt            # Scan history
+│   │   │   └── pipeline-status.json    # Current status
+│   │   │
+│   │   ├── src/                        # KB Pipeline Code
+│   │   │   ├── video_scanner.py        # YouTube scanner
+│   │   │   ├── transcript_extractor.py # Transcript extraction
+│   │   │   ├── ai_analyzer.py          # Claude API analyzer
+│   │   │   ├── knowledge_writer.py     # KB file writer
+│   │   │   ├── scheduler.py            # Automated scheduling
+│   │   │   ├── config.py               # Configuration
+│   │   │   ├── logger.py               # Logging utilities
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── temp/                       # Temporary processing files
+│   │   │   └── .gitkeep
+│   │   │
+│   │   ├── logs/                       # KB pipeline logs
+│   │   │   ├── pipeline.log
+│   │   │   └── .gitkeep
+│   │   │
+│   │   ├── README.md                   # KB system overview
+│   │   ├── SETUP_GUIDE.md              # Setup instructions
+│   │   ├── USER_GUIDE.md               # Usage guide
+│   │   ├── PIPELINE_STATUS.md          # Current status
+│   │   └── requirements.txt            # Python dependencies
+│   │
+│   └── docs/                           # Agent Documentation
+│       ├── AGENT_DISPATCH.md           # How to invoke agents
+│       ├── AGENT_TEAM_README.md        # Team overview
+│       ├── L3_MICRO_AGENT_ARCHITECTURE.md
+│       ├── SUB_AGENT_ARCHITECTURE.md
+│       ├── workflows/
+│       │   ├── character-creation.md
+│       │   ├── asset-review.md
+│       │   └── deployment.md
+│       └── README.md
+│
+├── control-center/                     # CONTROL CENTER WEB APP
+│   │
+│   ├── backend/                        # FastAPI Backend
+│   │   ├── api/                        # API Endpoints
+│   │   │   ├── agents.py               # Agent management
+│   │   │   ├── knowledge.py            # KB management
+│   │   │   ├── projects.py             # Project tracking
+│   │   │   ├── comfyui.py              # ComfyUI integration
+│   │   │   ├── docker.py               # Docker management
+│   │   │   ├── services.py             # Service monitoring
+│   │   │   ├── system.py               # System health
+│   │   │   ├── usage.py                # Usage analytics
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── database/                   # Database Layer
+│   │   │   ├── models.py               # SQLAlchemy models
+│   │   │   ├── db.py                   # DB connection
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── services/                   # Business Logic
+│   │   │   ├── agent_service.py
+│   │   │   ├── knowledge_service.py
+│   │   │   ├── project_service.py
+│   │   │   ├── comfyui_service.py
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── config.py                   # Backend config
+│   │   ├── main.py                     # FastAPI app entry
+│   │   ├── requirements.txt            # Python dependencies
+│   │   ├── .env.example                # Environment template
+│   │   └── README.md
+│   │
+│   ├── frontend/                       # React Frontend
+│   │   ├── src/
+│   │   │   ├── components/             # React Components
+│   │   │   │   ├── agents/
+│   │   │   │   │   ├── AgentCard.tsx
+│   │   │   │   │   ├── AgentList.tsx
+│   │   │   │   │   ├── AgentDetail.tsx
+│   │   │   │   │   └── AgentStats.tsx
+│   │   │   │   │
+│   │   │   │   ├── knowledge/
+│   │   │   │   │   ├── KnowledgeViewer.tsx
+│   │   │   │   │   ├── CreatorList.tsx
+│   │   │   │   │   ├── ScanHistory.tsx
+│   │   │   │   │   └── InsightCard.tsx
+│   │   │   │   │
+│   │   │   │   ├── projects/
+│   │   │   │   │   ├── ProjectCard.tsx
+│   │   │   │   │   ├── ProjectList.tsx
+│   │   │   │   │   └── ProjectDetail.tsx
+│   │   │   │   │
+│   │   │   │   ├── dashboard/
+│   │   │   │   │   ├── SystemHealth.tsx
+│   │   │   │   │   ├── RecentActivity.tsx
+│   │   │   │   │   ├── QuickActions.tsx
+│   │   │   │   │   └── UsageChart.tsx
+│   │   │   │   │
+│   │   │   │   ├── layout/
+│   │   │   │   │   ├── Header.tsx
+│   │   │   │   │   ├── Sidebar.tsx
+│   │   │   │   │   ├── Footer.tsx
+│   │   │   │   │   └── Layout.tsx
+│   │   │   │   │
+│   │   │   │   └── common/
+│   │   │   │       ├── Button.tsx
+│   │   │   │       ├── Card.tsx
+│   │   │   │       ├── Modal.tsx
+│   │   │   │       └── Loading.tsx
+│   │   │   │
+│   │   │   ├── pages/                  # Page Components
+│   │   │   │   ├── Dashboard.tsx
+│   │   │   │   ├── Agents.tsx
+│   │   │   │   ├── Knowledge.tsx
+│   │   │   │   ├── Projects.tsx
+│   │   │   │   ├── Settings.tsx
+│   │   │   │   └── NotFound.tsx
+│   │   │   │
+│   │   │   ├── services/               # API Clients
+│   │   │   │   ├── agentService.ts
+│   │   │   │   ├── knowledgeService.ts
+│   │   │   │   ├── projectService.ts
+│   │   │   │   └── api.ts              # Base HTTP client
+│   │   │   │
+│   │   │   ├── hooks/                  # Custom React Hooks
+│   │   │   │   ├── useAgents.ts
+│   │   │   │   ├── useKnowledge.ts
+│   │   │   │   ├── useProjects.ts
+│   │   │   │   └── useAuth.ts
+│   │   │   │
+│   │   │   ├── types/                  # TypeScript Types
+│   │   │   │   ├── agent.ts
+│   │   │   │   ├── knowledge.ts
+│   │   │   │   ├── project.ts
+│   │   │   │   └── common.ts
+│   │   │   │
+│   │   │   ├── utils/                  # Utility Functions
+│   │   │   │   ├── formatters.ts
+│   │   │   │   ├── validators.ts
+│   │   │   │   └── helpers.ts
+│   │   │   │
+│   │   │   ├── styles/                 # Global Styles
+│   │   │   │   ├── global.css
+│   │   │   │   └── theme.ts
+│   │   │   │
+│   │   │   ├── App.tsx                 # Root component
+│   │   │   ├── main.tsx                # Entry point
+│   │   │   └── vite-env.d.ts           # Vite types
+│   │   │
+│   │   ├── public/                     # Static Assets
+│   │   │   ├── favicon.ico
+│   │   │   ├── logo.svg
+│   │   │   └── assets/
+│   │   │
+│   │   ├── package.json                # Node dependencies
+│   │   ├── vite.config.ts              # Vite configuration
+│   │   ├── tsconfig.json               # TypeScript config
+│   │   ├── .env.local.example          # Env template
+│   │   └── README.md
+│   │
+│   ├── ComfyUI/                        # ComfyUI Integration
+│   │   ├── workflows/                  # Workflow Templates
+│   │   │   ├── text_to_3d_basic.json
+│   │   │   ├── text_to_3d_advanced.json
+│   │   │   ├── sdxl_turbo_EXACT_character_clone.json
+│   │   │   ├── sdxl_turbo_equipment_variations.json
+│   │   │   ├── sdxl_turbo_animation_poses.json
+│   │   │   ├── sdxl_turbo_size_progression.json
+│   │   │   └── README.md
+│   │   │
+│   │   ├── models/                     # Model Storage
+│   │   │   ├── hunyuan3d/
+│   │   │   ├── sdxl/
+│   │   │   ├── controlnet/
+│   │   │   ├── ip-adapter/
+│   │   │   └── .gitkeep
+│   │   │
+│   │   ├── output/                     # Generated Outputs
+│   │   │   └── .gitkeep
+│   │   │
+│   │   ├── input/                      # Input Images
+│   │   │   └── .gitkeep
+│   │   │
+│   │   ├── temp/                       # Temp Files
+│   │   │   └── .gitkeep
+│   │   │
+│   │   ├── Dockerfile                  # ComfyUI container
+│   │   ├── docker-compose.yml          # Docker compose
+│   │   ├── download_models.sh          # Model downloader
+│   │   ├── requirements.txt            # Python deps
+│   │   └── README.md
+│   │
+│   └── docs/                           # Control Center Docs
+│       ├── USER_GUIDE.md
+│       ├── API_REFERENCE.md
+│       ├── DEPLOYMENT.md
+│       ├── TROUBLESHOOTING.md
+│       └── README.md
+│
+├── game/                               # MEOW PING RTS GAME
+│   │
+│   ├── backend/                        # Game Backend (FastAPI)
+│   │   ├── app/
+│   │   │   ├── config/                 # Game Configuration
+│   │   │   │   ├── unit_stats.py
+│   │   │   │   ├── wave_config.py
+│   │   │   │   ├── building_config.py
+│   │   │   │   ├── settings.py
+│   │   │   │   └── __init__.py
+│   │   │   │
+│   │   │   ├── models/                 # Data Models
+│   │   │   │   ├── unit.py
+│   │   │   │   ├── unit_types.py
+│   │   │   │   ├── combat_schemas.py
+│   │   │   │   └── __init__.py
+│   │   │   │
+│   │   │   ├── routes/                 # API Routes
+│   │   │   │   ├── combat.py
+│   │   │   │   ├── units.py
+│   │   │   │   ├── buildings.py
+│   │   │   │   ├── sessions.py
+│   │   │   │   └── __init__.py
+│   │   │   │
+│   │   │   ├── services/               # Game Logic
+│   │   │   │   ├── combat_service.py
+│   │   │   │   ├── unit_service.py
+│   │   │   │   ├── unit_behavior.py
+│   │   │   │   ├── player_unit_ai_service.py
+│   │   │   │   └── __init__.py
+│   │   │   │
+│   │   │   ├── schemas/                # Pydantic Schemas
+│   │   │   │   ├── unit_schemas.py
+│   │   │   │   └── __init__.py
+│   │   │   │
+│   │   │   ├── tasks/                  # Background Tasks
+│   │   │   │   ├── background_tasks.py
+│   │   │   │   └── __init__.py
+│   │   │   │
+│   │   │   ├── utils/                  # Utilities
+│   │   │   │   ├── auth.py
+│   │   │   │   ├── combat_calculator.py
+│   │   │   │   ├── position_calculator.py
+│   │   │   │   └── __init__.py
+│   │   │   │
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── auth/                       # Authentication
+│   │   │   ├── routes.py
+│   │   │   ├── service.py
+│   │   │   ├── dependencies.py
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── building/                   # Building System
+│   │   │   ├── routes.py
+│   │   │   ├── service.py
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── session/                    # Session/Lobby
+│   │   │   ├── routes.py
+│   │   │   ├── service.py
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── database/                   # Database
+│   │   │   ├── models.py
+│   │   │   ├── connection.py
+│   │   │   ├── building_models.py
+│   │   │   ├── session_models.py
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── tests/                      # Backend Tests
+│   │   │   ├── unit/
+│   │   │   │   ├── test_combat_calculator.py
+│   │   │   │   ├── test_unit_service.py
+│   │   │   │   └── __init__.py
+│   │   │   │
+│   │   │   ├── integration/
+│   │   │   │   ├── test_units_api.py
+│   │   │   │   └── __init__.py
+│   │   │   │
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── main.py                     # FastAPI entry point
+│   │   ├── requirements.txt            # Python dependencies
+│   │   ├── .env.example                # Environment template
+│   │   └── README.md
+│   │
+│   ├── frontend/                       # Game Frontend (React)
+│   │   ├── src/
+│   │   │   ├── components/
+│   │   │   │   ├── auth/               # Auth Components
+│   │   │   │   │   ├── Login.tsx
+│   │   │   │   │   ├── Register.tsx
+│   │   │   │   │   └── AuthGuard.tsx
+│   │   │   │   │
+│   │   │   │   ├── combat/             # Combat UI
+│   │   │   │   │   ├── CombatView.tsx
+│   │   │   │   │   ├── UnitCard.tsx
+│   │   │   │   │   ├── WaveIndicator.tsx
+│   │   │   │   │   └── CombatLog.tsx
+│   │   │   │   │
+│   │   │   │   ├── game/               # Game Rendering
+│   │   │   │   │   ├── GameCanvas.tsx
+│   │   │   │   │   ├── UnitRenderer.tsx
+│   │   │   │   │   ├── BuildingRenderer.tsx
+│   │   │   │   │   └── TerrainRenderer.tsx
+│   │   │   │   │
+│   │   │   │   ├── session/            # Lobby UI
+│   │   │   │   │   ├── Lobby.tsx
+│   │   │   │   │   ├── SessionList.tsx
+│   │   │   │   │   └── CreateSession.tsx
+│   │   │   │   │
+│   │   │   │   ├── layout/             # Layout
+│   │   │   │   │   ├── Header.tsx
+│   │   │   │   │   ├── Sidebar.tsx
+│   │   │   │   │   └── GameLayout.tsx
+│   │   │   │   │
+│   │   │   │   ├── ui/                 # UI Components
+│   │   │   │   │   ├── Button.tsx
+│   │   │   │   │   ├── Card.tsx
+│   │   │   │   │   ├── Modal.tsx
+│   │   │   │   │   └── HUD.tsx
+│   │   │   │   │
+│   │   │   │   └── test/               # Test Components
+│   │   │   │       └── TestHarness.tsx
+│   │   │   │
+│   │   │   ├── pages/                  # Game Pages
+│   │   │   │   ├── Home.tsx
+│   │   │   │   ├── Game.tsx
+│   │   │   │   ├── Lobby.tsx
+│   │   │   │   └── Settings.tsx
+│   │   │   │
+│   │   │   ├── contexts/               # React Contexts
+│   │   │   │   ├── AuthContext.tsx
+│   │   │   │   ├── GameContext.tsx
+│   │   │   │   └── SessionContext.tsx
+│   │   │   │
+│   │   │   ├── hooks/                  # Custom Hooks
+│   │   │   │   ├── useAuth.ts
+│   │   │   │   ├── useGame.ts
+│   │   │   │   ├── useCombat.ts
+│   │   │   │   └── useUnits.ts
+│   │   │   │
+│   │   │   ├── services/               # API Clients
+│   │   │   │   ├── authService.ts
+│   │   │   │   ├── gameService.ts
+│   │   │   │   ├── combatService.ts
+│   │   │   │   └── api.ts
+│   │   │   │
+│   │   │   ├── types/                  # TypeScript Types
+│   │   │   │   ├── unit.ts
+│   │   │   │   ├── combat.ts
+│   │   │   │   ├── building.ts
+│   │   │   │   └── common.ts
+│   │   │   │
+│   │   │   ├── utils/                  # Utilities
+│   │   │   │   ├── formatters.ts
+│   │   │   │   ├── validators.ts
+│   │   │   │   └── gameHelpers.ts
+│   │   │   │
+│   │   │   ├── styles/                 # Styles
+│   │   │   │   ├── global.css
+│   │   │   │   └── game.css
+│   │   │   │
+│   │   │   ├── App.tsx
+│   │   │   └── main.tsx
+│   │   │
+│   │   ├── public/
+│   │   │   └── assets/                 # Game Assets
+│   │   │       ├── sprites/
+│   │   │       ├── icons/
+│   │   │       ├── audio/
+│   │   │       └── fonts/
+│   │   │
+│   │   ├── package.json
+│   │   ├── vite.config.ts
+│   │   ├── tsconfig.json
+│   │   └── README.md
+│   │
+│   ├── assets/                         # Source Assets
+│   │   ├── characters/
+│   │   │   ├── cats/                   # Hero Faction
+│   │   │   │   ├── hero-meowping/
+│   │   │   │   │   ├── base/
+│   │   │   │   │   ├── tier2/
+│   │   │   │   │   └── tier3/
+│   │   │   │   │
+│   │   │   │   ├── warrior-cat/
+│   │   │   │   ├── archer-cat/
+│   │   │   │   └── mage-cat/
+│   │   │   │
+│   │   │   └── ai-enemies/             # Enemy Faction
+│   │   │       ├── robot-soldier/
+│   │   │       ├── drone/
+│   │   │       └── turret/
+│   │   │
+│   │   ├── environment/
+│   │   │   ├── terrain/
+│   │   │   │   ├── grass/
+│   │   │   │   ├── dirt/
+│   │   │   │   └── stone/
+│   │   │   │
+│   │   │   ├── buildings/
+│   │   │   │   ├── cat-base/
+│   │   │   │   ├── resource-node/
+│   │   │   │   └── defense-tower/
+│   │   │   │
+│   │   │   └── props/
+│   │   │       ├── trees/
+│   │   │       ├── rocks/
+│   │   │       └── decorations/
+│   │   │
+│   │   ├── vfx/                        # Visual Effects
+│   │   │   ├── explosions/
+│   │   │   ├── projectiles/
+│   │   │   └── abilities/
+│   │   │
+│   │   ├── icons/                      # UI Icons
+│   │   │   ├── units/
+│   │   │   ├── buildings/
+│   │   │   └── abilities/
+│   │   │
+│   │   ├── audio/                      # Sound Effects
+│   │   │   ├── sfx/
+│   │   │   ├── music/
+│   │   │   └── voice/
+│   │   │
+│   │   ├── generated/                  # AI-Generated
+│   │   │   ├── 3d-models/              # .glb files
+│   │   │   ├── sprites/                # Rendered sprites
+│   │   │   └── sprite-sheets/          # Compiled sheets
+│   │   │
+│   │   └── .cache/                     # Asset Cache
+│   │
+│   ├── data/                           # Game Data
+│   │   ├── unit-stats.json             # Unit statistics
+│   │   ├── balance-config.json         # Balance params
+│   │   ├── tech-tree.json              # Technology tree
+│   │   ├── character-specs.json        # Character specs
+│   │   └── README.md
+│   │
+│   ├── missions/                       # Campaign Missions
+│   │   ├── 01-tutorial.json
+│   │   ├── 02-first-battle.json
+│   │   ├── 03-resource-rush.json
+│   │   └── README.md
+│   │
+│   └── docs/                           # Game Documentation
+│       ├── GAME_DESIGN.md
+│       ├── COMBAT_SYSTEM.md
+│       ├── UNITS_REFERENCE.md
+│       ├── BUILDING_SYSTEM.md
+│       ├── API_GUIDE.md
+│       └── README.md
+│
+├── shared/                             # SHARED RESOURCES
+│   │
+│   ├── automation/                     # Automation Scripts
+│   │   ├── install/                    # Installation
+│   │   │   ├── 01_core_infrastructure.sh
+│   │   │   ├── 02_backend_services.sh
+│   │   │   ├── 03_frontend_core.sh
+│   │   │   ├── 04_rendering_system.sh
+│   │   │   ├── 05_asset_pipeline.sh
+│   │   │   ├── 06_development_tools.sh
+│   │   │   ├── master_setup.sh
+│   │   │   └── README.md
+│   │   │
+│   │   ├── deployment/                 # Deployment
+│   │   │   ├── deploy.sh
+│   │   │   ├── rollback.sh
+│   │   │   ├── health-check.sh
+│   │   │   └── README.md
+│   │   │
+│   │   ├── maintenance/                # Maintenance
+│   │   │   ├── backup.sh
+│   │   │   ├── cleanup.sh
+│   │   │   ├── update.sh
+│   │   │   ├── verify.sh
+│   │   │   └── README.md
+│   │   │
+│   │   └── README.md
+│   │
+│   ├── configs/                        # Shared Configs
+│   │   ├── docker/                     # Docker
+│   │   │   ├── docker-compose.yml
+│   │   │   ├── docker-compose.dev.yml
+│   │   │   ├── docker-compose.prod.yml
+│   │   │   ├── Dockerfile.template
+│   │   │   └── README.md
+│   │   │
+│   │   ├── environment/                # Environment
+│   │   │   ├── .env.development.example
+│   │   │   ├── .env.production.example
+│   │   │   ├── .env.test.example
+│   │   │   ├── control-center.env.example
+│   │   │   ├── game.env.example
+│   │   │   └── README.md
+│   │   │
+│   │   ├── security/                   # Security
+│   │   │   ├── cors.yaml
+│   │   │   ├── api-keys.yaml.example
+│   │   │   └── README.md
+│   │   │
+│   │   └── README.md
+│   │
+│   ├── templates/                      # Reusable Templates
+│   │   ├── agent-templates/            # Agent Templates
+│   │   │   ├── L1_AGENT_TEMPLATE.md
+│   │   │   ├── L2_AGENT_TEMPLATE.md
+│   │   │   ├── L3_AGENT_TEMPLATE.md
+│   │   │   └── README.md
+│   │   │
+│   │   ├── doc-templates/              # Doc Templates
+│   │   │   ├── API_DOC_TEMPLATE.md
+│   │   │   ├── USER_GUIDE_TEMPLATE.md
+│   │   │   ├── ARCHITECTURE_TEMPLATE.md
+│   │   │   └── README.md
+│   │   │
+│   │   ├── workflow-templates/         # Workflow Templates
+│   │   │   ├── comfyui-workflow-template.json
+│   │   │   └── README.md
+│   │   │
+│   │   └── README.md
+│   │
+│   ├── tools/                          # Utility Scripts
+│   │   ├── db-migrate.py               # Database migration
+│   │   ├── asset-optimizer.py          # Asset optimization
+│   │   ├── log-analyzer.py             # Log analysis
+│   │   ├── performance-profiler.py     # Performance profiling
+│   │   └── README.md
+│   │
+│   └── README.md
+│
+├── tests/                              # ALL TESTS
+│   │
+│   ├── agents/                         # Agent Tests
+│   │   ├── test_agent_system.py
+│   │   ├── test_agent_dispatch.py
+│   │   ├── test_knowledge_base.py
+│   │   ├── test_kb_pipeline.py
+│   │   └── README.md
+│   │
+│   ├── control-center/                 # Control Center Tests
+│   │   ├── backend/
+│   │   │   ├── test_agents_api.py
+│   │   │   ├── test_knowledge_api.py
+│   │   │   ├── test_projects_api.py
+│   │   │   ├── test_comfyui_api.py
+│   │   │   └── README.md
+│   │   │
+│   │   ├── frontend/
+│   │   │   ├── AgentCard.test.tsx
+│   │   │   ├── KnowledgeViewer.test.tsx
+│   │   │   ├── ProjectList.test.tsx
+│   │   │   └── README.md
+│   │   │
+│   │   └── README.md
+│   │
+│   ├── game/                           # Game Tests
+│   │   ├── backend/
+│   │   │   ├── test_combat.py
+│   │   │   ├── test_units.py
+│   │   │   ├── test_auth.py
+│   │   │   ├── test_buildings.py
+│   │   │   └── README.md
+│   │   │
+│   │   ├── frontend/
+│   │   │   ├── GameRenderer.test.tsx
+│   │   │   ├── CombatView.test.tsx
+│   │   │   └── README.md
+│   │   │
+│   │   └── README.md
+│   │
+│   ├── integration/                    # Integration Tests
+│   │   ├── test_end_to_end.py
+│   │   ├── test_agent_workflow.py
+│   │   ├── test_asset_pipeline.py
+│   │   ├── test_kb_to_agents.py
+│   │   └── README.md
+│   │
+│   ├── performance/                    # Performance Tests
+│   │   ├── test_api_performance.py
+│   │   ├── test_rendering_performance.py
+│   │   ├── test_db_performance.py
+│   │   └── README.md
+│   │
+│   ├── fixtures/                       # Test Fixtures
+│   │   ├── agent_fixtures.py
+│   │   ├── game_fixtures.py
+│   │   └── README.md
+│   │
+│   ├── mocks/                          # Mock Data
+│   │   ├── mock_agents.py
+│   │   ├── mock_api_responses.py
+│   │   └── README.md
+│   │
+│   ├── conftest.py                     # pytest configuration
+│   └── README.md
+│
+├── docs/                               # CENTRAL DOCUMENTATION
+│   │
+│   ├── architecture/                   # Architecture Docs
+│   │   ├── SYSTEM_OVERVIEW.md
+│   │   ├── AGENT_ARCHITECTURE.md
+│   │   ├── API_ARCHITECTURE.md
+│   │   ├── DATABASE_SCHEMA.md
+│   │   ├── DIAGRAMS.md
+│   │   └── README.md
+│   │
+│   ├── guides/                         # How-To Guides
+│   │   ├── getting-started/
+│   │   │   ├── INSTALLATION.md
+│   │   │   ├── FIRST_STEPS.md
+│   │   │   ├── CONFIGURATION.md
+│   │   │   ├── TROUBLESHOOTING.md
+│   │   │   └── README.md
+│   │   │
+│   │   ├── development/
+│   │   │   ├── CONTRIBUTING.md
+│   │   │   ├── CODE_STYLE.md
+│   │   │   ├── TESTING_GUIDE.md
+│   │   │   ├── DEBUGGING.md
+│   │   │   ├── GIT_WORKFLOW.md
+│   │   │   └── README.md
+│   │   │
+│   │   ├── operations/
+│   │   │   ├── DEPLOYMENT.md
+│   │   │   ├── MONITORING.md
+│   │   │   ├── MAINTENANCE.md
+│   │   │   ├── BACKUP.md
+│   │   │   └── README.md
+│   │   │
+│   │   ├── game-design/
+│   │   │   ├── ART_BIBLE.md
+│   │   │   ├── GAME_MECHANICS.md
+│   │   │   ├── UNIT_DESIGN.md
+│   │   │   └── README.md
+│   │   │
+│   │   └── README.md
+│   │
+│   ├── api/                            # API Documentation
+│   │   ├── control-center/
+│   │   │   ├── AGENTS_API.md
+│   │   │   ├── KNOWLEDGE_API.md
+│   │   │   ├── PROJECTS_API.md
+│   │   │   ├── COMFYUI_API.md
+│   │   │   └── README.md
+│   │   │
+│   │   ├── game/
+│   │   │   ├── COMBAT_API.md
+│   │   │   ├── UNITS_API.md
+│   │   │   ├── AUTH_API.md
+│   │   │   ├── BUILDINGS_API.md
+│   │   │   └── README.md
+│   │   │
+│   │   └── README.md
+│   │
+│   ├── tutorials/                      # Step-by-Step Tutorials
+│   │   ├── 01_creating_first_agent.md
+│   │   ├── 02_generating_game_asset.md
+│   │   ├── 03_adding_knowledge_source.md
+│   │   ├── 04_deploying_to_production.md
+│   │   ├── 05_writing_tests.md
+│   │   └── README.md
+│   │
+│   └── README.md
+│
+├── data/                               # DATA STORAGE
+│   ├── databases/                      # Database Files
+│   │   ├── control-center.db           # Control Center DB
+│   │   ├── game.db                     # Game DB
+│   │   └── .gitkeep
+│   │
+│   ├── logs/                           # System Logs
+│   │   ├── control-center/
+│   │   │   ├── api.log
+│   │   │   ├── error.log
+│   │   │   └── .gitkeep
+│   │   │
+│   │   ├── game/
+│   │   │   ├── api.log
+│   │   │   ├── game.log
+│   │   │   └── .gitkeep
+│   │   │
+│   │   ├── agents/
+│   │   │   ├── kb-pipeline.log
+│   │   │   └── .gitkeep
+│   │   │
+│   │   └── .gitkeep
+│   │
+│   ├── cache/                          # Temporary Cache
+│   │   ├── api-cache/
+│   │   ├── asset-cache/
+│   │   └── .gitkeep
+│   │
+│   ├── exports/                        # Data Exports
+│   │   ├── agents/
+│   │   ├── knowledge/
+│   │   └── .gitkeep
+│   │
+│   └── README.md
+│
+└── .github/                            # GITHUB CONFIGURATION
+    ├── workflows/                      # CI/CD Pipelines
+    │   ├── test.yml                    # Run tests
+    │   ├── deploy.yml                  # Deploy to production
+    │   ├── docs.yml                    # Build documentation
+    │   └── README.md
+    │
+    ├── ISSUE_TEMPLATE/                 # Issue Templates
+    │   ├── bug_report.md               # Bug reports
+    │   ├── feature_request.md          # Feature requests
+    │   ├── agent_request.md            # New agent requests
+    │   └── README.md
+    │
+    ├── PULL_REQUEST_TEMPLATE.md        # PR template
+    └── README.md
+
+================================================================================
+DIRECTORY COUNTS:
+================================================================================
+
+Top-Level Directories:        8
+  - agents/
+  - control-center/
+  - game/
+  - shared/
+  - tests/
+  - docs/
+  - data/
+  - .github/
+
+AI Agents:                    584
+  - L1 (Primary):             8
+  - L2 (Specialized):         64 (8 per L1)
+  - L3 (Micro):               512 (8 per L2)
+
+Major Components:             4
+  - AI Agent System
+  - Control Center
+  - Game Platform
+  - Shared Resources
+
+Documentation Files:          100+
+Test Files:                   50+
+Configuration Files:          30+
+Automation Scripts:           59
+
+================================================================================
+KEY PATHS REFERENCE:
+================================================================================
+
+Agents:                       C:\Ziggie\agents\
+  - L1:                       agents\L1-agents\
+  - Knowledge Base:           agents\knowledge-base\
+  - Documentation:            agents\docs\
+
+Control Center:               C:\Ziggie\control-center\
+  - Backend:                  control-center\backend\
+  - Frontend:                 control-center\frontend\
+  - ComfyUI:                  control-center\ComfyUI\
+
+Game:                         C:\Ziggie\game\
+  - Backend:                  game\backend\
+  - Frontend:                 game\frontend\
+  - Assets:                   game\assets\
+
+Shared:                       C:\Ziggie\shared\
+  - Scripts:                  shared\automation\
+  - Configs:                  shared\configs\
+  - Templates:                shared\templates\
+
+Tests:                        C:\Ziggie\tests\
+Documentation:                C:\Ziggie\docs\
+Data:                         C:\Ziggie\data\
+
+================================================================================
+END OF DIRECTORY TREE
+================================================================================

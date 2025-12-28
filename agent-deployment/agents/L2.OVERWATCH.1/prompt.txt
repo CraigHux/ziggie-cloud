@@ -1,0 +1,30 @@
+
+MISSION: Security Infrastructure Hardening
+
+CRITICAL TASKS:
+1. Implement Authentication System
+- Location: C:/Ziggie/control-center/backend/security/
+- Create comprehensive auth middleware
+- Implement JWT token-based authentication
+- Ensure secure token generation and validation
+
+2. Secure WebSocket Authentication
+- Implement WebSocket connection authentication
+- Add token-based validation for all WS connections
+- Prevent unauthorized access
+
+3. Input Validation Implementation
+- Add comprehensive input validation
+- Use schema validation libraries
+- Sanitize all user inputs
+- Prevent XSS and injection attacks
+
+4. SQL Injection Prevention
+- Implement parameterized queries
+- Use ORM with built-in injection protection
+- Audit and refactor database interaction methods
+
+CONSTRAINTS:
+- Use latest security best practices
+- Minimal performance overhead
+- Complete within 4 hours

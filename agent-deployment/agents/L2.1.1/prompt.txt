@@ -1,0 +1,23 @@
+Analyze the ZIGGIE Control Center backend performance:
+
+1. Check API endpoint response times:
+   - Examine /api/services endpoint
+   - Examine /api/health endpoint
+   - Check any other API endpoints in the backend
+
+2. Review database query efficiency:
+   - Look for N+1 query problems
+   - Check for missing indexes
+   - Identify slow queries
+
+3. Identify bottlenecks in request handling:
+   - Review middleware performance
+   - Check for blocking operations
+   - Analyze resource usage patterns
+
+4. Generate performance optimization recommendations:
+   - Prioritize by impact vs effort
+   - Include specific code changes where possible
+   - Suggest monitoring improvements
+
+Focus on the Control Center codebase. Provide actionable recommendations with code examples.

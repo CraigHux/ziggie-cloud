@@ -1,0 +1,20 @@
+# =============================================================================
+# GRAFANA DASHBOARD PROVISIONING
+# =============================================================================
+# Auto-load dashboards from /var/lib/grafana/dashboards
+# =============================================================================
+
+apiVersion: 1
+
+providers:
+  - name: 'Ziggie Dashboards'
+    orgId: 1
+    folder: 'Ziggie'
+    folderUid: 'ziggie'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: true

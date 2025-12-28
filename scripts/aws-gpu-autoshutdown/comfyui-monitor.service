@@ -1,0 +1,19 @@
+[Unit]
+Description=ComfyUI Queue Depth Monitor for CloudWatch
+After=network.target comfyui.service
+Wants=comfyui.service
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/opt
+Environment="INSTANCE_ID=__REPLACE_WITH_INSTANCE_ID__"
+Environment="COMFYUI_URL=http://localhost:8188"
+ExecStart=/usr/bin/python3 /opt/comfyui_monitor.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

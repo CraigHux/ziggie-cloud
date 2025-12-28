@@ -1,0 +1,674 @@
+2025-11-12 11:19:10.725 | -------------------------------------------------------------------------------->8
+2025-11-12 11:19:10.725 | [2025-09-22T13:45:45.387626900Z][inference] Running on system with 15724 MB RAM
+2025-11-12 11:19:10.725 | [2025-09-22T13:45:45.388677000Z][inference.model-manager] Successfully initialized store
+2025-11-12 11:19:10.725 | [2025-09-22T13:45:45.388677000Z][inference] 2 backends available
+2025-11-12 11:19:10.725 | [2025-09-22T13:45:48.344712700Z][inference] Reconciling service state on initialization
+2025-11-12 11:19:10.725 | [2025-09-22T13:45:48.344712700Z][inference] Reconciling service state on settings change
+2025-11-12 11:19:10.725 | [2025-09-22T13:45:48.344712700Z][inference.inference-llama.cpp] downloadLatestLlamaCpp: latest, cpu, C:\Program Files\Docker\Docker\resources\model-runner\bin, <HOME>\.docker\bin\inference\com.docker.llama-server.exe
+2025-11-12 11:19:10.725 | [2025-09-22T13:45:49.773316900Z][inference.inference-llama.cpp] failed to ensure latest llama.cpp: bundled llama.cpp version is up to date, no need to update
+2025-11-12 11:19:10.725 | [2025-09-22T13:45:49.923129900Z][inference.inference-llama.cpp] installed llama-server with gpuSupport=false
+2025-11-12 11:19:10.725 | [2025-09-22T13:45:49.923129900Z][inference][W] Backend installation failed for vllm: not implemented
+2025-11-12 11:19:10.726 | [2025-09-22T13:45:54.578810600Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.726 | [2025-09-22T13:45:54.578810600Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.726 | [2025-09-22T13:45:54.866888500Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.726 | [2025-09-22T13:45:54.867410600Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.726 | [2025-09-22T13:45:56.692376800Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.726 | [2025-09-22T13:45:56.692376800Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.726 | [2025-09-22T13:46:05.384208000Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.726 | [2025-09-22T13:46:05.385723700Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.726 | [2025-09-22T13:48:08.152591600Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.726 | [2025-09-22T13:48:08.152591600Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.726 | [2025-09-22T13:53:21.404124900Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.726 | [2025-09-22T13:53:21.404655500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.726 | [2025-09-22T13:55:03.223186300Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.726 | [2025-09-22T13:55:03.223186300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.726 | [2025-09-22T13:55:12.369098500Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.726 | [2025-09-22T13:55:12.369635000Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.726 | [2025-09-22T13:55:12.422648300Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.726 | [2025-09-22T13:55:12.422648300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.726 | [2025-09-22T13:56:53.816318500Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.726 | [2025-09-22T13:56:53.816826500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.726 | [2025-09-22T13:57:22.305541500Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.726 | [2025-09-22T13:57:22.305541500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.726 | [2025-09-22T13:58:09.363197500Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.726 | [2025-09-22T13:58:09.363708300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.726 | [2025-09-22T13:59:42.024511400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.726 | [2025-09-22T13:59:42.025060000Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.726 | -------------------------------------------------------------------------------->8
+2025-11-12 11:19:10.726 | [2025-09-22T14:03:19.352757300Z][inference][W] Could not read VRAM size: exit status 0xffffffff
+2025-11-12 11:19:10.726 | [2025-09-22T14:03:19.363687500Z][inference] Running on system with 15724 MB RAM
+2025-11-12 11:19:10.727 | [2025-09-22T14:03:19.363687500Z][inference.model-manager] Successfully initialized store
+2025-11-12 11:19:10.727 | [2025-09-22T14:03:19.364206500Z][inference] 2 backends available
+2025-11-12 11:19:10.727 | [2025-09-22T14:03:22.966886300Z][inference] Reconciling service state on initialization
+2025-11-12 11:19:10.727 | [2025-09-22T14:03:22.967885100Z][inference] Reconciling service state on settings change
+2025-11-12 11:19:10.727 | [2025-09-22T14:03:22.967885100Z][inference.inference-llama.cpp] downloadLatestLlamaCpp: latest, cpu, C:\Program Files\Docker\Docker\resources\model-runner\bin, <HOME>\.docker\bin\inference\com.docker.llama-server.exe
+2025-11-12 11:19:10.727 | [2025-09-22T14:03:23.229051600Z][inference.inference-llama.cpp] failed to ensure latest llama.cpp: bundled llama.cpp version is up to date, no need to update
+2025-11-12 11:19:10.727 | [2025-09-22T14:03:23.336673600Z][inference.inference-llama.cpp] installed llama-server with gpuSupport=false
+2025-11-12 11:19:10.727 | [2025-09-22T14:03:23.336673600Z][inference][W] Backend installation failed for vllm: not implemented
+2025-11-12 11:19:10.727 | [2025-09-22T14:03:24.928791600Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.727 | [2025-09-22T14:03:24.929323900Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.727 | [2025-09-22T14:03:25.195390400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.727 | [2025-09-22T14:03:25.196071100Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.727 | [2025-09-22T14:03:27.066762100Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.727 | [2025-09-22T14:03:27.067195000Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.727 | [2025-09-22T14:03:30.051915200Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.727 | [2025-09-22T14:03:30.052423500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.727 | [2025-09-22T14:04:08.226383200Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.727 | [2025-09-22T14:04:08.226383200Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.727 | [2025-09-22T14:51:32.385930200Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.727 | [2025-09-22T14:51:32.385930200Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.727 | [2025-09-22T14:53:45.472779300Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.727 | [2025-09-22T14:53:45.473316700Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.728 | [2025-09-22T14:57:23.163807600Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.728 | [2025-09-22T14:57:23.163807600Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.728 | [2025-09-22T14:57:49.665114900Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.728 | [2025-09-22T14:57:49.665886500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.728 | [2025-09-22T14:58:59.532920100Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.728 | [2025-09-22T14:58:59.532920100Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.728 | [2025-09-22T15:03:58.934257500Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.728 | [2025-09-22T15:03:58.934257500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.728 | [2025-09-22T15:05:14.890377100Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.728 | [2025-09-22T15:05:14.890377100Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.728 | [2025-09-22T15:06:25.514052400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.728 | [2025-09-22T15:06:25.514052400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.728 | [2025-09-22T15:08:02.592595500Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.728 | [2025-09-22T15:08:02.592595500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.728 | [2025-09-22T15:09:41.443508900Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.728 | [2025-09-22T15:09:41.443508900Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.728 | [2025-09-22T17:03:07.553351500Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.728 | [2025-09-22T17:03:07.553894000Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.728 | [2025-09-22T17:10:00.469451500Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.728 | [2025-09-22T17:10:00.469975200Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.728 | [2025-09-22T17:11:41.655579200Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.728 | [2025-09-22T17:11:41.655579200Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.728 | [2025-09-22T17:11:41.724351800Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.728 | [2025-09-22T17:11:41.724351800Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.728 | [2025-09-22T17:13:25.080931100Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.728 | [2025-09-22T17:13:25.082285700Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.728 | [2025-09-22T17:13:25.109717800Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.728 | [2025-09-22T17:13:25.109717800Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.728 | [2025-09-22T17:20:32.510176700Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.728 | [2025-09-22T17:20:32.510176700Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.729 | [2025-09-22T17:20:49.122727600Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.729 | [2025-09-22T17:20:49.123233400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.729 | [2025-09-22T17:23:02.122585300Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.729 | [2025-09-22T17:23:02.122585300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.730 | [2025-09-22T18:19:09.769100400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.730 | [2025-09-22T18:19:09.769100400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.731 | [2025-09-22T18:21:23.680312700Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.731 | [2025-09-22T18:21:23.680967800Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.731 | [2025-09-22T18:21:29.908339900Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.731 | [2025-09-22T18:21:29.908844300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.731 | [2025-09-22T18:23:27.833997300Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.731 | [2025-09-22T18:23:27.833997300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.731 | [2025-09-22T18:24:02.626161400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.731 | [2025-09-22T18:24:02.626161400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.731 | [2025-09-22T18:24:08.527048300Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.731 | [2025-09-22T18:24:08.527048300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.731 | [2025-09-22T18:24:14.287454300Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.731 | [2025-09-22T18:24:14.287454300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.731 | [2025-09-22T18:24:48.292803600Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.731 | [2025-09-22T18:24:48.292803600Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.731 | [2025-09-22T19:02:56.130975000Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.731 | [2025-09-22T19:02:56.131524800Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.731 | -------------------------------------------------------------------------------->8
+2025-11-12 11:19:10.731 | [2025-10-29T09:43:23.996464800Z][inference][W] Could not read VRAM size: exit status 0xffffffff
+2025-11-12 11:19:10.731 | [2025-10-29T09:43:24.006911200Z][inference] Running on system with 15724 MB RAM
+2025-11-12 11:19:10.731 | [2025-10-29T09:43:24.006911200Z][inference.model-manager] Successfully initialized store
+2025-11-12 11:19:10.788 | [2025-10-29T09:43:24.007444200Z][inference] 2 backends available
+2025-11-12 11:19:10.788 | [2025-10-29T09:43:37.186608600Z][inference] Reconciling service state on initialization
+2025-11-12 11:19:10.788 | [2025-10-29T09:43:37.187131700Z][inference] Reconciling service state on settings change
+2025-11-12 11:19:10.788 | [2025-10-29T09:43:37.187131700Z][inference.inference-llama.cpp] downloadLatestLlamaCpp: latest, cpu, C:\Program Files\Docker\Docker\resources\model-runner\bin, <HOME>\.docker\bin\inference\com.docker.llama-server.exe
+2025-11-12 11:19:10.788 | [2025-10-29T09:43:40.406846500Z][inference.inference-llama.cpp][W] failed to read current llama.cpp version: open <HOME>\.docker\bin\inference\.llamacpp_version: The system cannot find the path specified.
+2025-11-12 11:19:10.788 | [2025-10-29T09:43:40.406846500Z][inference.inference-llama.cpp][W] proceeding to update llama.cpp binary
+2025-11-12 11:19:10.788 | [2025-10-29T09:43:40.407380400Z][inference.inference-llama.cpp] Extracting image "registry-1.docker.io/docker/docker-model-backend-llamacpp@sha256:d560bb2beda10a04ae3daaacc7db13fe162150ad387c598e910de0bfaab111ed" to "C:\\Users\\minin\\AppData\\Local\\Temp\\llamacpp-install4165119211"
+2025-11-12 11:19:10.788 | [2025-10-29T09:44:03.091088600Z][inference.inference-llama.cpp] successfully updated llama.cpp binary
+2025-11-12 11:19:10.788 | [2025-10-29T09:44:04.178436500Z][inference.inference-llama.cpp] running llama.cpp latest-cpu (sha256:d560bb2beda10a04ae3daaacc7db13fe162150ad387c598e910de0bfaab111ed) version: 7a50cf3
+2025-11-12 11:19:10.788 | [2025-10-29T09:44:04.180516200Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.788 | [2025-10-29T09:44:04.181614200Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.788 | [2025-10-29T09:44:04.183711600Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.788 | [2025-10-29T09:44:04.183711600Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.788 | [2025-10-29T09:44:04.354965400Z][inference.inference-llama.cpp] installed llama-server with gpuSupport=true
+2025-11-12 11:19:10.788 | [2025-10-29T09:44:04.354965400Z][inference][W] Backend installation failed for vllm: not implemented
+2025-11-12 11:19:10.788 | [2025-10-29T09:45:35.922086000Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.788 | [2025-10-29T09:45:35.922086000Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.789 | [2025-10-29T09:47:01.057763700Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.789 | [2025-10-29T09:47:01.057763700Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.789 | [2025-10-29T09:47:14.842838800Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.789 | [2025-10-29T09:47:14.842838800Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.789 | [2025-10-29T09:47:23.687962000Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.789 | [2025-10-29T09:47:23.687962000Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.789 | [2025-10-29T09:47:45.094800900Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.789 | [2025-10-29T09:47:45.094800900Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.789 | [2025-10-29T09:49:39.699146200Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.789 | [2025-10-29T09:49:39.699146200Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.789 | [2025-10-29T09:50:18.184734300Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.789 | [2025-10-29T09:50:18.185283400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.789 | [2025-10-29T09:57:14.015094900Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.789 | [2025-10-29T09:57:14.015094900Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.789 | -------------------------------------------------------------------------------->8
+2025-11-12 11:19:10.789 | [2025-10-29T09:58:28.582431100Z][inference][W] Could not read VRAM size: exit status 0xffffffff
+2025-11-12 11:19:10.789 | [2025-10-29T09:58:28.593422400Z][inference] Running on system with 15724 MB RAM
+2025-11-12 11:19:10.789 | [2025-10-29T09:58:28.593422400Z][inference.model-manager] Successfully initialized store
+2025-11-12 11:19:10.789 | [2025-10-29T09:58:28.593944600Z][inference] 2 backends available
+2025-11-12 11:19:10.789 | [2025-10-29T09:58:32.941615300Z][inference] Reconciling service state on initialization
+2025-11-12 11:19:10.789 | [2025-10-29T09:58:32.942143900Z][inference] Reconciling service state on settings change
+2025-11-12 11:19:10.789 | [2025-10-29T09:58:32.942143900Z][inference.inference-llama.cpp] downloadLatestLlamaCpp: latest, cpu, C:\Program Files\Docker\Docker\resources\model-runner\bin, <HOME>\.docker\bin\inference\com.docker.llama-server.exe
+2025-11-12 11:19:10.789 | [2025-10-29T09:58:33.400729900Z][inference.inference-llama.cpp] failed to ensure latest llama.cpp: bundled llama.cpp version is up to date, no need to update
+2025-11-12 11:19:10.789 | [2025-10-29T09:58:33.407148100Z][inference.inference-llama.cpp][W] Failed to start sandboxed llama.cpp process to probe GPU support: unable to start sandboxed process: exec: "--list-devices": executable file not found in %PATH%
+2025-11-12 11:19:10.789 | [2025-10-29T09:58:33.407671700Z][inference.inference-llama.cpp] installed llama-server with gpuSupport=false
+2025-11-12 11:19:10.789 | [2025-10-29T09:58:33.407671700Z][inference][W] Backend installation failed for vllm: not implemented
+2025-11-12 11:19:10.789 | [2025-10-29T09:58:35.941424800Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.789 | [2025-10-29T09:58:35.941953800Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.789 | [2025-10-29T09:58:36.005624900Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.789 | [2025-10-29T09:58:36.006152300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.789 | [2025-10-29T09:58:36.680274900Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.789 | [2025-10-29T09:58:36.680274900Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.789 | [2025-10-29T09:59:10.256601700Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.789 | [2025-10-29T09:59:10.257106500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.789 | [2025-10-29T10:01:22.819311200Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.789 | [2025-10-29T10:01:22.819924900Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.789 | [2025-10-29T10:01:27.354034400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.789 | [2025-10-29T10:01:27.354034400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.789 | [2025-10-29T10:01:27.411788700Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.789 | [2025-10-29T10:01:27.411788700Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.789 | [2025-10-29T10:01:30.057756000Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.789 | [2025-10-29T10:01:30.057756000Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.789 | [2025-10-29T10:01:32.198562300Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.789 | [2025-10-29T10:01:32.198562300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.789 | [2025-10-29T10:01:33.784350500Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.789 | [2025-10-29T10:01:33.784918000Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.789 | [2025-10-29T10:03:37.622507200Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.789 | [2025-10-29T10:03:37.622507200Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.789 | [2025-10-29T10:03:47.737945700Z][inference] Getting remote model: ai/llama3.3:latest
+2025-11-12 11:19:10.789 | [2025-10-29T10:03:47.738467300Z][inference] Getting remote model: ai/llama3.3:70B-Q4_K_M
+2025-11-12 11:19:10.789 | [2025-10-29T10:03:47.738467300Z][inference] Getting remote model: ai/llama3.3:70B-Q4_0
+2025-11-12 11:19:10.789 | [2025-10-29T10:04:05.254671500Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.789 | [2025-10-29T10:04:05.254671500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.789 | [2025-10-29T10:04:13.275645400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.789 | [2025-10-29T10:04:13.276180300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.789 | [2025-10-29T10:04:20.740625500Z][inference] Getting remote model: ai/llama3.1:latest
+2025-11-12 11:19:10.789 | [2025-10-29T10:04:20.740625500Z][inference] Getting remote model: ai/llama3.1:8B-F16
+2025-11-12 11:19:10.789 | [2025-10-29T10:04:20.740625500Z][inference] Getting remote model: ai/llama3.1:8B-Q4_K_M
+2025-11-12 11:19:10.790 | [2025-10-29T10:04:35.799870900Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.790 | [2025-10-29T10:04:35.800410200Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.790 | [2025-10-29T10:04:42.470132300Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.790 | [2025-10-29T10:04:42.470132300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.790 | [2025-10-29T10:04:49.072161000Z][inference] Getting remote model: ai/llama3.2:latest
+2025-11-12 11:19:10.790 | [2025-10-29T10:04:49.072161000Z][inference] Getting remote model: ai/llama3.2:3B-Q4_0
+2025-11-12 11:19:10.790 | [2025-10-29T10:04:49.072703200Z][inference] Getting remote model: ai/llama3.2:1B-Q4_0
+2025-11-12 11:19:10.790 | [2025-10-29T10:04:49.072703200Z][inference] Getting remote model: ai/llama3.2:3B-F16
+2025-11-12 11:19:10.790 | [2025-10-29T10:04:49.073771800Z][inference] Getting remote model: ai/llama3.2:3B-Q4_K_M
+2025-11-12 11:19:10.790 | [2025-10-29T10:04:49.073771800Z][inference] Getting remote model: ai/llama3.2:1B-F16
+2025-11-12 11:19:10.790 | [2025-10-29T10:04:49.073771800Z][inference] Getting remote model: ai/llama3.2:1B-Q8_0
+2025-11-12 11:19:10.790 | [2025-10-29T10:06:17.318473700Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.790 | [2025-10-29T10:06:17.318473700Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.790 | [2025-10-29T10:06:17.320053800Z][inference] Pulling model: ai/llama3.2:3B-F16
+2025-11-12 11:19:10.790 | [2025-10-29T10:06:17.320053800Z][inference.model-manager] Starting model pull: ai/llama3.2:3B-F16
+2025-11-12 11:19:10.790 | [2025-10-29T10:06:37.944255100Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.790 | [2025-10-29T10:06:37.944255100Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.790 | [2025-10-29T10:06:41.704021000Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.790 | [2025-10-29T10:06:41.704021000Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.790 | [2025-10-29T10:06:43.196365800Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.790 | [2025-10-29T10:06:43.196365800Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.790 | [2025-10-29T10:06:44.357522500Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.790 | [2025-10-29T10:06:44.357522500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.790 | [2025-10-29T10:06:46.466790300Z][inference.model-manager] Remote model digest: sha256:172afec59c111f6e7e5c4bb37cf6e2a82bc497d352993aea72873bf78e877def
+2025-11-12 11:19:10.790 | [2025-10-29T10:06:46.467299200Z][inference.model-manager] Model not found in local store, pulling from remote: ai/llama3.2:3B-F16
+2025-11-12 11:19:10.790 | [2025-10-29T10:06:54.240273400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.790 | [2025-10-29T10:06:54.240273400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.790 | [2025-10-29T10:42:40.196652300Z][inference] Request canceled/timed out while pulling model "ai/llama3.2:3B-F16"
+2025-11-12 11:19:10.790 | -------------------------------------------------------------------------------->8
+2025-11-12 11:19:10.790 | [2025-11-03T12:39:39.861232400Z][inference][W] Could not read VRAM size: exit status 0xffffffff
+2025-11-12 11:19:10.790 | [2025-11-03T12:39:39.878708100Z][inference] Running on system with 15724 MB RAM
+2025-11-12 11:19:10.790 | [2025-11-03T12:39:39.879767100Z][inference.model-manager] Successfully initialized store
+2025-11-12 11:19:10.790 | [2025-11-03T12:39:39.880813900Z][inference] 2 backends available
+2025-11-12 11:19:10.790 | [2025-11-03T12:39:42.983023200Z][inference] Reconciling service state on initialization
+2025-11-12 11:19:10.790 | [2025-11-03T12:39:42.983023200Z][inference] Reconciling service state on settings change
+2025-11-12 11:19:10.790 | [2025-11-03T12:39:42.983550400Z][inference.inference-llama.cpp] downloadLatestLlamaCpp: latest, cpu, C:\Program Files\Docker\Docker\resources\model-runner\bin, <HOME>\.docker\bin\inference\com.docker.llama-server.exe
+2025-11-12 11:19:10.790 | [2025-11-03T12:39:43.131767100Z][inference.inference-llama.cpp] current llama.cpp version is outdated: sha256:d560bb2beda10a04ae3daaacc7db13fe162150ad387c598e910de0bfaab111ed vs sha256:c61874f9c84398f08a247ad904641fc8081ca960fc34f7572c55183bcd66ff6d, proceeding to update it
+2025-11-12 11:19:10.790 | [2025-11-03T12:39:43.132367000Z][inference.inference-llama.cpp] Extracting image "registry-1.docker.io/docker/docker-model-backend-llamacpp@sha256:c61874f9c84398f08a247ad904641fc8081ca960fc34f7572c55183bcd66ff6d" to "C:\\Users\\minin\\AppData\\Local\\Temp\\llamacpp-install6119928"
+2025-11-12 11:19:10.790 | [2025-11-03T12:39:45.921665300Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.790 | [2025-11-03T12:39:45.961197500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.790 | [2025-11-03T12:39:46.075373200Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.790 | [2025-11-03T12:39:46.075798900Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.859 | [2025-11-03T12:39:46.315464600Z][inference.inference-llama.cpp] successfully updated llama.cpp binary
+2025-11-12 11:19:10.859 | [2025-11-03T12:39:46.710976800Z][inference.inference-llama.cpp] running llama.cpp latest-cpu (sha256:c61874f9c84398f08a247ad904641fc8081ca960fc34f7572c55183bcd66ff6d) version: c22473b
+2025-11-12 11:19:10.859 | [2025-11-03T12:39:46.727465500Z][inference.inference-llama.cpp][W] Failed to start sandboxed llama.cpp process to probe GPU support: unable to start sandboxed process: exec: "--list-devices": executable file not found in %PATH%
+2025-11-12 11:19:10.859 | [2025-11-03T12:39:46.727465500Z][inference.inference-llama.cpp] installed llama-server with gpuSupport=false
+2025-11-12 11:19:10.859 | [2025-11-03T12:39:46.727465500Z][inference][W] Backend installation failed for vllm: not implemented
+2025-11-12 11:19:10.859 | [2025-11-03T12:39:47.498301900Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.859 | [2025-11-03T12:39:47.498846400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.859 | -------------------------------------------------------------------------------->8
+2025-11-12 11:19:10.859 | [2025-11-03T20:40:13.445107700Z][inference][W] Could not read VRAM size: exit status 0xffffffff
+2025-11-12 11:19:10.859 | [2025-11-03T20:40:13.459147800Z][inference] Running on system with 15724 MB RAM
+2025-11-12 11:19:10.859 | [2025-11-03T20:40:13.459658100Z][inference.model-manager] Successfully initialized store
+2025-11-12 11:19:10.859 | [2025-11-03T20:40:13.459658100Z][inference] 2 backends available
+2025-11-12 11:19:10.859 | [2025-11-03T20:40:19.944763500Z][inference] Reconciling service state on initialization
+2025-11-12 11:19:10.859 | [2025-11-03T20:40:19.944763500Z][inference] Reconciling service state on settings change
+2025-11-12 11:19:10.859 | [2025-11-03T20:40:19.944763500Z][inference.inference-llama.cpp] downloadLatestLlamaCpp: latest, cpu, C:\Program Files\Docker\Docker\resources\model-runner\bin, <HOME>\.docker\bin\inference\com.docker.llama-server.exe
+2025-11-12 11:19:10.859 | [2025-11-03T20:40:20.094172500Z][inference.inference-llama.cpp] current llama.cpp version is already up to date
+2025-11-12 11:19:10.859 | [2025-11-03T20:40:21.210329900Z][inference.inference-llama.cpp][W] Failed to start sandboxed llama.cpp process to probe GPU support: unable to start sandboxed process: exec: "--list-devices": executable file not found in %PATH%
+2025-11-12 11:19:10.859 | [2025-11-03T20:40:21.210329900Z][inference.inference-llama.cpp] installed llama-server with gpuSupport=false
+2025-11-12 11:19:10.859 | [2025-11-03T20:40:21.210329900Z][inference][W] Backend installation failed for vllm: not implemented
+2025-11-12 11:19:10.859 | [2025-11-03T20:40:21.881923800Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.859 | [2025-11-03T20:40:21.899709800Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.859 | [2025-11-03T20:40:21.940061100Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.859 | [2025-11-03T20:40:21.940604100Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.859 | [2025-11-03T20:40:23.754238800Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.859 | [2025-11-03T20:40:23.755298000Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.859 | [2025-11-03T20:52:35.285391900Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.859 | [2025-11-03T20:52:35.286535500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.859 | [2025-11-03T20:53:15.319014700Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.859 | [2025-11-03T20:53:15.319530800Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.859 | [2025-11-03T20:53:33.946565700Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.859 | [2025-11-03T20:53:33.947579300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.859 | [2025-11-03T20:59:27.332126600Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.859 | [2025-11-03T20:59:27.332633600Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.859 | [2025-11-03T21:00:30.805737300Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.859 | [2025-11-03T21:00:30.806293200Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.859 | [2025-11-03T21:02:55.038056800Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.859 | [2025-11-03T21:02:55.038056800Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.859 | [2025-11-03T21:03:53.656434000Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.860 | [2025-11-03T21:03:53.656434000Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.860 | [2025-11-03T21:04:08.326669600Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.860 | [2025-11-03T21:04:08.327193300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.860 | [2025-11-03T21:32:28.220314400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.860 | [2025-11-03T21:32:28.220836200Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.860 | [2025-11-03T21:33:07.552115200Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.860 | [2025-11-03T21:33:07.552115200Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.860 | [2025-11-03T21:33:17.206592700Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.860 | [2025-11-03T21:33:17.207133800Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.860 | [2025-11-03T22:15:05.061070700Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.860 | [2025-11-03T22:15:05.061070700Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.860 | [2025-11-03T22:24:25.006535700Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.860 | [2025-11-03T22:24:25.017265100Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.860 | -------------------------------------------------------------------------------->8
+2025-11-12 11:19:10.860 | [2025-11-04T09:21:43.135016300Z][inference][W] Could not read VRAM size: exit status 0xffffffff
+2025-11-12 11:19:10.860 | [2025-11-04T09:21:43.158936400Z][inference] Running on system with 15724 MB RAM
+2025-11-12 11:19:10.860 | [2025-11-04T09:21:43.160042100Z][inference.model-manager] Successfully initialized store
+2025-11-12 11:19:10.860 | [2025-11-04T09:21:43.161620100Z][inference] 2 backends available
+2025-11-12 11:19:10.860 | [2025-11-04T09:21:46.657214900Z][inference] Reconciling service state on initialization
+2025-11-12 11:19:10.860 | [2025-11-04T09:21:46.657214900Z][inference] Reconciling service state on settings change
+2025-11-12 11:19:10.860 | [2025-11-04T09:21:46.657803100Z][inference.inference-llama.cpp] downloadLatestLlamaCpp: latest, cpu, C:\Program Files\Docker\Docker\resources\model-runner\bin, <HOME>\.docker\bin\inference\com.docker.llama-server.exe
+2025-11-12 11:19:10.860 | [2025-11-04T09:21:46.818899400Z][inference.inference-llama.cpp] current llama.cpp version is already up to date
+2025-11-12 11:19:10.860 | [2025-11-04T09:21:47.431701400Z][inference.inference-llama.cpp][W] Failed to start sandboxed llama.cpp process to probe GPU support: unable to start sandboxed process: exec: "--list-devices": executable file not found in %PATH%
+2025-11-12 11:19:10.860 | [2025-11-04T09:21:47.431701400Z][inference.inference-llama.cpp] installed llama-server with gpuSupport=false
+2025-11-12 11:19:10.860 | [2025-11-04T09:21:47.431701400Z][inference][W] Backend installation failed for vllm: not implemented
+2025-11-12 11:19:10.860 | [2025-11-04T09:21:48.886904400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.860 | [2025-11-04T09:21:48.887442700Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.860 | [2025-11-04T09:21:48.934081000Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.860 | [2025-11-04T09:21:48.934620100Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.860 | [2025-11-04T09:21:50.188200300Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.860 | [2025-11-04T09:21:50.188200300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.860 | [2025-11-04T11:50:23.962650300Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.860 | [2025-11-04T11:50:23.974342600Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.860 | [2025-11-04T11:50:38.628450500Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.860 | [2025-11-04T11:50:38.629445500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.860 | [2025-11-04T11:50:38.684261400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.860 | [2025-11-04T11:50:38.684768500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.860 | [2025-11-04T11:50:46.811077400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.860 | [2025-11-04T11:50:46.811077400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.860 | [2025-11-04T11:51:35.392339400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.860 | [2025-11-04T11:51:35.393350600Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.860 | [2025-11-04T11:52:48.050992800Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.860 | [2025-11-04T11:52:48.051530900Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.860 | [2025-11-04T11:53:22.066170600Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.860 | [2025-11-04T11:53:22.066764400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.860 | [2025-11-04T11:58:46.508397700Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.860 | [2025-11-04T11:58:46.508951700Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.860 | [2025-11-04T11:59:08.157071700Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.860 | [2025-11-04T11:59:08.157486400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.860 | [2025-11-04T12:00:11.210217100Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.860 | [2025-11-04T12:00:11.210217100Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.860 | [2025-11-04T12:31:54.035613500Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.860 | [2025-11-04T12:31:54.048438300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.860 | [2025-11-04T17:10:42.893252100Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.860 | [2025-11-04T17:10:42.893252100Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.860 | [2025-11-04T17:12:45.125201400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.860 | [2025-11-04T17:12:45.126370900Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-05T05:40:28.153379300Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-05T05:40:28.172658800Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-05T05:42:44.991059300Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-05T05:42:44.991059300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-05T05:46:36.856011000Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-05T05:46:36.856011000Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-05T05:47:30.344455400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-05T05:47:30.344455400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-05T05:47:39.452268300Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-05T05:47:39.452268300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-05T05:57:17.758170800Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-05T05:57:17.758694700Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-05T06:01:58.313242600Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-05T06:01:58.313776900Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-05T06:48:06.154128100Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-05T06:48:06.154673500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-05T06:48:34.066264600Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-05T06:48:34.066264600Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-05T06:48:43.813643100Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-05T06:48:43.813643100Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-05T06:48:49.788307400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-05T06:48:49.788307400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-05T06:49:06.971258100Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-05T06:49:06.971258100Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-05T06:53:47.895488300Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-05T06:53:47.896891500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-05T06:54:57.860884900Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-05T06:54:57.861393600Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-05T06:55:08.248165300Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-05T06:55:08.248165300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-05T07:20:51.039304300Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-05T07:20:51.039854500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-05T11:46:40.211251800Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-05T11:46:40.213899000Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-05T11:47:31.491023000Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-05T11:47:31.491023000Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-05T11:49:59.172571400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-05T11:49:59.172571400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-05T14:44:33.684966400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-05T14:44:33.697638500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-05T14:44:34.101815400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-05T14:44:34.101815400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-05T14:44:34.895426600Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-05T14:44:34.895426600Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-05T14:44:35.620423100Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-05T14:44:35.620968300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-05T14:44:36.591838800Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-05T14:44:36.592372600Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-05T14:44:36.856077200Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-05T14:44:36.856077200Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-06T17:30:22.267671800Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-06T17:30:22.280676800Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-07T00:17:41.304523100Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.861 | [2025-11-07T00:17:41.328233600Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.861 | [2025-11-07T00:22:10.125618400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.862 | [2025-11-07T00:22:10.126768000Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.862 | [2025-11-07T13:18:56.270438500Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.862 | [2025-11-07T13:18:56.293793300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.862 | -------------------------------------------------------------------------------->8
+2025-11-12 11:19:10.862 | [2025-11-07T15:38:31.989873600Z][inference][W] Could not read VRAM size: exit status 0xffffffff
+2025-11-12 11:19:10.862 | [2025-11-07T15:38:32.012896600Z][inference] Running on system with 15724 MB RAM
+2025-11-12 11:19:10.862 | [2025-11-07T15:38:32.013966400Z][inference.model-manager] Successfully initialized store
+2025-11-12 11:19:10.862 | [2025-11-07T15:38:32.015574900Z][inference] 2 backends available
+2025-11-12 11:19:10.862 | [2025-11-07T15:38:36.604586600Z][inference] Reconciling service state on initialization
+2025-11-12 11:19:10.862 | [2025-11-07T15:38:36.604586600Z][inference] Reconciling service state on settings change
+2025-11-12 11:19:10.862 | [2025-11-07T15:38:36.604586600Z][inference.inference-llama.cpp] downloadLatestLlamaCpp: latest, cpu, C:\Program Files\Docker\Docker\resources\model-runner\bin, <HOME>\.docker\bin\inference\com.docker.llama-server.exe
+2025-11-12 11:19:10.862 | [2025-11-07T15:38:46.738321700Z][inference.inference-llama.cpp] failed to ensure latest llama.cpp: Get "https://hub.docker.com/v2/namespaces/docker/repositories/docker-model-backend-llamacpp/tags/latest-cpu": net/http: TLS handshake timeout
+2025-11-12 11:19:10.862 | [2025-11-07T15:38:46.739232400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.862 | [2025-11-07T15:38:46.747604300Z][inference.inference-llama.cpp][W] Failed to start sandboxed llama.cpp process to probe GPU support: unable to start sandboxed process: exec: "--list-devices": executable file not found in %PATH%
+2025-11-12 11:19:10.862 | [2025-11-07T15:38:46.747604300Z][inference.inference-llama.cpp] installed llama-server with gpuSupport=false
+2025-11-12 11:19:10.862 | [2025-11-07T15:38:46.747604300Z][inference][W] Backend installation failed for vllm: not implemented
+2025-11-12 11:19:10.862 | [2025-11-07T15:38:46.751702100Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.862 | [2025-11-07T15:38:46.755419200Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.862 | [2025-11-07T15:38:46.755419200Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.862 | [2025-11-07T15:39:23.833057800Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.862 | [2025-11-07T15:39:23.833371400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.862 | [2025-11-07T15:44:17.780059000Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.862 | [2025-11-07T15:44:17.803740800Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.862 | [2025-11-07T20:41:13.313980200Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.862 | [2025-11-07T20:41:13.328732900Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.862 | [2025-11-07T20:41:30.666168900Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.862 | [2025-11-07T20:41:30.666168900Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.862 | [2025-11-07T20:43:57.438158600Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.862 | [2025-11-07T20:43:57.438158600Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.862 | [2025-11-07T21:04:33.382901400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.862 | [2025-11-07T21:04:33.382901400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.862 | [2025-11-07T21:05:11.976960300Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.862 | [2025-11-07T21:05:11.976960300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.862 | [2025-11-07T21:08:09.319658300Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.862 | [2025-11-07T21:08:09.319658300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.862 | [2025-11-07T21:09:03.729492800Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.862 | [2025-11-07T21:09:03.729492800Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.862 | [2025-11-07T21:10:07.449211200Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.862 | [2025-11-07T21:10:07.449211200Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.862 | [2025-11-07T21:10:27.114249900Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.862 | [2025-11-07T21:10:27.114249900Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.862 | [2025-11-07T21:10:35.463935200Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.862 | [2025-11-07T21:10:35.463935200Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.862 | [2025-11-07T21:10:51.483708400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.862 | [2025-11-07T21:10:51.483708400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.862 | [2025-11-07T21:10:54.639230500Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.862 | [2025-11-07T21:10:54.639230500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.862 | [2025-11-07T22:28:01.343391200Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.862 | [2025-11-07T22:28:01.344459800Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.862 | [2025-11-07T23:19:10.125794000Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.862 | [2025-11-07T23:19:10.141534700Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.862 | [2025-11-07T23:19:10.167753800Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.862 | [2025-11-07T23:19:10.168303500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.862 | [2025-11-07T23:19:11.102513900Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.862 | [2025-11-07T23:19:11.102513900Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.862 | [2025-11-07T23:19:29.241033500Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.862 | [2025-11-07T23:19:29.241033500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.862 | [2025-11-07T23:19:29.310144700Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.863 | [2025-11-07T23:19:29.310670100Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.863 | [2025-11-07T23:19:30.139477400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.863 | [2025-11-07T23:19:30.139477400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.863 | -------------------------------------------------------------------------------->8
+2025-11-12 11:19:10.863 | [2025-11-08T00:01:13.082970300Z][inference][W] Could not read VRAM size: exit status 0xffffffff
+2025-11-12 11:19:10.863 | [2025-11-08T00:01:13.119513500Z][inference] Running on system with 15724 MB RAM
+2025-11-12 11:19:10.863 | [2025-11-08T00:01:13.121198000Z][inference.model-manager] Successfully initialized store
+2025-11-12 11:19:10.863 | [2025-11-08T00:01:13.123586600Z][inference] 2 backends available
+2025-11-12 11:19:10.863 | [2025-11-08T00:01:17.544966500Z][inference] Reconciling service state on initialization
+2025-11-12 11:19:10.863 | [2025-11-08T00:01:17.545509800Z][inference] Reconciling service state on settings change
+2025-11-12 11:19:10.863 | [2025-11-08T00:01:17.545509800Z][inference.inference-llama.cpp] downloadLatestLlamaCpp: latest, cpu, C:\Program Files\Docker\Docker\resources\model-runner\bin, <HOME>\.docker\bin\inference\com.docker.llama-server.exe
+2025-11-12 11:19:10.863 | [2025-11-08T00:01:17.713234500Z][inference.inference-llama.cpp] current llama.cpp version is already up to date
+2025-11-12 11:19:10.863 | [2025-11-08T00:01:18.524624300Z][inference.inference-llama.cpp][W] Failed to start sandboxed llama.cpp process to probe GPU support: unable to start sandboxed process: exec: "--list-devices": executable file not found in %PATH%
+2025-11-12 11:19:10.863 | [2025-11-08T00:01:18.524624300Z][inference.inference-llama.cpp] installed llama-server with gpuSupport=false
+2025-11-12 11:19:10.863 | [2025-11-08T00:01:18.524624300Z][inference][W] Backend installation failed for vllm: not implemented
+2025-11-12 11:19:10.863 | [2025-11-08T00:01:19.319859600Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.863 | [2025-11-08T00:01:19.320405400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.863 | [2025-11-08T00:01:19.366304200Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.863 | [2025-11-08T00:01:19.366861700Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.863 | [2025-11-08T00:01:20.337221700Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.863 | [2025-11-08T00:01:20.337221700Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.863 | [2025-11-08T00:02:05.969525900Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.863 | [2025-11-08T00:02:05.969525900Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.863 | [2025-11-08T00:03:43.956031700Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.863 | [2025-11-08T00:03:43.956562300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.863 | [2025-11-08T00:11:12.052439700Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.863 | [2025-11-08T00:11:12.053729400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.863 | -------------------------------------------------------------------------------->8
+2025-11-12 11:19:10.863 | [2025-11-08T00:35:34.052776400Z][inference][W] Could not read VRAM size: exit status 0xffffffff
+2025-11-12 11:19:10.863 | [2025-11-08T00:35:34.071455000Z][inference] Running on system with 15724 MB RAM
+2025-11-12 11:19:10.863 | [2025-11-08T00:35:34.071455000Z][inference.model-manager] Successfully initialized store
+2025-11-12 11:19:10.863 | [2025-11-08T00:35:34.072004500Z][inference] 2 backends available
+2025-11-12 11:19:10.863 | [2025-11-08T00:35:42.162948300Z][inference] Reconciling service state on initialization
+2025-11-12 11:19:10.863 | [2025-11-08T00:35:42.162948300Z][inference] Reconciling service state on settings change
+2025-11-12 11:19:10.863 | [2025-11-08T00:35:42.162948300Z][inference.inference-llama.cpp] downloadLatestLlamaCpp: latest, cpu, C:\Program Files\Docker\Docker\resources\model-runner\bin, <HOME>\.docker\bin\inference\com.docker.llama-server.exe
+2025-11-12 11:19:10.863 | [2025-11-08T00:35:42.295990400Z][inference.inference-llama.cpp] current llama.cpp version is already up to date
+2025-11-12 11:19:10.863 | [2025-11-08T00:35:42.554487700Z][inference.inference-llama.cpp][W] Failed to start sandboxed llama.cpp process to probe GPU support: unable to start sandboxed process: exec: "--list-devices": executable file not found in %PATH%
+2025-11-12 11:19:10.863 | [2025-11-08T00:35:42.554487700Z][inference.inference-llama.cpp] installed llama-server with gpuSupport=false
+2025-11-12 11:19:10.863 | [2025-11-08T00:35:42.554487700Z][inference][W] Backend installation failed for vllm: not implemented
+2025-11-12 11:19:10.863 | [2025-11-08T00:35:43.640966700Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.863 | [2025-11-08T00:35:43.641518300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.863 | [2025-11-08T00:35:43.671635100Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.863 | [2025-11-08T00:35:43.671635100Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.863 | [2025-11-08T00:35:44.789936600Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.863 | [2025-11-08T00:35:44.790462400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.863 | [2025-11-08T00:36:44.487455600Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.863 | [2025-11-08T00:36:44.487998100Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.863 | -------------------------------------------------------------------------------->8
+2025-11-12 11:19:10.863 | [2025-11-08T00:50:16.479594400Z][inference][W] Could not read VRAM size: exit status 0xffffffff
+2025-11-12 11:19:10.863 | [2025-11-08T00:50:16.498209100Z][inference] Running on system with 15724 MB RAM
+2025-11-12 11:19:10.863 | [2025-11-08T00:50:16.498209100Z][inference.model-manager] Successfully initialized store
+2025-11-12 11:19:10.863 | [2025-11-08T00:50:16.498748700Z][inference] 2 backends available
+2025-11-12 11:19:10.863 | [2025-11-08T00:50:24.327650100Z][inference] Reconciling service state on initialization
+2025-11-12 11:19:10.863 | [2025-11-08T00:50:24.327650100Z][inference] Reconciling service state on settings change
+2025-11-12 11:19:10.863 | [2025-11-08T00:50:24.327650100Z][inference.inference-llama.cpp] downloadLatestLlamaCpp: latest, cpu, C:\Program Files\Docker\Docker\resources\model-runner\bin, <HOME>\.docker\bin\inference\com.docker.llama-server.exe
+2025-11-12 11:19:10.864 | [2025-11-08T00:50:24.476905400Z][inference.inference-llama.cpp] current llama.cpp version is already up to date
+2025-11-12 11:19:10.864 | [2025-11-08T00:50:24.702585400Z][inference.inference-llama.cpp][W] Failed to start sandboxed llama.cpp process to probe GPU support: unable to start sandboxed process: exec: "--list-devices": executable file not found in %PATH%
+2025-11-12 11:19:10.864 | [2025-11-08T00:50:24.702585400Z][inference.inference-llama.cpp] installed llama-server with gpuSupport=false
+2025-11-12 11:19:10.864 | [2025-11-08T00:50:24.702585400Z][inference][W] Backend installation failed for vllm: not implemented
+2025-11-12 11:19:10.864 | [2025-11-08T00:50:25.926855100Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.864 | [2025-11-08T00:50:25.927418900Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.864 | [2025-11-08T00:50:25.977750500Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.864 | [2025-11-08T00:50:25.977750500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.864 | [2025-11-08T00:50:27.008388700Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.864 | [2025-11-08T00:50:27.008909800Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.864 | [2025-11-08T00:51:36.890040700Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.864 | [2025-11-08T00:51:36.893053200Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.864 | [2025-11-08T00:51:53.927674900Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.864 | [2025-11-08T00:51:53.928366600Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.864 | [2025-11-08T00:52:46.717238900Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.864 | [2025-11-08T00:52:46.717748400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.864 | [2025-11-08T00:53:09.006214000Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.864 | [2025-11-08T00:53:09.006214000Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.864 | [2025-11-08T00:54:49.995573700Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.864 | [2025-11-08T00:54:49.995573700Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.864 | [2025-11-08T00:55:02.542396500Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.864 | [2025-11-08T00:55:02.542396500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.864 | [2025-11-08T00:56:23.748772500Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.864 | [2025-11-08T00:56:23.749372900Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.864 | [2025-11-08T00:57:10.156595200Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.864 | [2025-11-08T00:57:10.157286700Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.864 | [2025-11-08T01:05:02.185914200Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.864 | [2025-11-08T01:05:02.186466600Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.864 | [2025-11-08T01:05:30.458633600Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.864 | [2025-11-08T01:05:30.459295100Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.864 | [2025-11-08T01:05:42.202797000Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.864 | [2025-11-08T01:05:42.202797000Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.864 | [2025-11-08T02:38:53.299716900Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.864 | [2025-11-08T02:38:53.301316000Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.864 | [2025-11-08T02:40:43.626375600Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.864 | [2025-11-08T02:40:43.626375600Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.864 | [2025-11-08T02:40:43.698027100Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.864 | [2025-11-08T02:40:43.698567500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.864 | [2025-11-08T02:40:44.613764700Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.864 | [2025-11-08T02:40:44.613764700Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.864 | -------------------------------------------------------------------------------->8
+2025-11-12 11:19:10.864 | [2025-11-08T03:11:35.587217600Z][inference][W] Could not read VRAM size: exit status 0xffffffff
+2025-11-12 11:19:10.864 | [2025-11-08T03:11:35.598226200Z][inference] Running on system with 15724 MB RAM
+2025-11-12 11:19:10.864 | [2025-11-08T03:11:35.599450300Z][inference.model-manager] Successfully initialized store
+2025-11-12 11:19:10.864 | [2025-11-08T03:11:35.601591900Z][inference] 2 backends available
+2025-11-12 11:19:10.864 | [2025-11-08T03:11:40.989264900Z][inference] Reconciling service state on initialization
+2025-11-12 11:19:10.864 | [2025-11-08T03:11:40.989264900Z][inference] Reconciling service state on settings change
+2025-11-12 11:19:10.865 | [2025-11-08T03:11:40.989264900Z][inference.inference-llama.cpp] downloadLatestLlamaCpp: latest, cpu, C:\Program Files\Docker\Docker\resources\model-runner\bin, <HOME>\.docker\bin\inference\com.docker.llama-server.exe
+2025-11-12 11:19:10.865 | [2025-11-08T03:11:41.139244800Z][inference.inference-llama.cpp] current llama.cpp version is already up to date
+2025-11-12 11:19:10.865 | [2025-11-08T03:11:41.840364300Z][inference.inference-llama.cpp][W] Failed to start sandboxed llama.cpp process to probe GPU support: unable to start sandboxed process: exec: "--list-devices": executable file not found in %PATH%
+2025-11-12 11:19:10.865 | [2025-11-08T03:11:41.840364300Z][inference.inference-llama.cpp] installed llama-server with gpuSupport=false
+2025-11-12 11:19:10.865 | [2025-11-08T03:11:41.840364300Z][inference][W] Backend installation failed for vllm: not implemented
+2025-11-12 11:19:10.865 | [2025-11-08T03:11:42.424736100Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.865 | [2025-11-08T03:11:42.426343600Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.865 | [2025-11-08T03:11:42.462855200Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.865 | [2025-11-08T03:11:42.462855200Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.865 | [2025-11-08T03:11:43.384676400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.865 | [2025-11-08T03:11:43.384676400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.865 | [2025-11-08T03:11:47.116331500Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.865 | [2025-11-08T03:11:47.116331500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.865 | -------------------------------------------------------------------------------->8
+2025-11-12 11:19:10.865 | [2025-11-08T12:47:11.548027700Z][inference][W] Could not read VRAM size: exit status 0xffffffff
+2025-11-12 11:19:10.865 | [2025-11-08T12:47:11.573573300Z][inference] Running on system with 15724 MB RAM
+2025-11-12 11:19:10.865 | [2025-11-08T12:47:11.575825400Z][inference.model-manager] Successfully initialized store
+2025-11-12 11:19:10.865 | [2025-11-08T12:47:11.577958300Z][inference] 2 backends available
+2025-11-12 11:19:10.865 | [2025-11-08T12:47:14.271845800Z][inference] Reconciling service state on initialization
+2025-11-12 11:19:10.865 | [2025-11-08T12:47:14.271845800Z][inference] Reconciling service state on settings change
+2025-11-12 11:19:10.865 | [2025-11-08T12:47:14.271845800Z][inference.inference-llama.cpp] downloadLatestLlamaCpp: latest, cpu, C:\Program Files\Docker\Docker\resources\model-runner\bin, <HOME>\.docker\bin\inference\com.docker.llama-server.exe
+2025-11-12 11:19:10.865 | [2025-11-08T12:47:14.276168900Z][inference.inference-llama.cpp] failed to ensure latest llama.cpp: Get "https://hub.docker.com/v2/namespaces/docker/repositories/docker-model-backend-llamacpp/tags/latest-cpu": dialing hub.docker.com:443 host via direct connection because static system has no HTTPS proxy: connecting to hub.docker.com:443: dial tcp: lookup hub.docker.com: no such host
+2025-11-12 11:19:10.865 | [2025-11-08T12:47:14.284325900Z][inference.inference-llama.cpp][W] Failed to start sandboxed llama.cpp process to probe GPU support: unable to start sandboxed process: exec: "--list-devices": executable file not found in %PATH%
+2025-11-12 11:19:10.865 | [2025-11-08T12:47:14.284325900Z][inference.inference-llama.cpp] installed llama-server with gpuSupport=false
+2025-11-12 11:19:10.865 | [2025-11-08T12:47:14.284325900Z][inference][W] Backend installation failed for vllm: not implemented
+2025-11-12 11:19:10.865 | [2025-11-08T12:47:16.715832800Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.865 | [2025-11-08T12:47:16.730306800Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.865 | [2025-11-08T12:47:16.747429900Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.865 | [2025-11-08T12:47:16.747429900Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.865 | [2025-11-08T12:47:18.181085400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.865 | [2025-11-08T12:47:18.181791900Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.865 | [2025-11-08T12:48:11.034231200Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.865 | [2025-11-08T12:48:11.034984200Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.865 | [2025-11-08T16:45:49.158109200Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.865 | [2025-11-08T16:45:49.179042000Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.865 | -------------------------------------------------------------------------------->8
+2025-11-12 11:19:10.865 | [2025-11-09T07:31:59.600075100Z][inference][W] Could not read VRAM size: exit status 0xffffffff
+2025-11-12 11:19:10.865 | [2025-11-09T07:31:59.623051900Z][inference] Running on system with 15724 MB RAM
+2025-11-12 11:19:10.865 | [2025-11-09T07:31:59.625296200Z][inference.model-manager] Successfully initialized store
+2025-11-12 11:19:10.865 | [2025-11-09T07:31:59.626342500Z][inference] 2 backends available
+2025-11-12 11:19:10.865 | [2025-11-09T07:32:02.474686100Z][inference] Reconciling service state on initialization
+2025-11-12 11:19:10.865 | [2025-11-09T07:32:02.474686100Z][inference] Reconciling service state on settings change
+2025-11-12 11:19:10.865 | [2025-11-09T07:32:02.475246000Z][inference.inference-llama.cpp] downloadLatestLlamaCpp: latest, cpu, C:\Program Files\Docker\Docker\resources\model-runner\bin, <HOME>\.docker\bin\inference\com.docker.llama-server.exe
+2025-11-12 11:19:10.865 | [2025-11-09T07:32:11.190111700Z][inference.inference-llama.cpp] current llama.cpp version is already up to date
+2025-11-12 11:19:10.865 | [2025-11-09T07:32:11.922999300Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.865 | [2025-11-09T07:32:11.923528300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.865 | [2025-11-09T07:32:11.926723600Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.865 | [2025-11-09T07:32:11.927257700Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.865 | [2025-11-09T07:32:11.930516400Z][inference.inference-llama.cpp][W] Failed to start sandboxed llama.cpp process to probe GPU support: unable to start sandboxed process: exec: "--list-devices": executable file not found in %PATH%
+2025-11-12 11:19:10.865 | [2025-11-09T07:32:11.930516400Z][inference.inference-llama.cpp] installed llama-server with gpuSupport=false
+2025-11-12 11:19:10.865 | [2025-11-09T07:32:11.930516400Z][inference][W] Backend installation failed for vllm: not implemented
+2025-11-12 11:19:10.865 | [2025-11-09T07:32:21.120773800Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.865 | [2025-11-09T07:32:21.120773800Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.865 | [2025-11-09T07:33:16.555603200Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.865 | [2025-11-09T07:33:16.555603200Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.865 | [2025-11-09T14:09:36.627897600Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.865 | [2025-11-09T14:09:36.641914500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.865 | [2025-11-09T14:10:57.673959700Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.865 | [2025-11-09T14:10:57.674512500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.865 | [2025-11-09T14:10:57.740354200Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.865 | [2025-11-09T14:10:57.740354200Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.865 | [2025-11-09T14:10:58.737301700Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.865 | [2025-11-09T14:10:58.737301700Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.866 | [2025-11-09T14:12:59.238946000Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.866 | [2025-11-09T14:12:59.238946000Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.866 | [2025-11-09T14:13:47.712032500Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.866 | [2025-11-09T14:13:47.712032500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.866 | [2025-11-09T14:13:59.315580600Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.866 | [2025-11-09T14:13:59.316127000Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.866 | [2025-11-09T17:12:13.775047000Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.866 | [2025-11-09T17:12:13.775047000Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.866 | -------------------------------------------------------------------------------->8
+2025-11-12 11:19:10.866 | [2025-11-12T11:00:28.187105200Z][inference][W] Could not read VRAM size: exit status 0xffffffff
+2025-11-12 11:19:10.866 | [2025-11-12T11:00:28.204350000Z][inference] Running on system with 15724 MB RAM
+2025-11-12 11:19:10.866 | [2025-11-12T11:00:28.205950900Z][inference.model-manager] Successfully initialized store
+2025-11-12 11:19:10.866 | [2025-11-12T11:00:28.207537400Z][inference] 2 backends available
+2025-11-12 11:19:10.866 | [2025-11-12T11:00:32.440494200Z][inference] Reconciling service state on initialization
+2025-11-12 11:19:10.866 | [2025-11-12T11:00:32.440494200Z][inference] Reconciling service state on settings change
+2025-11-12 11:19:10.866 | [2025-11-12T11:00:32.440494200Z][inference.inference-llama.cpp] downloadLatestLlamaCpp: latest, cpu, C:\Program Files\Docker\Docker\resources\model-runner\bin, <HOME>\.docker\bin\inference\com.docker.llama-server.exe
+2025-11-12 11:19:10.866 | [2025-11-12T11:00:32.661623100Z][inference.inference-llama.cpp] current llama.cpp version is already up to date
+2025-11-12 11:19:10.866 | [2025-11-12T11:00:33.461807900Z][inference.inference-llama.cpp][W] Failed to start sandboxed llama.cpp process to probe GPU support: unable to start sandboxed process: exec: "--list-devices": executable file not found in %PATH%
+2025-11-12 11:19:10.866 | [2025-11-12T11:00:33.461807900Z][inference.inference-llama.cpp] installed llama-server with gpuSupport=false
+2025-11-12 11:19:10.866 | [2025-11-12T11:00:33.461807900Z][inference][W] Backend installation failed for vllm: not implemented
+2025-11-12 11:19:10.866 | [2025-11-12T11:00:34.345713100Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.866 | [2025-11-12T11:00:34.359910000Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.866 | [2025-11-12T11:00:34.380090600Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.866 | [2025-11-12T11:00:34.380679400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.866 | [2025-11-12T11:00:35.429293400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.866 | [2025-11-12T11:00:35.429293400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.866 | [2025-11-12T11:00:47.871085200Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.866 | [2025-11-12T11:00:47.872095200Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.866 | [2025-11-12T11:16:51.224392000Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.866 | [2025-11-12T11:16:51.225407600Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.866 | [2025-11-12T11:17:02.344966600Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.866 | [2025-11-12T11:17:02.345516600Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.866 | [2025-11-12T11:17:06.676524400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.866 | [2025-11-12T11:17:06.676524400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.866 | [2025-11-12T11:17:27.548809300Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.866 | [2025-11-12T11:17:27.549320400Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.866 | [2025-11-12T11:17:32.478836800Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.866 | [2025-11-12T11:17:32.478836800Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.866 | [2025-11-12T11:17:41.259999400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.866 | [2025-11-12T11:17:41.261012900Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.866 | [2025-11-12T11:17:49.463878000Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.866 | [2025-11-12T11:17:49.464646600Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.866 | [2025-11-12T11:18:06.399882700Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.866 | [2025-11-12T11:18:06.399882700Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.866 | [2025-11-12T11:18:11.030780000Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.866 | [2025-11-12T11:18:11.030780000Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.866 | [2025-11-12T11:18:20.727945600Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.866 | [2025-11-12T11:18:20.728960300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.866 | [2025-11-12T11:18:25.282356500Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.866 | [2025-11-12T11:18:25.283366300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.866 | [2025-11-12T11:18:44.354221400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.866 | [2025-11-12T11:18:44.354765000Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.866 | [2025-11-12T11:18:49.185427300Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.866 | [2025-11-12T11:18:49.185969700Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.866 | [2025-11-12T11:18:57.858626600Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.866 | [2025-11-12T11:18:57.859628300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.867 | [2025-11-12T11:19:02.056977900Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.867 | [2025-11-12T11:19:02.057994000Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.867 | [2025-11-12T11:19:06.340106100Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.867 | [2025-11-12T11:19:06.340669200Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.867 | [2025-11-12T11:19:06.448736400Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.867 | [2025-11-12T11:19:06.449247900Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.867 | [2025-11-12T11:19:09.170839800Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.867 | [2025-11-12T11:19:09.171395300Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 11:19:10.867 | [2025-11-12T11:19:10.335916500Z][inference.model-manager] Listing available models
+2025-11-12 11:19:10.867 | [2025-11-12T11:19:10.335916500Z][inference.model-manager] Successfully listed models, count: 0
+2025-11-12 00:00:00.000 | 11:19:10 Waiting for C:\Users\minin\AppData\Local\Docker\log\host\inference-llama.cpp-server.log to appear...

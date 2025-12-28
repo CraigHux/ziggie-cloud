@@ -1,0 +1,48 @@
+
+Fix UX issues in Control Center frontend:
+
+ISSUE #5 - NO CONNECTION STATUS (HIGH):
+Location: frontend/src/hooks/useWebSocket.js
+Task: Add connection status to UI
+- Add connectionStatus state to hook
+- Expose isConnected, connectionStatus to components
+- Add Chip/Badge to Navbar showing connection status
+- Show "Reconnecting..." during backoff
+Code example in action plan
+
+ISSUE #7 - CONSOLE LOGGING (MEDIUM):
+Location: Multiple files (18 occurrences)
+Task: Create conditional logger utility
+- Create frontend/src/utils/logger.js
+- Replace all console.log with logger.log
+- Replace all console.error with logger.error (keep in prod)
+- Replace all console.warn with logger.warn
+Code example in action plan
+
+ISSUE #10 - ACCESSIBILITY (MEDIUM):
+Location: Multiple components
+Task: Improve accessibility
+- Add ARIA live regions for status updates
+- Add ARIA labels to error messages
+- Implement error boundary
+- Verify keyboard navigation
+
+ISSUE #12 - WEBSOCKET URL MISMATCH (LOW):
+Location: frontend/src/hooks/useWebSocket.js:3
+Task: Fix fallback URL
+- Change ws://localhost:8080/ws/system to ws://localhost:54112/api/system/ws
+
+ISSUE #15 - RESPONSIVE DESIGN (LOW):
+Task: Test responsive design
+- Verify dashboard on mobile (if possible via browser dev tools)
+- Document any issues found
+
+ISSUE #16 - REACT KEYS (LOW):
+Task: Audit list rendering for proper keys
+- Check ServiceCard, ProcessList components
+- Ensure all .map() operations have keys
+
+DELIVERABLE:
+- Create completion report: C:/Ziggie/agent-reports/L2.2.3_UX_FIX_REPORT.md
+- Document: UX improvements, accessibility score
+    

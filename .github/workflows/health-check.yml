@@ -1,0 +1,244 @@
+# =============================================================================
+# ZIGGIE COMMAND CENTER - Scheduled Health Check
+# =============================================================================
+# Runs every 5 minutes to monitor service health
+# Triggers alerts on failures
+# =============================================================================
+
+name: Health Check
+
+on:
+  schedule:
+    # Run every 5 minutes
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+    inputs:
+      verbose:
+        description: 'Enable verbose output'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  DEPLOYMENT_DIR: /opt/ziggie
+
+jobs:
+  health_check:
+    name: Check Service Health
+    runs-on: self-hosted
+    steps:
+      - name: Check container status
+        id: containers
+        run: |
+          echo "Checking container status..."
+
+          UNHEALTHY_COUNT=0
+          SERVICES="ziggie-api ziggie-mcp-gateway ziggie-sim-studio ziggie-postgres ziggie-mongodb ziggie-redis"
+
+          for SERVICE in $SERVICES; do
+            STATUS=$(docker inspect -f '{{.State.Status}}' "$SERVICE" 2>/dev/null || echo "not_found")
+            HEALTH=$(docker inspect -f '{{.State.Health.Status}}' "$SERVICE" 2>/dev/null || echo "N/A")
+
+            if [ "$STATUS" != "running" ]; then
+              echo "::error::$SERVICE is $STATUS"
+              UNHEALTHY_COUNT=$((UNHEALTHY_COUNT + 1))
+            elif [ "$HEALTH" = "unhealthy" ]; then
+              echo "::warning::$SERVICE is running but unhealthy"
+              UNHEALTHY_COUNT=$((UNHEALTHY_COUNT + 1))
+            else
+              echo "$SERVICE: $STATUS ($HEALTH)"
+            fi
+          done
+
+          echo "unhealthy_count=$UNHEALTHY_COUNT" >> $GITHUB_OUTPUT
+
+      - name: HTTP Health Checks
+        id: http
+        run: |
+          echo "Running HTTP health checks..."
+
+          FAILED=0
+
+          # Ziggie API
+          API_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ziggie-api 2>/dev/null || echo "")
+          if [ -n "$API_IP" ]; then
+            if curl -sf "http://$API_IP:8000/health" > /dev/null 2>&1; then
+              echo "Ziggie API: OK"
+            else
+              echo "::error::Ziggie API HTTP check failed"
+              FAILED=$((FAILED + 1))
+            fi
+          fi
+
+          # MCP Gateway
+          MCP_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ziggie-mcp-gateway 2>/dev/null || echo "")
+          if [ -n "$MCP_IP" ]; then
+            if curl -sf "http://$MCP_IP:8080/health" > /dev/null 2>&1; then
+              echo "MCP Gateway: OK"
+            else
+              echo "::error::MCP Gateway HTTP check failed"
+              FAILED=$((FAILED + 1))
+            fi
+          fi
+
+          # Sim Studio
+          SIM_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ziggie-sim-studio 2>/dev/null || echo "")
+          if [ -n "$SIM_IP" ]; then
+            if curl -sf "http://$SIM_IP:8001/health" > /dev/null 2>&1; then
+              echo "Sim Studio: OK"
+            else
+              echo "::error::Sim Studio HTTP check failed"
+              FAILED=$((FAILED + 1))
+            fi
+          fi
+
+          echo "failed_count=$FAILED" >> $GITHUB_OUTPUT
+
+      - name: Database Connectivity
+        id: databases
+        run: |
+          echo "Checking database connectivity..."
+
+          DB_FAILED=0
+
+          # PostgreSQL
+          if docker exec ziggie-postgres pg_isready -U ziggie -q 2>/dev/null; then
+            echo "PostgreSQL: OK"
+          else
+            echo "::error::PostgreSQL connectivity failed"
+            DB_FAILED=$((DB_FAILED + 1))
+          fi
+
+          # Redis
+          if docker exec ziggie-redis redis-cli ping 2>/dev/null | grep -q PONG; then
+            echo "Redis: OK"
+          else
+            echo "::error::Redis connectivity failed"
+            DB_FAILED=$((DB_FAILED + 1))
+          fi
+
+          # MongoDB
+          if docker exec ziggie-mongodb mongosh --quiet --eval "db.runCommand('ping').ok" 2>/dev/null | grep -q 1; then
+            echo "MongoDB: OK"
+          else
+            echo "::error::MongoDB connectivity failed"
+            DB_FAILED=$((DB_FAILED + 1))
+          fi
+
+          echo "db_failed_count=$DB_FAILED" >> $GITHUB_OUTPUT
+
+      - name: Check disk space
+        id: disk
+        run: |
+          USAGE=$(df -h ${{ env.DEPLOYMENT_DIR }} | tail -1 | awk '{print $5}' | tr -d '%')
+          echo "Disk usage: ${USAGE}%"
+
+          if [ "$USAGE" -gt 90 ]; then
+            echo "::error::Disk usage critical: ${USAGE}%"
+            echo "disk_critical=true" >> $GITHUB_OUTPUT
+          elif [ "$USAGE" -gt 80 ]; then
+            echo "::warning::Disk usage high: ${USAGE}%"
+            echo "disk_critical=false" >> $GITHUB_OUTPUT
+          else
+            echo "disk_critical=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check memory usage
+        id: memory
+        run: |
+          MEMORY_USED=$(free | grep Mem | awk '{printf("%.0f", $3/$2 * 100)}')
+          echo "Memory usage: ${MEMORY_USED}%"
+
+          if [ "$MEMORY_USED" -gt 95 ]; then
+            echo "::error::Memory usage critical: ${MEMORY_USED}%"
+            echo "memory_critical=true" >> $GITHUB_OUTPUT
+          elif [ "$MEMORY_USED" -gt 85 ]; then
+            echo "::warning::Memory usage high: ${MEMORY_USED}%"
+            echo "memory_critical=false" >> $GITHUB_OUTPUT
+          else
+            echo "memory_critical=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Determine overall status
+        id: status
+        run: |
+          TOTAL_ISSUES=0
+          TOTAL_ISSUES=$((TOTAL_ISSUES + ${{ steps.containers.outputs.unhealthy_count }}))
+          TOTAL_ISSUES=$((TOTAL_ISSUES + ${{ steps.http.outputs.failed_count }}))
+          TOTAL_ISSUES=$((TOTAL_ISSUES + ${{ steps.databases.outputs.db_failed_count }}))
+
+          if [ "${{ steps.disk.outputs.disk_critical }}" = "true" ]; then
+            TOTAL_ISSUES=$((TOTAL_ISSUES + 1))
+          fi
+
+          if [ "${{ steps.memory.outputs.memory_critical }}" = "true" ]; then
+            TOTAL_ISSUES=$((TOTAL_ISSUES + 1))
+          fi
+
+          echo "total_issues=$TOTAL_ISSUES" >> $GITHUB_OUTPUT
+
+          if [ "$TOTAL_ISSUES" -gt 0 ]; then
+            echo "::error::Found $TOTAL_ISSUES health issues"
+            echo "healthy=false" >> $GITHUB_OUTPUT
+          else
+            echo "All health checks passed"
+            echo "healthy=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Alert on failure
+        if: steps.status.outputs.healthy == 'false'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -n "$SLACK_WEBHOOK_URL" ]; then
+            curl -X POST -H 'Content-type: application/json' \
+              --data '{
+                "attachments": [{
+                  "color": "danger",
+                  "title": ":rotating_light: Ziggie Health Check Failed",
+                  "text": "Found ${{ steps.status.outputs.total_issues }} issue(s). Check GitHub Actions for details.",
+                  "footer": "Automated Health Check",
+                  "ts": '"$(date +%s)"'
+                }]
+              }' \
+              "$SLACK_WEBHOOK_URL" || true
+          fi
+
+      - name: Auto-restart unhealthy services
+        if: steps.status.outputs.healthy == 'false' && steps.containers.outputs.unhealthy_count > 0
+        run: |
+          echo "Attempting to restart unhealthy services..."
+
+          cd ${{ env.DEPLOYMENT_DIR }}
+
+          SERVICES="ziggie-api ziggie-mcp-gateway ziggie-sim-studio"
+
+          for SERVICE in $SERVICES; do
+            STATUS=$(docker inspect -f '{{.State.Status}}' "$SERVICE" 2>/dev/null || echo "not_found")
+            HEALTH=$(docker inspect -f '{{.State.Health.Status}}' "$SERVICE" 2>/dev/null || echo "N/A")
+
+            if [ "$STATUS" != "running" ] || [ "$HEALTH" = "unhealthy" ]; then
+              echo "Restarting $SERVICE..."
+              docker compose restart "$SERVICE" || true
+            fi
+          done
+
+          echo "Waiting for services to stabilize..."
+          sleep 15
+
+      - name: Verify recovery
+        if: steps.status.outputs.healthy == 'false'
+        run: |
+          echo "Verifying service recovery..."
+
+          RECOVERED=0
+          SERVICES="ziggie-api ziggie-mcp-gateway ziggie-sim-studio"
+
+          for SERVICE in $SERVICES; do
+            STATUS=$(docker inspect -f '{{.State.Status}}' "$SERVICE" 2>/dev/null || echo "not_found")
+            if [ "$STATUS" = "running" ]; then
+              RECOVERED=$((RECOVERED + 1))
+            fi
+          done
+
+          echo "Recovered services: $RECOVERED/3"

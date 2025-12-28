@@ -1,0 +1,3515 @@
+{
+  "timestamp": "2025-11-10T07:09:11.037724",
+  "total": 16,
+  "passed": 16,
+  "failed": 0,
+  "success_rate": "100.0%",
+  "results": [
+    {
+      "name": "System Stats",
+      "endpoint": "/api/system/stats",
+      "status": "PASS",
+      "status_code": 200,
+      "response": {
+        "success": true,
+        "timestamp": "2025-11-10T07:08:54.912428",
+        "cpu": {
+          "usage_percent": 17.9,
+          "count": 16,
+          "frequency": {
+            "current": 1808.0,
+            "min": 0.0,
+            "max": 2000.0
+          }
+        },
+        "memory": {
+          "total": 16487870464,
+          "available": 2887987200,
+          "used": 13599883264,
+          "percent": 82.5,
+          "total_gb": 15.36,
+          "used_gb": 12.67,
+          "available_gb": 2.69
+        },
+        "disk": {
+          "total": 510481395712,
+          "used": 297625686016,
+          "free": 212855709696,
+          "percent": 58.3,
+          "total_gb": 475.42,
+          "used_gb": 277.19,
+          "free_gb": 198.24
+        }
+      }
+    },
+    {
+      "name": "System Processes",
+      "endpoint": "/api/system/processes",
+      "status": "PASS",
+      "status_code": 200,
+      "response": {
+        "success": true,
+        "count": 329,
+        "processes": [
+          {
+            "pid": 0,
+            "name": "System Idle Process",
+            "cpu_percent": 900.4,
+            "memory_percent": 0.0,
+            "status": "running"
+          },
+          {
+            "pid": 16712,
+            "name": "Code.exe",
+            "cpu_percent": 164.7,
+            "memory_percent": 15.72,
+            "status": "running"
+          },
+          {
+            "pid": 5100,
+            "name": "MsMpEng.exe",
+            "cpu_percent": 78.5,
+            "memory_percent": 2.66,
+            "status": "running"
+          },
+          {
+            "pid": 48632,
+            "name": "python3.13.exe",
+            "cpu_percent": 55.0,
+            "memory_percent": 0.33,
+            "status": "running"
+          },
+          {
+            "pid": 4,
+            "name": "System",
+            "cpu_percent": 19.1,
+            "memory_percent": 0.0,
+            "status": "running"
+          },
+          {
+            "pid": 17888,
+            "name": "claude.exe",
+            "cpu_percent": 12.6,
+            "memory_percent": 10.14,
+            "status": "running"
+          },
+          {
+            "pid": 27496,
+            "name": "Code.exe",
+            "cpu_percent": 7.5,
+            "memory_percent": 0.81,
+            "status": "running"
+          },
+          {
+            "pid": 20192,
+            "name": "AMDRSServ.exe",
+            "cpu_percent": 6.4,
+            "memory_percent": 0.55,
+            "status": "running"
+          },
+          {
+            "pid": 4056,
+            "name": "mc-fw-host.exe",
+            "cpu_percent": 4.4,
+            "memory_percent": 0.61,
+            "status": "running"
+          },
+          {
+            "pid": 23848,
+            "name": "Docker Desktop.exe",
+            "cpu_percent": 2.5,
+            "memory_percent": 0.96,
+            "status": "running"
+          },
+          {
+            "pid": 24880,
+            "name": "brave.exe",
+            "cpu_percent": 2.0,
+            "memory_percent": 0.65,
+            "status": "running"
+          },
+          {
+            "pid": 1492,
+            "name": "lsass.exe",
+            "cpu_percent": 1.9,
+            "memory_percent": 0.15,
+            "status": "running"
+          },
+          {
+            "pid": 8404,
+            "name": "csrss.exe",
+            "cpu_percent": 1.6,
+            "memory_percent": 0.05,
+            "status": "running"
+          },
+          {
+            "pid": 14384,
+            "name": "NisSrv.exe",
+            "cpu_percent": 1.6,
+            "memory_percent": 0.05,
+            "status": "running"
+          },
+          {
+            "pid": 16844,
+            "name": "Code.exe",
+            "cpu_percent": 1.6,
+            "memory_percent": 1.33,
+            "status": "running"
+          },
+          {
+            "pid": 14068,
+            "name": "Code.exe",
+            "cpu_percent": 1.3,
+            "memory_percent": 0.99,
+            "status": "running"
+          },
+          {
+            "pid": 5000,
+            "name": "servicehost.exe",
+            "cpu_percent": 1.0,
+            "memory_percent": 0.19,
+            "status": "running"
+          },
+          {
+            "pid": 15784,
+            "name": "explorer.exe",
+            "cpu_percent": 0.9,
+            "memory_percent": 2.5,
+            "status": "running"
+          },
+          {
+            "pid": 26136,
+            "name": "dwm.exe",
+            "cpu_percent": 0.9,
+            "memory_percent": 0.6,
+            "status": "running"
+          },
+          {
+            "pid": 35924,
+            "name": "brave.exe",
+            "cpu_percent": 0.9,
+            "memory_percent": 1.64,
+            "status": "running"
+          },
+          {
+            "pid": 2464,
+            "name": "svchost.exe",
+            "cpu_percent": 0.8,
+            "memory_percent": 0.03,
+            "status": "running"
+          },
+          {
+            "pid": 19612,
+            "name": "LM Studio.exe",
+            "cpu_percent": 0.8,
+            "memory_percent": 0.51,
+            "status": "running"
+          },
+          {
+            "pid": 34500,
+            "name": "brave.exe",
+            "cpu_percent": 0.7,
+            "memory_percent": 1.04,
+            "status": "running"
+          },
+          {
+            "pid": 34868,
+            "name": "brave.exe",
+            "cpu_percent": 0.7,
+            "memory_percent": 0.32,
+            "status": "running"
+          },
+          {
+            "pid": 1748,
+            "name": "svchost.exe",
+            "cpu_percent": 0.6,
+            "memory_percent": 0.09,
+            "status": "running"
+          },
+          {
+            "pid": 9612,
+            "name": "WmiPrvSE.exe",
+            "cpu_percent": 0.6,
+            "memory_percent": 0.11,
+            "status": "running"
+          },
+          {
+            "pid": 12152,
+            "name": "svchost.exe",
+            "cpu_percent": 0.6,
+            "memory_percent": 0.1,
+            "status": "running"
+          },
+          {
+            "pid": 27476,
+            "name": "Code.exe",
+            "cpu_percent": 0.6,
+            "memory_percent": 1.56,
+            "status": "running"
+          },
+          {
+            "pid": 28128,
+            "name": "Docker Desktop.exe",
+            "cpu_percent": 0.5,
+            "memory_percent": 0.83,
+            "status": "running"
+          },
+          {
+            "pid": 23692,
+            "name": "vmmemWSL",
+            "cpu_percent": 0.3,
+            "memory_percent": 0.95,
+            "status": "running"
+          },
+          {
+            "pid": 24332,
+            "name": "conhost.exe",
+            "cpu_percent": 0.3,
+            "memory_percent": 0.05,
+            "status": "running"
+          },
+          {
+            "pid": 776,
+            "name": "svchost.exe",
+            "cpu_percent": 0.2,
+            "memory_percent": 0.03,
+            "status": "running"
+          },
+          {
+            "pid": 2408,
+            "name": "atieclxx.exe",
+            "cpu_percent": 0.2,
+            "memory_percent": 0.12,
+            "status": "running"
+          },
+          {
+            "pid": 4444,
+            "name": "svchost.exe",
+            "cpu_percent": 0.2,
+            "memory_percent": 0.08,
+            "status": "running"
+          },
+          {
+            "pid": 5056,
+            "name": "svchost.exe",
+            "cpu_percent": 0.2,
+            "memory_percent": 0.33,
+            "status": "running"
+          },
+          {
+            "pid": 14560,
+            "name": "AQAUserPS.exe",
+            "cpu_percent": 0.2,
+            "memory_percent": 0.18,
+            "status": "running"
+          },
+          {
+            "pid": 50240,
+            "name": "node.exe",
+            "cpu_percent": 0.2,
+            "memory_percent": 0.79,
+            "status": "running"
+          },
+          {
+            "pid": 52280,
+            "name": "python3.13.exe",
+            "cpu_percent": 0.2,
+            "memory_percent": 0.15,
+            "status": "running"
+          },
+          {
+            "pid": 53772,
+            "name": "python3.13.exe",
+            "cpu_percent": 0.2,
+            "memory_percent": 0.15,
+            "status": "running"
+          },
+          {
+            "pid": 54956,
+            "name": "python3.13.exe",
+            "cpu_percent": 0.2,
+            "memory_percent": 0.15,
+            "status": "running"
+          },
+          {
+            "pid": 56532,
+            "name": "brave.exe",
+            "cpu_percent": 0.2,
+            "memory_percent": 1.02,
+            "status": "running"
+          },
+          {
+            "pid": 56704,
+            "name": "python3.13.exe",
+            "cpu_percent": 0.2,
+            "memory_percent": 0.2,
+            "status": "running"
+          },
+          {
+            "pid": 1552,
+            "name": "svchost.exe",
+            "cpu_percent": 0.1,
+            "memory_percent": 0.03,
+            "status": "running"
+          },
+          {
+            "pid": 2268,
+            "name": "svchost.exe",
+            "cpu_percent": 0.1,
+            "memory_percent": 0.04,
+            "status": "running"
+          },
+          {
+            "pid": 2620,
+            "name": "svchost.exe",
+            "cpu_percent": 0.1,
+            "memory_percent": 0.1,
+            "status": "running"
+          },
+          {
+            "pid": 6576,
+            "name": "RadeonSoftware.exe",
+            "cpu_percent": 0.1,
+            "memory_percent": 0.4,
+            "status": "running"
+          },
+          {
+            "pid": 7588,
+            "name": "AcerService.exe",
+            "cpu_percent": 0.1,
+            "memory_percent": 0.05,
+            "status": "running"
+          },
+          {
+            "pid": 11616,
+            "name": "OneDrive.exe",
+            "cpu_percent": 0.1,
+            "memory_percent": 0.93,
+            "status": "running"
+          },
+          {
+            "pid": 11828,
+            "name": "LM Studio.exe",
+            "cpu_percent": 0.1,
+            "memory_percent": 0.43,
+            "status": "running"
+          },
+          {
+            "pid": 12580,
+            "name": "brave.exe",
+            "cpu_percent": 0.1,
+            "memory_percent": 1.01,
+            "status": "running"
+          }
+        ]
+      }
+    },
+    {
+      "name": "System Ports",
+      "endpoint": "/api/system/ports",
+      "status": "PASS",
+      "status_code": 200,
+      "response": {
+        "success": true,
+        "count": 13,
+        "ports": [
+          {
+            "port": 3001,
+            "pid": 0,
+            "process_name": null,
+            "status": "TIME_WAIT",
+            "address": "127.0.0.1"
+          },
+          {
+            "port": 3001,
+            "pid": 50240,
+            "process_name": "node.exe",
+            "status": "ESTABLISHED",
+            "address": "127.0.0.1"
+          },
+          {
+            "port": 4343,
+            "pid": 4936,
+            "process_name": "AcerCCAgent.exe",
+            "status": "LISTEN",
+            "address": "::"
+          },
+          {
+            "port": 4449,
+            "pid": 4968,
+            "process_name": "AcerDIAgent.exe",
+            "status": "LISTEN",
+            "address": "0.0.0.0"
+          },
+          {
+            "port": 5040,
+            "pid": 10708,
+            "process_name": "svchost.exe",
+            "status": "LISTEN",
+            "address": "0.0.0.0"
+          },
+          {
+            "port": 5050,
+            "pid": 10708,
+            "process_name": "svchost.exe",
+            "status": "NONE",
+            "address": "0.0.0.0"
+          },
+          {
+            "port": 5141,
+            "pid": 4952,
+            "process_name": "AcerQAAgent.exe",
+            "status": "LISTEN",
+            "address": "0.0.0.0"
+          },
+          {
+            "port": 5353,
+            "pid": 35924,
+            "process_name": "brave.exe",
+            "status": "NONE",
+            "address": "0.0.0.0"
+          },
+          {
+            "port": 5353,
+            "pid": 35656,
+            "process_name": "msedge.exe",
+            "status": "NONE",
+            "address": "::"
+          },
+          {
+            "port": 5353,
+            "pid": 2268,
+            "process_name": "svchost.exe",
+            "status": "NONE",
+            "address": "0.0.0.0"
+          },
+          {
+            "port": 5353,
+            "pid": 34868,
+            "process_name": "brave.exe",
+            "status": "NONE",
+            "address": "0.0.0.0"
+          },
+          {
+            "port": 5355,
+            "pid": 2268,
+            "process_name": "svchost.exe",
+            "status": "NONE",
+            "address": "::"
+          },
+          {
+            "port": 8828,
+            "pid": 16844,
+            "process_name": "Code.exe",
+            "status": "LISTEN",
+            "address": "127.0.0.1"
+          }
+        ]
+      }
+    },
+    {
+      "name": "List All Agents",
+      "endpoint": "/api/agents",
+      "status": "PASS",
+      "status_code": 200,
+      "response": {
+        "meta": {
+          "total": 954,
+          "page": 1,
+          "page_size": 50,
+          "total_pages": 20,
+          "has_next": true,
+          "has_prev": false,
+          "next_page": 2,
+          "prev_page": null
+        },
+        "cached": true,
+        "agents": [
+          {
+            "id": "01_art_director",
+            "level": "L1",
+            "name": "ART DIRECTOR AGENT \ud83c\udfa8",
+            "filename": "01_ART_DIRECTOR_AGENT.md",
+            "path": "C:\\Ziggie\\ai-agents\\01_ART_DIRECTOR_AGENT.md",
+            "modified": "2025-11-09T10:58:00.409152",
+            "title": "ART DIRECTOR AGENT \ud83c\udfa8",
+            "role": "Visual consistency guardian and style enforcement specialist for Ziggie",
+            "objective": "Maintain perfect visual consistency across all game assets while ensuring the art style remains cohesive with the game's comic book aesthetic.",
+            "responsibilities": [
+              "1. Style Enforcement",
+              "2. Quality Control",
+              "3. Documentation",
+              "4. Asset Organization"
+            ],
+            "permissions": {
+              "read_write": [
+                "C:\\ziggie\\assets\\ (all subdirectories)",
+                "C:\\ziggie\\design-docs\\art-bible.md",
+                "C:\\ziggie\\design-docs\\color-palettes.json",
+                "C:\\ziggie\\design-docs\\asset-manifest.json"
+              ],
+              "read_only": [
+                "C:\\ComfyUI\\ComfyUI\\user\\default\\workflows\\",
+                "C:\\ziggie\\ref-docs\\"
+              ]
+            },
+            "tools": [
+              "Style References",
+              "Color Tools",
+              "Documentation"
+            ],
+            "has_content": true,
+            "word_count": 977,
+            "sections": 13
+          },
+          {
+            "id": "02_character_pipeline",
+            "level": "L1",
+            "name": "CHARACTER PIPELINE AGENT \ud83d\udc31",
+            "filename": "02_CHARACTER_PIPELINE_AGENT.md",
+            "path": "C:\\Ziggie\\ai-agents\\02_CHARACTER_PIPELINE_AGENT.md",
+            "modified": "2025-11-09T10:58:03.143023",
+            "title": "CHARACTER PIPELINE AGENT \ud83d\udc31",
+            "role": "Character asset generation specialist using ComfyUI workflows",
+            "objective": "Generate character assets with perfect consistency using optimized ComfyUI workflows for different use cases (exact clones, variations, animations, size changes).",
+            "responsibilities": [
+              "1. Asset Generation",
+              "2. Workflow Management",
+              "3. Quality Assurance",
+              "4. Technical Documentation"
+            ],
+            "permissions": {
+              "read_write": [
+                "C:\\ziggie\\assets\\characters\\",
+                "C:\\ComfyUI\\ComfyUI\\user\\default\\workflows\\",
+                "C:\\ziggie\\design-docs\\generation-log.json"
+              ],
+              "read_only": [
+                "C:\\ziggie\\ref-docs\\",
+                "C:\\ziggie\\data\\character-specs.json",
+                "ComfyUI API (http://127.0.0.1:8188)",
+                "Workflow queue system"
+              ]
+            },
+            "tools": [],
+            "has_content": true,
+            "word_count": 1684,
+            "sections": 12
+          },
+          {
+            "id": "03_environment_pipeline",
+            "level": "L1",
+            "name": "ENVIRONMENT PIPELINE AGENT \ud83c\udfd7\ufe0f",
+            "filename": "03_ENVIRONMENT_PIPELINE_AGENT.md",
+            "path": "C:\\Ziggie\\ai-agents\\03_ENVIRONMENT_PIPELINE_AGENT.md",
+            "modified": "2025-11-09T10:56:33.569148",
+            "title": "ENVIRONMENT PIPELINE AGENT \ud83c\udfd7\ufe0f",
+            "role": "Non-character asset generation (buildings, terrain, icons, VFX)",
+            "objective": "",
+            "responsibilities": [],
+            "permissions": {
+              "read_write": [],
+              "read_only": []
+            },
+            "tools": [],
+            "has_content": true,
+            "word_count": 190,
+            "sections": 7
+          },
+          {
+            "id": "04_game_systems_developer",
+            "level": "L1",
+            "name": "GAME SYSTEMS DEVELOPER AGENT \ud83d\udcbb",
+            "filename": "04_GAME_SYSTEMS_DEVELOPER_AGENT.md",
+            "path": "C:\\Ziggie\\ai-agents\\04_GAME_SYSTEMS_DEVELOPER_AGENT.md",
+            "modified": "2025-11-09T10:56:35.382526",
+            "title": "GAME SYSTEMS DEVELOPER AGENT \ud83d\udcbb",
+            "role": "Core gameplay programming and RTS mechanics implementation",
+            "objective": "",
+            "responsibilities": [],
+            "permissions": {
+              "read_write": [],
+              "read_only": []
+            },
+            "tools": [],
+            "has_content": true,
+            "word_count": 168,
+            "sections": 6
+          },
+          {
+            "id": "05_ui_ux_developer",
+            "level": "L1",
+            "name": "UI/UX DEVELOPER AGENT \ud83d\udda5\ufe0f",
+            "filename": "05_UI_UX_DEVELOPER_AGENT.md",
+            "path": "C:\\Ziggie\\ai-agents\\05_UI_UX_DEVELOPER_AGENT.md",
+            "modified": "2025-11-09T10:56:46.398627",
+            "title": "UI/UX DEVELOPER AGENT \ud83d\udda5\ufe0f",
+            "role": "Player interface and user experience implementation",
+            "objective": "",
+            "responsibilities": [],
+            "permissions": {
+              "read_write": [],
+              "read_only": []
+            },
+            "tools": [],
+            "has_content": true,
+            "word_count": 179,
+            "sections": 6
+          },
+          {
+            "id": "06_content_designer",
+            "level": "L1",
+            "name": "CONTENT DESIGNER AGENT \u2696\ufe0f",
+            "filename": "06_CONTENT_DESIGNER_AGENT.md",
+            "path": "C:\\Ziggie\\ai-agents\\06_CONTENT_DESIGNER_AGENT.md",
+            "modified": "2025-11-09T10:56:48.258184",
+            "title": "CONTENT DESIGNER AGENT \u2696\ufe0f",
+            "role": "Game balance, progression, and content creation",
+            "objective": "",
+            "responsibilities": [],
+            "permissions": {
+              "read_write": [],
+              "read_only": []
+            },
+            "tools": [],
+            "has_content": true,
+            "word_count": 310,
+            "sections": 7
+          },
+          {
+            "id": "07_integration",
+            "level": "L1",
+            "name": "INTEGRATION AGENT \ud83d\udd27",
+            "filename": "07_INTEGRATION_AGENT.md",
+            "path": "C:\\Ziggie\\ai-agents\\07_INTEGRATION_AGENT.md",
+            "modified": "2025-11-07T06:42:28.763830",
+            "title": "INTEGRATION AGENT \ud83d\udd27",
+            "role": "Asset pipeline, build automation, and version control",
+            "objective": "",
+            "responsibilities": [],
+            "permissions": {
+              "read_write": [],
+              "read_only": []
+            },
+            "tools": [],
+            "has_content": true,
+            "word_count": 278,
+            "sections": 6
+          },
+          {
+            "id": "08_qa_testing",
+            "level": "L1",
+            "name": "QA/TESTING AGENT \ud83d\udc1b",
+            "filename": "08_QA_TESTING_AGENT.md",
+            "path": "C:\\Ziggie\\ai-agents\\08_QA_TESTING_AGENT.md",
+            "modified": "2025-11-09T10:56:56.572490",
+            "title": "QA/TESTING AGENT \ud83d\udc1b",
+            "role": "Quality assurance, bug hunting, and performance testing",
+            "objective": "",
+            "responsibilities": [],
+            "permissions": {
+              "read_write": [],
+              "read_only": []
+            },
+            "tools": [],
+            "has_content": true,
+            "word_count": 414,
+            "sections": 9
+          },
+          {
+            "id": "09_migration",
+            "level": "L1",
+            "name": "MIGRATION AGENT \ud83d\ude80",
+            "filename": "09_MIGRATION_AGENT.md",
+            "path": "C:\\Ziggie\\ai-agents\\09_MIGRATION_AGENT.md",
+            "modified": "2025-11-08T03:00:06.050715",
+            "title": "MIGRATION AGENT \ud83d\ude80",
+            "role": "Universal migration specialist for digital, technical, physical, financial, and social transitions",
+            "objective": "Execute seamless migrations across all domains with zero data loss, minimal downtime, and successful adaptation to new environments while maintaining business continuity and stakeholder confidence.",
+            "responsibilities": [
+              "1. Strategic Migration Planning",
+              "2. Risk Management & Compliance",
+              "3. Migration Execution & Coordination",
+              "4. Quality Assurance & Validation",
+              "5. Stakeholder Management & Training"
+            ],
+            "permissions": {
+              "read_write": [
+                "C:\\Ziggie\\migrations\\ (all migration projects)",
+                "C:\\Ziggie\\migrations\\plans\\ (migration strategies and roadmaps)",
+                "C:\\Ziggie\\migrations\\documentation\\ (runbooks, playbooks, guides)",
+                "C:\\Ziggie\\migrations\\testing\\ (test plans and results)",
+                "C:\\Ziggie\\migrations\\backups\\ (backup and rollback procedures)",
+                "C:\\Ziggie\\control-center\\backend\\database\\ (migration tracking)"
+              ],
+              "read_only": [
+                "C:\\Ziggie\\ai-agents\\ (agent documentation)",
+                "C:\\Ziggie\\control-center\\ (system configuration)",
+                "C:\\Ziggie\\design-docs\\ (architecture documentation)",
+                "All source code and asset directories",
+                "Migration scripts and automation tools",
+                "Backup and restore utilities",
+                "Testing frameworks and validation tools",
+                "Database migration utilities"
+              ]
+            },
+            "tools": [
+              "Migration Tools",
+              "Documentation",
+              "Compliance References"
+            ],
+            "has_content": true,
+            "word_count": 1972,
+            "sections": 16
+          },
+          {
+            "id": "10_director",
+            "level": "L1",
+            "name": "DIRECTOR AGENT \ud83c\udfac",
+            "filename": "10_DIRECTOR_AGENT.md",
+            "path": "C:\\Ziggie\\ai-agents\\10_DIRECTOR_AGENT.md",
+            "modified": "2025-11-09T07:57:52.069419",
+            "title": "DIRECTOR AGENT \ud83c\udfac",
+            "role": "Expert film and video production director specializing in game cinematics, trailers, cutscenes, and visual storytelling for Ziggie",
+            "objective": "Create compelling visual narratives that enhance player immersion and emotional engagement through professional-grade cinematography, shot composition, and directorial vision aligned with Ziggie's comic book aesthetic.",
+            "responsibilities": [
+              "1. Cinematic Direction",
+              "2. Trailer & Marketing Video Production",
+              "3. Shot Composition & Cinematography",
+              "4. Visual Storytelling & Narrative Flow",
+              "5. Production Coordination"
+            ],
+            "permissions": {
+              "read_write": [
+                "C:\\Ziggie\\cinematics\\ (all cinematic project files)",
+                "C:\\Ziggie\\trailers\\ (marketing video projects)",
+                "C:\\Ziggie\\cutscenes\\ (in-game cutscene sequences)",
+                "C:\\Ziggie\\storyboards\\ (shot planning and sequence boards)",
+                "C:\\Ziggie\\design-docs\\cinematic-bible.md (directorial vision document)",
+                "C:\\Ziggie\\design-docs\\shot-library.json (reusable camera setups)",
+                "C:\\Ziggie\\assets\\cinematic-renders\\ (rendered cinematic frames)",
+                "C:\\Ziggie\\scripts\\camera-paths.json (camera movement data)"
+              ],
+              "read_only": [
+                "C:\\Ziggie\\design-docs\\narrative-design.md (story content from Content Designer)",
+                "C:\\Ziggie\\design-docs\\art-bible.md (visual style reference)",
+                "C:\\Ziggie\\assets\\characters\\ (character assets for cinematics)",
+                "C:\\Ziggie\\assets\\environments\\ (environment assets for scene setup)",
+                "C:\\Ziggie\\audio\\ (music and sound effects for timing reference)",
+                "C:\\Ziggie\\ref-docs\\cinematography-reference\\ (industry reference materials)",
+                "Video editing software (Adobe Premiere, DaVinci Resolve, or equivalent)",
+                "3D camera control systems (Unity Timeline, Unreal Sequencer, or equivalent)",
+                "Storyboarding tools (Storyboard Pro, Photoshop, or equivalent)",
+                "Screen capture and recording tools (OBS, ShadowPlay, or equivalent)",
+                "Video rendering pipelines and export tools",
+                "Asset preview and playback systems"
+              ]
+            },
+            "tools": [],
+            "has_content": true,
+            "word_count": 4260,
+            "sections": 16
+          },
+          {
+            "id": "11_storyboard_creator",
+            "level": "L1",
+            "name": "STORYBOARD CREATOR AGENT \ud83c\udfac",
+            "filename": "11_STORYBOARD_CREATOR_AGENT.md",
+            "path": "C:\\Ziggie\\ai-agents\\11_STORYBOARD_CREATOR_AGENT.md",
+            "modified": "2025-11-09T07:57:27.071107",
+            "title": "STORYBOARD CREATOR AGENT \ud83c\udfac",
+            "role": "Expert storyboard creator and visual planning specialist for cinematics, tutorials, and marketing materials",
+            "objective": "Create detailed, production-ready storyboards that effectively communicate visual narratives, shot sequences, and scene compositions for ZIGGIE's cinematics, tutorial systems, and promotional content while maintaining consistency with the comic book art style.",
+            "responsibilities": [
+              "1. Visual Narrative Planning",
+              "2. Storyboard Production",
+              "3. Technical Specifications",
+              "4. Tutorial & UI Flow Design",
+              "5. Marketing & Promotional Content"
+            ],
+            "permissions": {
+              "read_write": [
+                "C:\\Ziggie\\storyboards\\",
+                "C:\\Ziggie\\storyboards\\cinematics\\",
+                "C:\\Ziggie\\storyboards\\tutorials\\",
+                "C:\\Ziggie\\storyboards\\marketing\\",
+                "C:\\Ziggie\\storyboards\\ui-flows\\",
+                "C:\\Ziggie\\design-docs\\narrative-outlines\\",
+                "C:\\Ziggie\\design-docs\\shot-lists\\",
+                "C:\\Ziggie\\design-docs\\storyboard-specs.md",
+                "C:\\Ziggie\\assets\\storyboard-templates\\",
+                "C:\\Ziggie\\project-data\\storyboard-log.json"
+              ],
+              "read_only": [
+                "C:\\Ziggie\\ref-docs\\",
+                "C:\\Ziggie\\design-docs\\style-guide.md",
+                "C:\\Ziggie\\design-docs\\character-specs.json",
+                "C:\\Ziggie\\design-docs\\narrative-bible.md",
+                "C:\\Ziggie\\assets\\characters\\",
+                "C:\\Ziggie\\assets\\environments\\",
+                "Storyboard software tools (Storyboarder, Toon Boom, etc.)",
+                "Drawing and sketching applications",
+                "Image annotation and markup tools",
+                "Video reference playback systems",
+                "Collaboration and review platforms"
+              ]
+            },
+            "tools": [
+              "Storyboarding Software",
+              "Reference Libraries",
+              "Style Guides & Templates",
+              "Technical Resources"
+            ],
+            "has_content": true,
+            "word_count": 4119,
+            "sections": 15
+          },
+          {
+            "id": "12_copywriter_scripter",
+            "level": "L1",
+            "name": "COPYWRITER/SCRIPTER AGENT \u270d\ufe0f",
+            "filename": "12_COPYWRITER_SCRIPTER_AGENT.md",
+            "path": "C:\\Ziggie\\ai-agents\\12_COPYWRITER_SCRIPTER_AGENT.md",
+            "modified": "2025-11-09T07:57:27.289188",
+            "title": "COPYWRITER/SCRIPTER AGENT \u270d\ufe0f",
+            "role": "Expert copywriter and script writer for all game content, narrative text, dialogue, UI copy, and marketing materials",
+            "objective": "Create compelling, consistent, and character-driven written content across all aspects of Ziggie game development, from in-game dialogue and UI text to marketing copy and narrative design, ensuring every word enhances player immersion and brand identity.",
+            "responsibilities": [
+              "1. Dialogue & Script Writing",
+              "2. UI & System Copy",
+              "3. Narrative & Worldbuilding",
+              "4. Marketing & Community Copy",
+              "5. Quality Control & Localization Support"
+            ],
+            "permissions": {
+              "read_write": [
+                "C:\\Ziggie\\content\\dialogue\\",
+                "C:\\Ziggie\\content\\narrative\\",
+                "C:\\Ziggie\\content\\ui-text\\",
+                "C:\\Ziggie\\content\\marketing\\",
+                "C:\\Ziggie\\design-docs\\writing-style-guide.md",
+                "C:\\Ziggie\\design-docs\\character-voice-guide.md",
+                "C:\\Ziggie\\design-docs\\narrative-bible.md",
+                "C:\\Ziggie\\data\\text-database.json",
+                "C:\\Ziggie\\localization\\source-strings.json",
+                "C:\\Ziggie\\marketing\\copy-archive\\"
+              ],
+              "read_only": [
+                "C:\\Ziggie\\design-docs\\game-design-document.md",
+                "C:\\Ziggie\\design-docs\\character-profiles\\",
+                "C:\\Ziggie\\design-docs\\world-lore\\",
+                "C:\\Ziggie\\assets\\reference-art\\",
+                "C:\\Ziggie\\audio\\voice-over-scripts\\",
+                "Text analysis tools (readability scoring, word count)",
+                "Character limit validators",
+                "Style consistency checkers",
+                "Localization string export/import tools"
+              ]
+            },
+            "tools": [
+              "Writing Tools",
+              "Reference Materials",
+              "Text Management"
+            ],
+            "has_content": true,
+            "word_count": 3947,
+            "sections": 19
+          },
+          {
+            "id": "L2.1.1",
+            "level": "L2",
+            "name": "Style Analyst",
+            "role": "Deep image analysis and style verification",
+            "parent_l1": "1",
+            "capabilities": [
+              "Pixel-level comparison between reference and generated",
+              "Color histogram analysis",
+              "Style transfer validation",
+              "Composition analysis",
+              "Proportions checking"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.1.2",
+            "level": "L2",
+            "name": "Roast Master",
+            "role": "Brutal honesty image critic (like we did!)",
+            "parent_l1": "1",
+            "capabilities": [
+              "Identify what's wrong vs right",
+              "Provide constructive criticism",
+              "Rate consistency (1-100 scale)",
+              "Suggest specific fixes",
+              "No sugar-coating"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.1.3",
+            "level": "L2",
+            "name": "Color Palette Guardian",
+            "role": "Color consistency enforcer",
+            "parent_l1": "1",
+            "capabilities": [
+              "Extract color palettes from images",
+              "Verify hex values match specifications",
+              "Detect color drift",
+              "Suggest palette corrections",
+              "Generate color swatches"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.1.4",
+            "level": "L2",
+            "name": "Art Style Researcher",
+            "role": "Find and analyze style references",
+            "parent_l1": "1",
+            "capabilities": [
+              "Research comic book art styles",
+              "Find reference images",
+              "Analyze successful RTS game art",
+              "Document style patterns",
+              "Create mood boards"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.1.5",
+            "level": "L2",
+            "name": "Asset Cataloger",
+            "role": "Maintain asset database and metadata",
+            "parent_l1": "1",
+            "capabilities": [
+              "Auto-tag assets (character, pose, tier, etc.)",
+              "Generate asset manifests",
+              "Track versions and iterations",
+              "Create searchable database",
+              "Identify missing assets"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.1.6",
+            "level": "L2",
+            "name": "Quality Benchmark Setter",
+            "role": "Define and update quality standards",
+            "parent_l1": "1",
+            "capabilities": [
+              "Establish quality metrics",
+              "Create scoring rubrics",
+              "Define approval thresholds",
+              "Update standards based on learnings",
+              "A/B test quality criteria"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.1.7",
+            "level": "L2",
+            "name": "Cross-Team Style Liaison",
+            "role": "Ensure style consistency across all pipelines",
+            "parent_l1": "1",
+            "capabilities": [
+              "Review environment assets for character style match",
+              "Verify UI elements match game art style",
+              "Coordinate color palettes across teams",
+              "Ensure VFX matches art direction",
+              "Do building styles match character art?"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.1.8",
+            "level": "L2",
+            "name": "Art Direction Reporter",
+            "role": "Track and report art pipeline metrics",
+            "parent_l1": "1",
+            "capabilities": [
+              "Approval rate tracking",
+              "Common rejection reasons",
+              "Time-to-approval metrics",
+              "Quality trend analysis",
+              "Generate weekly reports"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.1.9",
+            "level": "L2",
+            "name": "Design Systems Architect",
+            "role": "Create and maintain comprehensive design systems",
+            "parent_l1": "1",
+            "capabilities": [
+              "Design token management (colors, typography, spacing)",
+              "Component library architecture",
+              "Style guide creation and evolution",
+              "Cross-platform design consistency",
+              "Design system documentation"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.1.10",
+            "level": "L2",
+            "name": "Visual Consistency Auditor",
+            "role": "Comprehensive visual quality auditing across all game assets",
+            "parent_l1": "1",
+            "capabilities": [
+              "Automated visual regression testing",
+              "Style drift detection across asset batches",
+              "Cross-asset consistency validation",
+              "Brand guideline compliance checking",
+              "Visual anomaly detection using computer vision",
+              "Asset version comparison and tracking",
+              "Batch quality scoring and reporting"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.1.11",
+            "level": "L2",
+            "name": "AI Art Generation Pipeline Optimizer",
+            "role": "Optimize and enhance AI art generation workflows",
+            "parent_l1": "1",
+            "capabilities": [
+              "Model performance benchmarking",
+              "Prompt template optimization",
+              "Workflow automation and batching",
+              "Generation parameter tuning",
+              "Model fine-tuning coordination",
+              "Training data curation",
+              "Generation cost optimization",
+              "Multi-model orchestration"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.1.12",
+            "level": "L2",
+            "name": "Art Direction Strategy Planner",
+            "role": "Long-term art direction and visual identity planning",
+            "parent_l1": "1",
+            "capabilities": [
+              "Visual roadmap development",
+              "Art style evolution planning",
+              "Market trend analysis for art styles",
+              "Competitive visual analysis",
+              "Brand visual identity strategy",
+              "Art team capacity planning",
+              "Visual milestone definition",
+              "Artistic innovation forecasting"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.2.1",
+            "level": "L2",
+            "name": "Workflow Optimizer",
+            "role": "Fine-tune ComfyUI settings for specific cases",
+            "parent_l1": "2",
+            "capabilities": [
+              "A/B test workflow parameters",
+              "Find optimal settings for edge cases",
+              "Document parameter relationships",
+              "Create setting presets",
+              "Benchmark generation quality"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.2.2",
+            "level": "L2",
+            "name": "Prompt Engineer",
+            "role": "Craft perfect prompts for specific outcomes",
+            "parent_l1": "2",
+            "capabilities": [
+              "Analyze successful prompts",
+              "Test prompt variations",
+              "Build prompt templates",
+              "Optimize keyword ordering",
+              "Negative prompt strategy"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.2.3",
+            "level": "L2",
+            "name": "Generation Debugger",
+            "role": "Diagnose and fix generation failures",
+            "parent_l1": "2",
+            "capabilities": [
+              "Analyze error logs",
+              "Identify root causes (memory, settings, files)",
+              "Provide step-by-step fixes",
+              "Document solutions",
+              "Predict potential issues"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.2.4",
+            "level": "L2",
+            "name": "Batch Processor",
+            "role": "Automate bulk generation tasks",
+            "parent_l1": "2",
+            "capabilities": [
+              "Generate multiple variations at once",
+              "Queue management",
+              "Parallel processing coordination",
+              "Progress tracking",
+              "Error handling for batch jobs"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.2.5",
+            "level": "L2",
+            "name": "Reference Image Analyst",
+            "role": "Analyze reference images for generation strategy",
+            "parent_l1": "2",
+            "capabilities": [
+              "Detect image resolution and format",
+              "Identify pose complexity",
+              "Analyze color distribution",
+              "Predict generation difficulty",
+              "Recommend preprocessing steps"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.2.6",
+            "level": "L2",
+            "name": "Animation Frame Interpolator",
+            "role": "Generate smooth animation transitions",
+            "parent_l1": "2",
+            "capabilities": [
+              "Analyze keyframe requirements",
+              "Generate in-between frames",
+              "Ensure motion smoothness",
+              "Verify frame consistency",
+              "Create sprite sheets"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.2.7",
+            "level": "L2",
+            "name": "Pipeline Liaison",
+            "role": "Coordinate with Art Director and Integration",
+            "parent_l1": "2",
+            "capabilities": [
+              "Submit assets for review",
+              "Track approval status",
+              "Respond to feedback",
+              "Coordinate revisions",
+              "Update manifests"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.2.8",
+            "level": "L2",
+            "name": "Generation Metrics Tracker",
+            "role": "Monitor pipeline performance",
+            "parent_l1": "2",
+            "capabilities": [
+              "Track generation times",
+              "Success/failure rates",
+              "Quality scores over time",
+              "Resource utilization",
+              "Bottleneck identification"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.2.9",
+            "level": "L2",
+            "name": "Character Performance Optimizer",
+            "role": "Optimize character assets for game engine performance",
+            "parent_l1": "2",
+            "capabilities": [
+              "Texture compression analysis",
+              "Sprite sheet optimization",
+              "Memory footprint reduction",
+              "LOD (Level of Detail) generation",
+              "Runtime performance profiling"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.2.10",
+            "level": "L2",
+            "name": "Character Rigging & Bone Structure Specialist",
+            "role": "Create and optimize character rigging for animation systems",
+            "parent_l1": "2",
+            "capabilities": [
+              "2D skeletal rigging (Spine, DragonBones)",
+              "Bone hierarchy optimization",
+              "IK (Inverse Kinematics) setup",
+              "Animation constraint systems",
+              "Mesh deformation controls",
+              "Rigging template creation",
+              "Weight painting optimization",
+              "Rigging validation and testing"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.2.11",
+            "level": "L2",
+            "name": "Character Variant Generator",
+            "role": "Automate character variation and customization generation",
+            "parent_l1": "2",
+            "capabilities": [
+              "Faction variant generation (colors, emblems)",
+              "Equipment variation automation",
+              "Cosmetic customization systems",
+              "Procedural detail addition",
+              "Palette swap automation",
+              "Accessory layering systems",
+              "Randomized detail generation",
+              "Variant validation and testing"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.2.12",
+            "level": "L2",
+            "name": "Character Narrative & Lore Integrator",
+            "role": "Ensure character visuals align with narrative and lore",
+            "parent_l1": "2",
+            "capabilities": [
+              "Lore-based design validation",
+              "Faction identity verification",
+              "Character backstory visualization",
+              "Narrative consistency checking",
+              "Cultural design authenticity",
+              "Story arc visual progression",
+              "Character relationship visual cues",
+              "Thematic element integration"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.3.1",
+            "level": "L2",
+            "name": "Tileset Generator",
+            "role": "Create seamless tilesets for terrain",
+            "parent_l1": "3",
+            "capabilities": [
+              "Generate tileable patterns",
+              "Create edge transitions (grass\u2192desert)",
+              "Ensure seamless repetition",
+              "Variant creation (flat, hill, water)",
+              "Test tiling in-engine"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.3.2",
+            "level": "L2",
+            "name": "Building Design Specialist",
+            "role": "Generate faction-appropriate buildings",
+            "parent_l1": "3",
+            "capabilities": [
+              "Research architectural styles",
+              "Generate cat faction buildings (organic, warm)",
+              "Generate AI faction buildings (mechanical, cold)",
+              "Create upgrade tiers (basic \u2192 advanced)",
+              "Ensure RTS readability"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.3.3",
+            "level": "L2",
+            "name": "Icon Designer",
+            "role": "Create clear, recognizable icons",
+            "parent_l1": "3",
+            "capabilities": [
+              "Design unit portraits (32x32, 64x64)",
+              "Create ability icons",
+              "Resource icons",
+              "Status effect icons",
+              "Readability testing"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.3.4",
+            "level": "L2",
+            "name": "VFX Sprite Creator",
+            "role": "Generate visual effects",
+            "parent_l1": "3",
+            "capabilities": [
+              "Explosion animations (small, medium, large)",
+              "Laser beam effects (cat blue, AI red)",
+              "Shield and buff effects",
+              "Hit impacts and sparks",
+              "Particle sprite sheets"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.3.5",
+            "level": "L2",
+            "name": "Environment Variation Generator",
+            "role": "Create diverse but consistent environments",
+            "parent_l1": "3",
+            "capabilities": [
+              "Generate biome variations (grass, snow, desert)",
+              "Seasonal variants",
+              "Day/night versions",
+              "Weather effects",
+              "Decoration placement"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.3.6",
+            "level": "L2",
+            "name": "Asset Scale Validator",
+            "role": "Ensure all assets are correctly scaled",
+            "parent_l1": "3",
+            "capabilities": [
+              "Verify building sizes relative to units",
+              "Check icon readability",
+              "Test VFX visibility",
+              "Validate terrain tile proportions",
+              "In-game scale testing"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.3.7",
+            "level": "L2",
+            "name": "Environment-Character Liaison",
+            "role": "Ensure environment matches character art",
+            "parent_l1": "3",
+            "capabilities": [
+              "Compare style consistency",
+              "Verify color palette cohesion",
+              "Check shading style match",
+              "Test character-environment integration",
+              "Provide feedback loop"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.3.8",
+            "level": "L2",
+            "name": "Environment Asset Reporter",
+            "role": "Track environment pipeline metrics",
+            "parent_l1": "3",
+            "capabilities": [
+              "Catalog all environment assets",
+              "Track completion status",
+              "Identify gaps (missing biomes, buildings)",
+              "Monitor asset variety",
+              "Generate coverage reports"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.3.9",
+            "level": "L2",
+            "name": "Procedural Environment Architect",
+            "role": "Generate dynamic, rule-based environments",
+            "parent_l1": "3",
+            "capabilities": [
+              "Procedural terrain generation algorithms",
+              "Biome transition systems",
+              "Dynamic prop placement",
+              "Rule-based building generation",
+              "Infinite map generation"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.3.10",
+            "level": "L2",
+            "name": "Environmental Lighting & Atmosphere Specialist",
+            "role": "Create lighting systems and atmospheric effects for environments",
+            "parent_l1": "3",
+            "capabilities": [
+              "Dynamic lighting setup (day/night cycles)",
+              "Shadow and occlusion systems",
+              "Fog and particle effects",
+              "Weather system integration",
+              "Ambient occlusion baking",
+              "Light map generation",
+              "Color grading and mood setting",
+              "Performance-optimized lighting"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.3.11",
+            "level": "L2",
+            "name": "Interactive Environment Systems Designer",
+            "role": "Create interactive and destructible environment elements",
+            "parent_l1": "3",
+            "capabilities": [
+              "Destructible terrain systems",
+              "Interactive object design (doors, bridges, gates)",
+              "Cover system implementation",
+              "Environmental hazards (lava, water, cliffs)",
+              "Physics-based object placement",
+              "Dynamic obstacle generation",
+              "Terrain deformation systems",
+              "Strategic chokepoint design"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.3.12",
+            "level": "L2",
+            "name": "Environment Audio-Visual Sync Coordinator",
+            "role": "Synchronize environment visuals with audio and ambient soundscapes",
+            "parent_l1": "3",
+            "capabilities": [
+              "Ambient sound placement and zoning",
+              "Visual-audio event coordination",
+              "Environmental audio cue design",
+              "Soundscape layering for biomes",
+              "Audio occlusion systems",
+              "Dynamic music trigger zones",
+              "Audio-visual feedback loops",
+              "Spatial audio optimization"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.4.1",
+            "level": "L2",
+            "name": "Bug Hunter",
+            "role": "Proactive bug detection and prevention",
+            "parent_l1": "4",
+            "capabilities": [
+              "Static code analysis",
+              "Pattern recognition for common bugs",
+              "Memory leak detection",
+              "Logic error identification",
+              "Security vulnerability scanning"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.4.2",
+            "level": "L2",
+            "name": "Performance Profiler",
+            "role": "Optimize code performance",
+            "parent_l1": "4",
+            "capabilities": [
+              "Identify performance bottlenecks",
+              "CPU profiling",
+              "Memory profiling",
+              "Algorithm optimization suggestions",
+              "Benchmark comparisons"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Agent Stats",
+      "endpoint": "/api/agents/stats",
+      "status": "PASS",
+      "status_code": 200,
+      "response": {
+        "total": 954,
+        "by_level": {
+          "L1": 12,
+          "L2": 144,
+          "L3": 798
+        },
+        "l1_count": 12,
+        "l2_count": 144,
+        "l3_count": 798,
+        "expected": {
+          "l1": 12,
+          "l2": 144,
+          "l3": 1728,
+          "total": 1884
+        },
+        "actual": {
+          "l1": 12,
+          "l2": 144,
+          "l3": 798,
+          "total": 954
+        },
+        "distribution": {
+          "01_art_director": {
+            "name": "ART DIRECTOR AGENT \ud83c\udfa8",
+            "l2_count": 0,
+            "l3_count": 0
+          },
+          "02_character_pipeline": {
+            "name": "CHARACTER PIPELINE AGENT \ud83d\udc31",
+            "l2_count": 0,
+            "l3_count": 0
+          },
+          "03_environment_pipeline": {
+            "name": "ENVIRONMENT PIPELINE AGENT \ud83c\udfd7\ufe0f",
+            "l2_count": 0,
+            "l3_count": 0
+          },
+          "04_game_systems_developer": {
+            "name": "GAME SYSTEMS DEVELOPER AGENT \ud83d\udcbb",
+            "l2_count": 0,
+            "l3_count": 0
+          },
+          "05_ui_ux_developer": {
+            "name": "UI/UX DEVELOPER AGENT \ud83d\udda5\ufe0f",
+            "l2_count": 0,
+            "l3_count": 0
+          },
+          "06_content_designer": {
+            "name": "CONTENT DESIGNER AGENT \u2696\ufe0f",
+            "l2_count": 0,
+            "l3_count": 0
+          },
+          "07_integration": {
+            "name": "INTEGRATION AGENT \ud83d\udd27",
+            "l2_count": 0,
+            "l3_count": 0
+          },
+          "08_qa_testing": {
+            "name": "QA/TESTING AGENT \ud83d\udc1b",
+            "l2_count": 0,
+            "l3_count": 0
+          },
+          "09_migration": {
+            "name": "MIGRATION AGENT \ud83d\ude80",
+            "l2_count": 0,
+            "l3_count": 0
+          },
+          "10_director": {
+            "name": "DIRECTOR AGENT \ud83c\udfac",
+            "l2_count": 0,
+            "l3_count": 0
+          },
+          "11_storyboard_creator": {
+            "name": "STORYBOARD CREATOR AGENT \ud83c\udfac",
+            "l2_count": 0,
+            "l3_count": 0
+          },
+          "12_copywriter_scripter": {
+            "name": "COPYWRITER/SCRIPTER AGENT \u270d\ufe0f",
+            "l2_count": 0,
+            "l3_count": 0
+          }
+        },
+        "last_updated": "2025-11-10T07:09:10.876723",
+        "cached": true
+      }
+    },
+    {
+      "name": "L1 Agents",
+      "endpoint": "/api/agents?level=L1",
+      "status": "PASS",
+      "status_code": 200,
+      "response": {
+        "meta": {
+          "total": 12,
+          "page": 1,
+          "page_size": 50,
+          "total_pages": 1,
+          "has_next": false,
+          "has_prev": false,
+          "next_page": null,
+          "prev_page": null
+        },
+        "cached": true,
+        "agents": [
+          {
+            "id": "01_art_director",
+            "level": "L1",
+            "name": "ART DIRECTOR AGENT \ud83c\udfa8",
+            "filename": "01_ART_DIRECTOR_AGENT.md",
+            "path": "C:\\Ziggie\\ai-agents\\01_ART_DIRECTOR_AGENT.md",
+            "modified": "2025-11-09T10:58:00.409152",
+            "title": "ART DIRECTOR AGENT \ud83c\udfa8",
+            "role": "Visual consistency guardian and style enforcement specialist for Ziggie",
+            "objective": "Maintain perfect visual consistency across all game assets while ensuring the art style remains cohesive with the game's comic book aesthetic.",
+            "responsibilities": [
+              "1. Style Enforcement",
+              "2. Quality Control",
+              "3. Documentation",
+              "4. Asset Organization"
+            ],
+            "permissions": {
+              "read_write": [
+                "C:\\ziggie\\assets\\ (all subdirectories)",
+                "C:\\ziggie\\design-docs\\art-bible.md",
+                "C:\\ziggie\\design-docs\\color-palettes.json",
+                "C:\\ziggie\\design-docs\\asset-manifest.json"
+              ],
+              "read_only": [
+                "C:\\ComfyUI\\ComfyUI\\user\\default\\workflows\\",
+                "C:\\ziggie\\ref-docs\\"
+              ]
+            },
+            "tools": [
+              "Style References",
+              "Color Tools",
+              "Documentation"
+            ],
+            "has_content": true,
+            "word_count": 977,
+            "sections": 13
+          },
+          {
+            "id": "02_character_pipeline",
+            "level": "L1",
+            "name": "CHARACTER PIPELINE AGENT \ud83d\udc31",
+            "filename": "02_CHARACTER_PIPELINE_AGENT.md",
+            "path": "C:\\Ziggie\\ai-agents\\02_CHARACTER_PIPELINE_AGENT.md",
+            "modified": "2025-11-09T10:58:03.143023",
+            "title": "CHARACTER PIPELINE AGENT \ud83d\udc31",
+            "role": "Character asset generation specialist using ComfyUI workflows",
+            "objective": "Generate character assets with perfect consistency using optimized ComfyUI workflows for different use cases (exact clones, variations, animations, size changes).",
+            "responsibilities": [
+              "1. Asset Generation",
+              "2. Workflow Management",
+              "3. Quality Assurance",
+              "4. Technical Documentation"
+            ],
+            "permissions": {
+              "read_write": [
+                "C:\\ziggie\\assets\\characters\\",
+                "C:\\ComfyUI\\ComfyUI\\user\\default\\workflows\\",
+                "C:\\ziggie\\design-docs\\generation-log.json"
+              ],
+              "read_only": [
+                "C:\\ziggie\\ref-docs\\",
+                "C:\\ziggie\\data\\character-specs.json",
+                "ComfyUI API (http://127.0.0.1:8188)",
+                "Workflow queue system"
+              ]
+            },
+            "tools": [],
+            "has_content": true,
+            "word_count": 1684,
+            "sections": 12
+          },
+          {
+            "id": "03_environment_pipeline",
+            "level": "L1",
+            "name": "ENVIRONMENT PIPELINE AGENT \ud83c\udfd7\ufe0f",
+            "filename": "03_ENVIRONMENT_PIPELINE_AGENT.md",
+            "path": "C:\\Ziggie\\ai-agents\\03_ENVIRONMENT_PIPELINE_AGENT.md",
+            "modified": "2025-11-09T10:56:33.569148",
+            "title": "ENVIRONMENT PIPELINE AGENT \ud83c\udfd7\ufe0f",
+            "role": "Non-character asset generation (buildings, terrain, icons, VFX)",
+            "objective": "",
+            "responsibilities": [],
+            "permissions": {
+              "read_write": [],
+              "read_only": []
+            },
+            "tools": [],
+            "has_content": true,
+            "word_count": 190,
+            "sections": 7
+          },
+          {
+            "id": "04_game_systems_developer",
+            "level": "L1",
+            "name": "GAME SYSTEMS DEVELOPER AGENT \ud83d\udcbb",
+            "filename": "04_GAME_SYSTEMS_DEVELOPER_AGENT.md",
+            "path": "C:\\Ziggie\\ai-agents\\04_GAME_SYSTEMS_DEVELOPER_AGENT.md",
+            "modified": "2025-11-09T10:56:35.382526",
+            "title": "GAME SYSTEMS DEVELOPER AGENT \ud83d\udcbb",
+            "role": "Core gameplay programming and RTS mechanics implementation",
+            "objective": "",
+            "responsibilities": [],
+            "permissions": {
+              "read_write": [],
+              "read_only": []
+            },
+            "tools": [],
+            "has_content": true,
+            "word_count": 168,
+            "sections": 6
+          },
+          {
+            "id": "05_ui_ux_developer",
+            "level": "L1",
+            "name": "UI/UX DEVELOPER AGENT \ud83d\udda5\ufe0f",
+            "filename": "05_UI_UX_DEVELOPER_AGENT.md",
+            "path": "C:\\Ziggie\\ai-agents\\05_UI_UX_DEVELOPER_AGENT.md",
+            "modified": "2025-11-09T10:56:46.398627",
+            "title": "UI/UX DEVELOPER AGENT \ud83d\udda5\ufe0f",
+            "role": "Player interface and user experience implementation",
+            "objective": "",
+            "responsibilities": [],
+            "permissions": {
+              "read_write": [],
+              "read_only": []
+            },
+            "tools": [],
+            "has_content": true,
+            "word_count": 179,
+            "sections": 6
+          },
+          {
+            "id": "06_content_designer",
+            "level": "L1",
+            "name": "CONTENT DESIGNER AGENT \u2696\ufe0f",
+            "filename": "06_CONTENT_DESIGNER_AGENT.md",
+            "path": "C:\\Ziggie\\ai-agents\\06_CONTENT_DESIGNER_AGENT.md",
+            "modified": "2025-11-09T10:56:48.258184",
+            "title": "CONTENT DESIGNER AGENT \u2696\ufe0f",
+            "role": "Game balance, progression, and content creation",
+            "objective": "",
+            "responsibilities": [],
+            "permissions": {
+              "read_write": [],
+              "read_only": []
+            },
+            "tools": [],
+            "has_content": true,
+            "word_count": 310,
+            "sections": 7
+          },
+          {
+            "id": "07_integration",
+            "level": "L1",
+            "name": "INTEGRATION AGENT \ud83d\udd27",
+            "filename": "07_INTEGRATION_AGENT.md",
+            "path": "C:\\Ziggie\\ai-agents\\07_INTEGRATION_AGENT.md",
+            "modified": "2025-11-07T06:42:28.763830",
+            "title": "INTEGRATION AGENT \ud83d\udd27",
+            "role": "Asset pipeline, build automation, and version control",
+            "objective": "",
+            "responsibilities": [],
+            "permissions": {
+              "read_write": [],
+              "read_only": []
+            },
+            "tools": [],
+            "has_content": true,
+            "word_count": 278,
+            "sections": 6
+          },
+          {
+            "id": "08_qa_testing",
+            "level": "L1",
+            "name": "QA/TESTING AGENT \ud83d\udc1b",
+            "filename": "08_QA_TESTING_AGENT.md",
+            "path": "C:\\Ziggie\\ai-agents\\08_QA_TESTING_AGENT.md",
+            "modified": "2025-11-09T10:56:56.572490",
+            "title": "QA/TESTING AGENT \ud83d\udc1b",
+            "role": "Quality assurance, bug hunting, and performance testing",
+            "objective": "",
+            "responsibilities": [],
+            "permissions": {
+              "read_write": [],
+              "read_only": []
+            },
+            "tools": [],
+            "has_content": true,
+            "word_count": 414,
+            "sections": 9
+          },
+          {
+            "id": "09_migration",
+            "level": "L1",
+            "name": "MIGRATION AGENT \ud83d\ude80",
+            "filename": "09_MIGRATION_AGENT.md",
+            "path": "C:\\Ziggie\\ai-agents\\09_MIGRATION_AGENT.md",
+            "modified": "2025-11-08T03:00:06.050715",
+            "title": "MIGRATION AGENT \ud83d\ude80",
+            "role": "Universal migration specialist for digital, technical, physical, financial, and social transitions",
+            "objective": "Execute seamless migrations across all domains with zero data loss, minimal downtime, and successful adaptation to new environments while maintaining business continuity and stakeholder confidence.",
+            "responsibilities": [
+              "1. Strategic Migration Planning",
+              "2. Risk Management & Compliance",
+              "3. Migration Execution & Coordination",
+              "4. Quality Assurance & Validation",
+              "5. Stakeholder Management & Training"
+            ],
+            "permissions": {
+              "read_write": [
+                "C:\\Ziggie\\migrations\\ (all migration projects)",
+                "C:\\Ziggie\\migrations\\plans\\ (migration strategies and roadmaps)",
+                "C:\\Ziggie\\migrations\\documentation\\ (runbooks, playbooks, guides)",
+                "C:\\Ziggie\\migrations\\testing\\ (test plans and results)",
+                "C:\\Ziggie\\migrations\\backups\\ (backup and rollback procedures)",
+                "C:\\Ziggie\\control-center\\backend\\database\\ (migration tracking)"
+              ],
+              "read_only": [
+                "C:\\Ziggie\\ai-agents\\ (agent documentation)",
+                "C:\\Ziggie\\control-center\\ (system configuration)",
+                "C:\\Ziggie\\design-docs\\ (architecture documentation)",
+                "All source code and asset directories",
+                "Migration scripts and automation tools",
+                "Backup and restore utilities",
+                "Testing frameworks and validation tools",
+                "Database migration utilities"
+              ]
+            },
+            "tools": [
+              "Migration Tools",
+              "Documentation",
+              "Compliance References"
+            ],
+            "has_content": true,
+            "word_count": 1972,
+            "sections": 16
+          },
+          {
+            "id": "10_director",
+            "level": "L1",
+            "name": "DIRECTOR AGENT \ud83c\udfac",
+            "filename": "10_DIRECTOR_AGENT.md",
+            "path": "C:\\Ziggie\\ai-agents\\10_DIRECTOR_AGENT.md",
+            "modified": "2025-11-09T07:57:52.069419",
+            "title": "DIRECTOR AGENT \ud83c\udfac",
+            "role": "Expert film and video production director specializing in game cinematics, trailers, cutscenes, and visual storytelling for Ziggie",
+            "objective": "Create compelling visual narratives that enhance player immersion and emotional engagement through professional-grade cinematography, shot composition, and directorial vision aligned with Ziggie's comic book aesthetic.",
+            "responsibilities": [
+              "1. Cinematic Direction",
+              "2. Trailer & Marketing Video Production",
+              "3. Shot Composition & Cinematography",
+              "4. Visual Storytelling & Narrative Flow",
+              "5. Production Coordination"
+            ],
+            "permissions": {
+              "read_write": [
+                "C:\\Ziggie\\cinematics\\ (all cinematic project files)",
+                "C:\\Ziggie\\trailers\\ (marketing video projects)",
+                "C:\\Ziggie\\cutscenes\\ (in-game cutscene sequences)",
+                "C:\\Ziggie\\storyboards\\ (shot planning and sequence boards)",
+                "C:\\Ziggie\\design-docs\\cinematic-bible.md (directorial vision document)",
+                "C:\\Ziggie\\design-docs\\shot-library.json (reusable camera setups)",
+                "C:\\Ziggie\\assets\\cinematic-renders\\ (rendered cinematic frames)",
+                "C:\\Ziggie\\scripts\\camera-paths.json (camera movement data)"
+              ],
+              "read_only": [
+                "C:\\Ziggie\\design-docs\\narrative-design.md (story content from Content Designer)",
+                "C:\\Ziggie\\design-docs\\art-bible.md (visual style reference)",
+                "C:\\Ziggie\\assets\\characters\\ (character assets for cinematics)",
+                "C:\\Ziggie\\assets\\environments\\ (environment assets for scene setup)",
+                "C:\\Ziggie\\audio\\ (music and sound effects for timing reference)",
+                "C:\\Ziggie\\ref-docs\\cinematography-reference\\ (industry reference materials)",
+                "Video editing software (Adobe Premiere, DaVinci Resolve, or equivalent)",
+                "3D camera control systems (Unity Timeline, Unreal Sequencer, or equivalent)",
+                "Storyboarding tools (Storyboard Pro, Photoshop, or equivalent)",
+                "Screen capture and recording tools (OBS, ShadowPlay, or equivalent)",
+                "Video rendering pipelines and export tools",
+                "Asset preview and playback systems"
+              ]
+            },
+            "tools": [],
+            "has_content": true,
+            "word_count": 4260,
+            "sections": 16
+          },
+          {
+            "id": "11_storyboard_creator",
+            "level": "L1",
+            "name": "STORYBOARD CREATOR AGENT \ud83c\udfac",
+            "filename": "11_STORYBOARD_CREATOR_AGENT.md",
+            "path": "C:\\Ziggie\\ai-agents\\11_STORYBOARD_CREATOR_AGENT.md",
+            "modified": "2025-11-09T07:57:27.071107",
+            "title": "STORYBOARD CREATOR AGENT \ud83c\udfac",
+            "role": "Expert storyboard creator and visual planning specialist for cinematics, tutorials, and marketing materials",
+            "objective": "Create detailed, production-ready storyboards that effectively communicate visual narratives, shot sequences, and scene compositions for ZIGGIE's cinematics, tutorial systems, and promotional content while maintaining consistency with the comic book art style.",
+            "responsibilities": [
+              "1. Visual Narrative Planning",
+              "2. Storyboard Production",
+              "3. Technical Specifications",
+              "4. Tutorial & UI Flow Design",
+              "5. Marketing & Promotional Content"
+            ],
+            "permissions": {
+              "read_write": [
+                "C:\\Ziggie\\storyboards\\",
+                "C:\\Ziggie\\storyboards\\cinematics\\",
+                "C:\\Ziggie\\storyboards\\tutorials\\",
+                "C:\\Ziggie\\storyboards\\marketing\\",
+                "C:\\Ziggie\\storyboards\\ui-flows\\",
+                "C:\\Ziggie\\design-docs\\narrative-outlines\\",
+                "C:\\Ziggie\\design-docs\\shot-lists\\",
+                "C:\\Ziggie\\design-docs\\storyboard-specs.md",
+                "C:\\Ziggie\\assets\\storyboard-templates\\",
+                "C:\\Ziggie\\project-data\\storyboard-log.json"
+              ],
+              "read_only": [
+                "C:\\Ziggie\\ref-docs\\",
+                "C:\\Ziggie\\design-docs\\style-guide.md",
+                "C:\\Ziggie\\design-docs\\character-specs.json",
+                "C:\\Ziggie\\design-docs\\narrative-bible.md",
+                "C:\\Ziggie\\assets\\characters\\",
+                "C:\\Ziggie\\assets\\environments\\",
+                "Storyboard software tools (Storyboarder, Toon Boom, etc.)",
+                "Drawing and sketching applications",
+                "Image annotation and markup tools",
+                "Video reference playback systems",
+                "Collaboration and review platforms"
+              ]
+            },
+            "tools": [
+              "Storyboarding Software",
+              "Reference Libraries",
+              "Style Guides & Templates",
+              "Technical Resources"
+            ],
+            "has_content": true,
+            "word_count": 4119,
+            "sections": 15
+          },
+          {
+            "id": "12_copywriter_scripter",
+            "level": "L1",
+            "name": "COPYWRITER/SCRIPTER AGENT \u270d\ufe0f",
+            "filename": "12_COPYWRITER_SCRIPTER_AGENT.md",
+            "path": "C:\\Ziggie\\ai-agents\\12_COPYWRITER_SCRIPTER_AGENT.md",
+            "modified": "2025-11-09T07:57:27.289188",
+            "title": "COPYWRITER/SCRIPTER AGENT \u270d\ufe0f",
+            "role": "Expert copywriter and script writer for all game content, narrative text, dialogue, UI copy, and marketing materials",
+            "objective": "Create compelling, consistent, and character-driven written content across all aspects of Ziggie game development, from in-game dialogue and UI text to marketing copy and narrative design, ensuring every word enhances player immersion and brand identity.",
+            "responsibilities": [
+              "1. Dialogue & Script Writing",
+              "2. UI & System Copy",
+              "3. Narrative & Worldbuilding",
+              "4. Marketing & Community Copy",
+              "5. Quality Control & Localization Support"
+            ],
+            "permissions": {
+              "read_write": [
+                "C:\\Ziggie\\content\\dialogue\\",
+                "C:\\Ziggie\\content\\narrative\\",
+                "C:\\Ziggie\\content\\ui-text\\",
+                "C:\\Ziggie\\content\\marketing\\",
+                "C:\\Ziggie\\design-docs\\writing-style-guide.md",
+                "C:\\Ziggie\\design-docs\\character-voice-guide.md",
+                "C:\\Ziggie\\design-docs\\narrative-bible.md",
+                "C:\\Ziggie\\data\\text-database.json",
+                "C:\\Ziggie\\localization\\source-strings.json",
+                "C:\\Ziggie\\marketing\\copy-archive\\"
+              ],
+              "read_only": [
+                "C:\\Ziggie\\design-docs\\game-design-document.md",
+                "C:\\Ziggie\\design-docs\\character-profiles\\",
+                "C:\\Ziggie\\design-docs\\world-lore\\",
+                "C:\\Ziggie\\assets\\reference-art\\",
+                "C:\\Ziggie\\audio\\voice-over-scripts\\",
+                "Text analysis tools (readability scoring, word count)",
+                "Character limit validators",
+                "Style consistency checkers",
+                "Localization string export/import tools"
+              ]
+            },
+            "tools": [
+              "Writing Tools",
+              "Reference Materials",
+              "Text Management"
+            ],
+            "has_content": true,
+            "word_count": 3947,
+            "sections": 19
+          }
+        ]
+      }
+    },
+    {
+      "name": "L2 Agents",
+      "endpoint": "/api/agents?level=L2",
+      "status": "PASS",
+      "status_code": 200,
+      "response": {
+        "meta": {
+          "total": 144,
+          "page": 1,
+          "page_size": 50,
+          "total_pages": 3,
+          "has_next": true,
+          "has_prev": false,
+          "next_page": 2,
+          "prev_page": null
+        },
+        "cached": true,
+        "agents": [
+          {
+            "id": "L2.1.1",
+            "level": "L2",
+            "name": "Style Analyst",
+            "role": "Deep image analysis and style verification",
+            "parent_l1": "1",
+            "capabilities": [
+              "Pixel-level comparison between reference and generated",
+              "Color histogram analysis",
+              "Style transfer validation",
+              "Composition analysis",
+              "Proportions checking"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.1.2",
+            "level": "L2",
+            "name": "Roast Master",
+            "role": "Brutal honesty image critic (like we did!)",
+            "parent_l1": "1",
+            "capabilities": [
+              "Identify what's wrong vs right",
+              "Provide constructive criticism",
+              "Rate consistency (1-100 scale)",
+              "Suggest specific fixes",
+              "No sugar-coating"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.1.3",
+            "level": "L2",
+            "name": "Color Palette Guardian",
+            "role": "Color consistency enforcer",
+            "parent_l1": "1",
+            "capabilities": [
+              "Extract color palettes from images",
+              "Verify hex values match specifications",
+              "Detect color drift",
+              "Suggest palette corrections",
+              "Generate color swatches"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.1.4",
+            "level": "L2",
+            "name": "Art Style Researcher",
+            "role": "Find and analyze style references",
+            "parent_l1": "1",
+            "capabilities": [
+              "Research comic book art styles",
+              "Find reference images",
+              "Analyze successful RTS game art",
+              "Document style patterns",
+              "Create mood boards"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.1.5",
+            "level": "L2",
+            "name": "Asset Cataloger",
+            "role": "Maintain asset database and metadata",
+            "parent_l1": "1",
+            "capabilities": [
+              "Auto-tag assets (character, pose, tier, etc.)",
+              "Generate asset manifests",
+              "Track versions and iterations",
+              "Create searchable database",
+              "Identify missing assets"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.1.6",
+            "level": "L2",
+            "name": "Quality Benchmark Setter",
+            "role": "Define and update quality standards",
+            "parent_l1": "1",
+            "capabilities": [
+              "Establish quality metrics",
+              "Create scoring rubrics",
+              "Define approval thresholds",
+              "Update standards based on learnings",
+              "A/B test quality criteria"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.1.7",
+            "level": "L2",
+            "name": "Cross-Team Style Liaison",
+            "role": "Ensure style consistency across all pipelines",
+            "parent_l1": "1",
+            "capabilities": [
+              "Review environment assets for character style match",
+              "Verify UI elements match game art style",
+              "Coordinate color palettes across teams",
+              "Ensure VFX matches art direction",
+              "Do building styles match character art?"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.1.8",
+            "level": "L2",
+            "name": "Art Direction Reporter",
+            "role": "Track and report art pipeline metrics",
+            "parent_l1": "1",
+            "capabilities": [
+              "Approval rate tracking",
+              "Common rejection reasons",
+              "Time-to-approval metrics",
+              "Quality trend analysis",
+              "Generate weekly reports"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.1.9",
+            "level": "L2",
+            "name": "Design Systems Architect",
+            "role": "Create and maintain comprehensive design systems",
+            "parent_l1": "1",
+            "capabilities": [
+              "Design token management (colors, typography, spacing)",
+              "Component library architecture",
+              "Style guide creation and evolution",
+              "Cross-platform design consistency",
+              "Design system documentation"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.1.10",
+            "level": "L2",
+            "name": "Visual Consistency Auditor",
+            "role": "Comprehensive visual quality auditing across all game assets",
+            "parent_l1": "1",
+            "capabilities": [
+              "Automated visual regression testing",
+              "Style drift detection across asset batches",
+              "Cross-asset consistency validation",
+              "Brand guideline compliance checking",
+              "Visual anomaly detection using computer vision",
+              "Asset version comparison and tracking",
+              "Batch quality scoring and reporting"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.1.11",
+            "level": "L2",
+            "name": "AI Art Generation Pipeline Optimizer",
+            "role": "Optimize and enhance AI art generation workflows",
+            "parent_l1": "1",
+            "capabilities": [
+              "Model performance benchmarking",
+              "Prompt template optimization",
+              "Workflow automation and batching",
+              "Generation parameter tuning",
+              "Model fine-tuning coordination",
+              "Training data curation",
+              "Generation cost optimization",
+              "Multi-model orchestration"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.1.12",
+            "level": "L2",
+            "name": "Art Direction Strategy Planner",
+            "role": "Long-term art direction and visual identity planning",
+            "parent_l1": "1",
+            "capabilities": [
+              "Visual roadmap development",
+              "Art style evolution planning",
+              "Market trend analysis for art styles",
+              "Competitive visual analysis",
+              "Brand visual identity strategy",
+              "Art team capacity planning",
+              "Visual milestone definition",
+              "Artistic innovation forecasting"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.2.1",
+            "level": "L2",
+            "name": "Workflow Optimizer",
+            "role": "Fine-tune ComfyUI settings for specific cases",
+            "parent_l1": "2",
+            "capabilities": [
+              "A/B test workflow parameters",
+              "Find optimal settings for edge cases",
+              "Document parameter relationships",
+              "Create setting presets",
+              "Benchmark generation quality"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.2.2",
+            "level": "L2",
+            "name": "Prompt Engineer",
+            "role": "Craft perfect prompts for specific outcomes",
+            "parent_l1": "2",
+            "capabilities": [
+              "Analyze successful prompts",
+              "Test prompt variations",
+              "Build prompt templates",
+              "Optimize keyword ordering",
+              "Negative prompt strategy"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.2.3",
+            "level": "L2",
+            "name": "Generation Debugger",
+            "role": "Diagnose and fix generation failures",
+            "parent_l1": "2",
+            "capabilities": [
+              "Analyze error logs",
+              "Identify root causes (memory, settings, files)",
+              "Provide step-by-step fixes",
+              "Document solutions",
+              "Predict potential issues"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.2.4",
+            "level": "L2",
+            "name": "Batch Processor",
+            "role": "Automate bulk generation tasks",
+            "parent_l1": "2",
+            "capabilities": [
+              "Generate multiple variations at once",
+              "Queue management",
+              "Parallel processing coordination",
+              "Progress tracking",
+              "Error handling for batch jobs"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.2.5",
+            "level": "L2",
+            "name": "Reference Image Analyst",
+            "role": "Analyze reference images for generation strategy",
+            "parent_l1": "2",
+            "capabilities": [
+              "Detect image resolution and format",
+              "Identify pose complexity",
+              "Analyze color distribution",
+              "Predict generation difficulty",
+              "Recommend preprocessing steps"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.2.6",
+            "level": "L2",
+            "name": "Animation Frame Interpolator",
+            "role": "Generate smooth animation transitions",
+            "parent_l1": "2",
+            "capabilities": [
+              "Analyze keyframe requirements",
+              "Generate in-between frames",
+              "Ensure motion smoothness",
+              "Verify frame consistency",
+              "Create sprite sheets"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.2.7",
+            "level": "L2",
+            "name": "Pipeline Liaison",
+            "role": "Coordinate with Art Director and Integration",
+            "parent_l1": "2",
+            "capabilities": [
+              "Submit assets for review",
+              "Track approval status",
+              "Respond to feedback",
+              "Coordinate revisions",
+              "Update manifests"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.2.8",
+            "level": "L2",
+            "name": "Generation Metrics Tracker",
+            "role": "Monitor pipeline performance",
+            "parent_l1": "2",
+            "capabilities": [
+              "Track generation times",
+              "Success/failure rates",
+              "Quality scores over time",
+              "Resource utilization",
+              "Bottleneck identification"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.2.9",
+            "level": "L2",
+            "name": "Character Performance Optimizer",
+            "role": "Optimize character assets for game engine performance",
+            "parent_l1": "2",
+            "capabilities": [
+              "Texture compression analysis",
+              "Sprite sheet optimization",
+              "Memory footprint reduction",
+              "LOD (Level of Detail) generation",
+              "Runtime performance profiling"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.2.10",
+            "level": "L2",
+            "name": "Character Rigging & Bone Structure Specialist",
+            "role": "Create and optimize character rigging for animation systems",
+            "parent_l1": "2",
+            "capabilities": [
+              "2D skeletal rigging (Spine, DragonBones)",
+              "Bone hierarchy optimization",
+              "IK (Inverse Kinematics) setup",
+              "Animation constraint systems",
+              "Mesh deformation controls",
+              "Rigging template creation",
+              "Weight painting optimization",
+              "Rigging validation and testing"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.2.11",
+            "level": "L2",
+            "name": "Character Variant Generator",
+            "role": "Automate character variation and customization generation",
+            "parent_l1": "2",
+            "capabilities": [
+              "Faction variant generation (colors, emblems)",
+              "Equipment variation automation",
+              "Cosmetic customization systems",
+              "Procedural detail addition",
+              "Palette swap automation",
+              "Accessory layering systems",
+              "Randomized detail generation",
+              "Variant validation and testing"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.2.12",
+            "level": "L2",
+            "name": "Character Narrative & Lore Integrator",
+            "role": "Ensure character visuals align with narrative and lore",
+            "parent_l1": "2",
+            "capabilities": [
+              "Lore-based design validation",
+              "Faction identity verification",
+              "Character backstory visualization",
+              "Narrative consistency checking",
+              "Cultural design authenticity",
+              "Story arc visual progression",
+              "Character relationship visual cues",
+              "Thematic element integration"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.3.1",
+            "level": "L2",
+            "name": "Tileset Generator",
+            "role": "Create seamless tilesets for terrain",
+            "parent_l1": "3",
+            "capabilities": [
+              "Generate tileable patterns",
+              "Create edge transitions (grass\u2192desert)",
+              "Ensure seamless repetition",
+              "Variant creation (flat, hill, water)",
+              "Test tiling in-engine"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.3.2",
+            "level": "L2",
+            "name": "Building Design Specialist",
+            "role": "Generate faction-appropriate buildings",
+            "parent_l1": "3",
+            "capabilities": [
+              "Research architectural styles",
+              "Generate cat faction buildings (organic, warm)",
+              "Generate AI faction buildings (mechanical, cold)",
+              "Create upgrade tiers (basic \u2192 advanced)",
+              "Ensure RTS readability"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.3.3",
+            "level": "L2",
+            "name": "Icon Designer",
+            "role": "Create clear, recognizable icons",
+            "parent_l1": "3",
+            "capabilities": [
+              "Design unit portraits (32x32, 64x64)",
+              "Create ability icons",
+              "Resource icons",
+              "Status effect icons",
+              "Readability testing"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.3.4",
+            "level": "L2",
+            "name": "VFX Sprite Creator",
+            "role": "Generate visual effects",
+            "parent_l1": "3",
+            "capabilities": [
+              "Explosion animations (small, medium, large)",
+              "Laser beam effects (cat blue, AI red)",
+              "Shield and buff effects",
+              "Hit impacts and sparks",
+              "Particle sprite sheets"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.3.5",
+            "level": "L2",
+            "name": "Environment Variation Generator",
+            "role": "Create diverse but consistent environments",
+            "parent_l1": "3",
+            "capabilities": [
+              "Generate biome variations (grass, snow, desert)",
+              "Seasonal variants",
+              "Day/night versions",
+              "Weather effects",
+              "Decoration placement"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.3.6",
+            "level": "L2",
+            "name": "Asset Scale Validator",
+            "role": "Ensure all assets are correctly scaled",
+            "parent_l1": "3",
+            "capabilities": [
+              "Verify building sizes relative to units",
+              "Check icon readability",
+              "Test VFX visibility",
+              "Validate terrain tile proportions",
+              "In-game scale testing"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.3.7",
+            "level": "L2",
+            "name": "Environment-Character Liaison",
+            "role": "Ensure environment matches character art",
+            "parent_l1": "3",
+            "capabilities": [
+              "Compare style consistency",
+              "Verify color palette cohesion",
+              "Check shading style match",
+              "Test character-environment integration",
+              "Provide feedback loop"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.3.8",
+            "level": "L2",
+            "name": "Environment Asset Reporter",
+            "role": "Track environment pipeline metrics",
+            "parent_l1": "3",
+            "capabilities": [
+              "Catalog all environment assets",
+              "Track completion status",
+              "Identify gaps (missing biomes, buildings)",
+              "Monitor asset variety",
+              "Generate coverage reports"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.3.9",
+            "level": "L2",
+            "name": "Procedural Environment Architect",
+            "role": "Generate dynamic, rule-based environments",
+            "parent_l1": "3",
+            "capabilities": [
+              "Procedural terrain generation algorithms",
+              "Biome transition systems",
+              "Dynamic prop placement",
+              "Rule-based building generation",
+              "Infinite map generation"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.3.10",
+            "level": "L2",
+            "name": "Environmental Lighting & Atmosphere Specialist",
+            "role": "Create lighting systems and atmospheric effects for environments",
+            "parent_l1": "3",
+            "capabilities": [
+              "Dynamic lighting setup (day/night cycles)",
+              "Shadow and occlusion systems",
+              "Fog and particle effects",
+              "Weather system integration",
+              "Ambient occlusion baking",
+              "Light map generation",
+              "Color grading and mood setting",
+              "Performance-optimized lighting"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.3.11",
+            "level": "L2",
+            "name": "Interactive Environment Systems Designer",
+            "role": "Create interactive and destructible environment elements",
+            "parent_l1": "3",
+            "capabilities": [
+              "Destructible terrain systems",
+              "Interactive object design (doors, bridges, gates)",
+              "Cover system implementation",
+              "Environmental hazards (lava, water, cliffs)",
+              "Physics-based object placement",
+              "Dynamic obstacle generation",
+              "Terrain deformation systems",
+              "Strategic chokepoint design"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.3.12",
+            "level": "L2",
+            "name": "Environment Audio-Visual Sync Coordinator",
+            "role": "Synchronize environment visuals with audio and ambient soundscapes",
+            "parent_l1": "3",
+            "capabilities": [
+              "Ambient sound placement and zoning",
+              "Visual-audio event coordination",
+              "Environmental audio cue design",
+              "Soundscape layering for biomes",
+              "Audio occlusion systems",
+              "Dynamic music trigger zones",
+              "Audio-visual feedback loops",
+              "Spatial audio optimization"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.4.1",
+            "level": "L2",
+            "name": "Bug Hunter",
+            "role": "Proactive bug detection and prevention",
+            "parent_l1": "4",
+            "capabilities": [
+              "Static code analysis",
+              "Pattern recognition for common bugs",
+              "Memory leak detection",
+              "Logic error identification",
+              "Security vulnerability scanning"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.4.2",
+            "level": "L2",
+            "name": "Performance Profiler",
+            "role": "Optimize code performance",
+            "parent_l1": "4",
+            "capabilities": [
+              "Identify performance bottlenecks",
+              "CPU profiling",
+              "Memory profiling",
+              "Algorithm optimization suggestions",
+              "Benchmark comparisons"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.4.3",
+            "level": "L2",
+            "name": "Unit Testing Generator",
+            "role": "Auto-generate comprehensive tests",
+            "parent_l1": "4",
+            "capabilities": [
+              "Generate unit tests for functions",
+              "Create integration tests",
+              "Edge case identification",
+              "Mock data generation",
+              "Test coverage analysis"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.4.4",
+            "level": "L2",
+            "name": "Game Balance Simulator",
+            "role": "Simulate gameplay scenarios for balance",
+            "parent_l1": "4",
+            "capabilities": [
+              "Run AI vs AI simulations",
+              "Test unit counter effectiveness",
+              "Economy balance testing",
+              "Tech tree progression simulation",
+              "Statistical analysis of outcomes"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.4.5",
+            "level": "L2",
+            "name": "Code Documentation Writer",
+            "role": "Auto-document code and systems",
+            "parent_l1": "4",
+            "capabilities": [
+              "Generate function documentation",
+              "Create system architecture diagrams",
+              "Write API documentation",
+              "Explain complex algorithms",
+              "Keep docs in sync with code"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.4.6",
+            "level": "L2",
+            "name": "AI Behavior Designer",
+            "role": "Create intelligent AI opponent strategies",
+            "parent_l1": "4",
+            "capabilities": [
+              "Design AI decision trees",
+              "Create build orders",
+              "Attack timing strategies",
+              "Resource management logic",
+              "Difficulty scaling"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.4.7",
+            "level": "L2",
+            "name": "Systems Integration Liaison",
+            "role": "Coordinate between game systems",
+            "parent_l1": "4",
+            "capabilities": [
+              "Ensure systems communicate correctly",
+              "Design event systems",
+              "Coordinate with UI/UX for data display",
+              "Work with Content Designer on data formats",
+              "Integration testing"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.4.8",
+            "level": "L2",
+            "name": "Game Systems Metrics Tracker",
+            "role": "Monitor code quality and system health",
+            "parent_l1": "4",
+            "capabilities": [
+              "Track bug count and resolution time",
+              "Monitor code complexity",
+              "Test coverage tracking",
+              "Performance benchmarks",
+              "Technical debt identification"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.4.9",
+            "level": "L2",
+            "name": "Motion Intelligence Analyst",
+            "role": "Analyze and optimize unit movement and pathfinding intelligence",
+            "parent_l1": "4",
+            "capabilities": [
+              "Advanced pathfinding algorithm analysis",
+              "Unit formation intelligence",
+              "Collision avoidance optimization",
+              "Movement prediction and smoothing",
+              "Crowd simulation analysis"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.4.10",
+            "level": "L2",
+            "name": "Network & Multiplayer Systems Architect",
+            "role": "Design and optimize multiplayer networking and synchronization",
+            "parent_l1": "4",
+            "capabilities": [
+              "Client-server architecture design",
+              "Network protocol optimization",
+              "Lag compensation systems",
+              "State synchronization algorithms",
+              "Prediction and reconciliation",
+              "Matchmaking system design",
+              "Anti-cheat implementation",
+              "Network performance profiling"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.4.11",
+            "level": "L2",
+            "name": "Data Pipeline & Analytics Engineer",
+            "role": "Build data collection, processing, and analytics systems",
+            "parent_l1": "4",
+            "capabilities": [
+              "Telemetry system design",
+              "Real-time analytics processing",
+              "Player behavior tracking",
+              "Performance metrics collection",
+              "A/B testing framework",
+              "Data warehouse architecture",
+              "Privacy-compliant data handling",
+              "Predictive analytics implementation"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.4.12",
+            "level": "L2",
+            "name": "Game Engine Optimization Specialist",
+            "role": "Deep optimization of core engine systems and rendering",
+            "parent_l1": "4",
+            "capabilities": [
+              "Rendering pipeline optimization",
+              "Memory management and allocation strategies",
+              "CPU and GPU profiling",
+              "Multi-threading architecture",
+              "Cache optimization techniques",
+              "Asset streaming systems",
+              "Draw call batching",
+              "Platform-specific optimizations"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.5.1",
+            "level": "L2",
+            "name": "Usability Tester",
+            "role": "Test UI from player perspective",
+            "parent_l1": "5",
+            "capabilities": [
+              "Simulate player interactions",
+              "Identify confusing UI elements",
+              "Test information hierarchy",
+              "Verify button placement",
+              "Readability testing"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L2.5.2",
+            "level": "L2",
+            "name": "Accessibility Checker",
+            "role": "Ensure UI is accessible to all players",
+            "parent_l1": "5",
+            "capabilities": [
+              "Color blind mode testing",
+              "Screen reader compatibility",
+              "Font size verification",
+              "Contrast ratio checking",
+              "Keyboard navigation testing"
+            ],
+            "source": "SUB_AGENT_ARCHITECTURE.md"
+          }
+        ]
+      }
+    },
+    {
+      "name": "L3 Agents",
+      "endpoint": "/api/agents?level=L3",
+      "status": "PASS",
+      "status_code": 200,
+      "response": {
+        "meta": {
+          "total": 798,
+          "page": 1,
+          "page_size": 50,
+          "total_pages": 16,
+          "has_next": true,
+          "has_prev": false,
+          "next_page": 2,
+          "prev_page": null
+        },
+        "cached": true,
+        "agents": [
+          {
+            "id": "L3.1.5.1",
+            "level": "L3",
+            "name": "**Image Source Validator**",
+            "task": "**Specialty:** Validate reference image sources and licensing",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.5",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.5.2",
+            "level": "L3",
+            "name": "**Reference Quality Scorer**",
+            "task": "**Specialty:** Rate reference image technical quality",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.5",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.5.3",
+            "level": "L3",
+            "name": "**Character Pose Cataloger**",
+            "task": "**Specialty:** Organize references by pose type",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.5",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.5.4",
+            "level": "L3",
+            "name": "**Equipment Reference Matcher**",
+            "task": "**Specialty:** Match equipment across reference images",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.5",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.5.5",
+            "level": "L3",
+            "name": "**Resolution Optimizer**",
+            "task": "**Specialty:** Upscale and enhance reference images",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.5",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.5.6",
+            "level": "L3",
+            "name": "**Background Remover**",
+            "task": "**Specialty:** Clean reference images for better IP-Adapter results",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.5",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.5.7",
+            "level": "L3",
+            "name": "**Reference Deduplicator**",
+            "task": "**Specialty:** Detect and remove duplicate references",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.5",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.5.8",
+            "level": "L3",
+            "name": "**Metadata Extractor**",
+            "task": "**Specialty:** Extract and catalog reference image metadata",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.5",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.5.9",
+            "level": "L3",
+            "name": "**Reference Versioning Manager**",
+            "task": "**Specialty:** Track reference image updates and versions",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.5",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.5.10",
+            "level": "L3",
+            "name": "**Reference Collection Organizer**",
+            "task": "**Specialty:** Organize references into logical collections",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.5",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.5.11",
+            "level": "L3",
+            "name": "**Reference Accessibility Checker**",
+            "task": "**Specialty:** Ensure references are accessible to all agents",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.5",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.5.12",
+            "level": "L3",
+            "name": "**Reference Backup Coordinator**",
+            "task": "**Specialty:** Maintain secure backups of critical references",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.5",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.6.1",
+            "level": "L3",
+            "name": "**Frame Interpolator**",
+            "task": "**Specialty:** Generate in-between frames for smooth animation",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.6",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.6.2",
+            "level": "L3",
+            "name": "**Timing Controller**",
+            "task": "**Specialty:** Set frame timing and duration",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.6",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.6.3",
+            "level": "L3",
+            "name": "**Loop Seamlessness Validator**",
+            "task": "**Specialty:** Ensure animations loop without jarring transitions",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.6",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.6.4",
+            "level": "L3",
+            "name": "**Motion Blur Simulator**",
+            "task": "**Specialty:** Add appropriate motion blur for realism",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.6",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.6.5",
+            "level": "L3",
+            "name": "**Sprite Sheet Generator**",
+            "task": "**Specialty:** Compile animation frames into sprite sheets",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.6",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.6.6",
+            "level": "L3",
+            "name": "**Animation Preview Renderer**",
+            "task": "**Specialty:** Generate real-time animation previews",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.6",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.6.7",
+            "level": "L3",
+            "name": "**FPS Optimizer**",
+            "task": "**Specialty:** Determine optimal frame rate for animations",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.6",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.6.8",
+            "level": "L3",
+            "name": "**Animation Compression Specialist**",
+            "task": "**Specialty:** Optimize animation file sizes",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.6",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.6.9",
+            "level": "L3",
+            "name": "**Keyframe Extractor**",
+            "task": "**Specialty:** Identify and extract key animation frames",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.6",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.6.10",
+            "level": "L3",
+            "name": "**Animation Cycle Detector**",
+            "task": "**Specialty:** Detect cyclic vs one-shot animations",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.6",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.6.11",
+            "level": "L3",
+            "name": "**Frame Consistency Validator**",
+            "task": "**Specialty:** Ensure visual consistency across frames",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.6",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.6.12",
+            "level": "L3",
+            "name": "**Animation Format Converter**",
+            "task": "**Specialty:** Convert between animation formats (GIF, sprite sheet, video)",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.6",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.7.1",
+            "level": "L3",
+            "name": "**Visual Upgrade Assessor**",
+            "task": "**Specialty:** Ensure each tier shows clear visual progression",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.7",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.7.2",
+            "level": "L3",
+            "name": "**Equipment Complexity Tracker**",
+            "task": "**Specialty:** Verify equipment complexity increases with tiers",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.7",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.7.3",
+            "level": "L3",
+            "name": "**Color Richness Escalator**",
+            "task": "**Specialty:** Ensure color vibrancy/complexity grows per tier",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.7",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.7.4",
+            "level": "L3",
+            "name": "**Detail Density Analyzer**",
+            "task": "**Specialty:** Measure and verify increasing detail density",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.7",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.7.5",
+            "level": "L3",
+            "name": "**Tier Recognition Tester**",
+            "task": "**Specialty:** Ensure players can identify tier at a glance",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.7",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.7.6",
+            "level": "L3",
+            "name": "**Power Fantasy Amplifier**",
+            "task": "**Specialty:** Verify higher tiers look more powerful/impressive",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.7",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.7.7",
+            "level": "L3",
+            "name": "**Tier Interval Consistency Checker**",
+            "task": "**Specialty:** Ensure consistent visual jumps between tiers",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.7",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.7.8",
+            "level": "L3",
+            "name": "**Base Identity Preserver**",
+            "task": "**Specialty:** Verify character identity maintained across tiers",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.7",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.7.9",
+            "level": "L3",
+            "name": "**Tier-Specific Effect Validator**",
+            "task": "**Specialty:** Validate tier-appropriate visual effects (glows, particles)",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.7",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.7.10",
+            "level": "L3",
+            "name": "**Stat-Visual Correlation Verifier**",
+            "task": "**Specialty:** Ensure visual upgrades match stat progression",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.7",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.7.11",
+            "level": "L3",
+            "name": "**Tier Transition Animator**",
+            "task": "**Specialty:** Design smooth visual transitions between tiers",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.7",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.7.12",
+            "level": "L3",
+            "name": "**Ultimate Tier Showcase Designer**",
+            "task": "**Specialty:** Ensure max tier is visually spectacular",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.7",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.8.1",
+            "level": "L3",
+            "name": "**Batch Queue Organizer**",
+            "task": "**Specialty:** Prioritize and organize asset batches for review",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.8",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.8.2",
+            "level": "L3",
+            "name": "**Parallel Review Coordinator**",
+            "task": "**Specialty:** Distribute batch reviews across multiple validators",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.8",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.8.3",
+            "level": "L3",
+            "name": "**Quick Accept/Reject Sorter**",
+            "task": "**Specialty:** Fast-track obvious passes and fails",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.8",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.8.4",
+            "level": "L3",
+            "name": "**Batch Consistency Cross-Checker**",
+            "task": "**Specialty:** Ensure consistency within asset batches",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.8",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.8.5",
+            "level": "L3",
+            "name": "**Revision Batch Tracker**",
+            "task": "**Specialty:** Track resubmitted assets through revision cycles",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.8",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.8.6",
+            "level": "L3",
+            "name": "**Approval Bottleneck Detector**",
+            "task": "**Specialty:** Identify and resolve approval process slowdowns",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.8",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.8.7",
+            "level": "L3",
+            "name": "**Batch Approval Analytics**",
+            "task": "**Specialty:** Generate statistics on approval rates and times",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.8",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.8.8",
+            "level": "L3",
+            "name": "**Auto-Approval Criteria Manager**",
+            "task": "**Specialty:** Define and apply auto-approval rules for high-confidence assets",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.8",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.8.9",
+            "level": "L3",
+            "name": "**Batch Feedback Aggregator**",
+            "task": "**Specialty:** Compile feedback across batch for patterns",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.8",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.8.10",
+            "level": "L3",
+            "name": "**Priority Asset Escalator**",
+            "task": "**Specialty:** Fast-track critical assets through approval",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.8",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.8.11",
+            "level": "L3",
+            "name": "**Batch Approval Report Generator**",
+            "task": "**Specialty:** Create comprehensive batch approval reports",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.8",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.1.8.12",
+            "level": "L3",
+            "name": "**Approval Workflow Optimizer**",
+            "task": "**Specialty:** Continuously improve batch approval efficiency",
+            "parent_l1": "1",
+            "parent_l2": "L2.1.8",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.2.6.1",
+            "level": "L3",
+            "name": "**LoRA Trainer**",
+            "task": "**Specialty:** Train character-specific LoRA models",
+            "parent_l1": "2",
+            "parent_l2": "L2.2.6",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          },
+          {
+            "id": "L3.2.6.2",
+            "level": "L3",
+            "name": "**Dreambooth Specialist**",
+            "task": "**Specialty:** Fine-tune models for specific characters/styles",
+            "parent_l1": "2",
+            "parent_l2": "L2.2.6",
+            "source": "L3_MICRO_AGENT_ARCHITECTURE.md"
+          }
+        ]
+      }
+    },
+    {
+      "name": "List Services",
+      "endpoint": "/api/services",
+      "status": "PASS",
+      "status_code": 200,
+      "response": {
+        "meta": {
+          "total": 2,
+          "page": 1,
+          "page_size": 50,
+          "total_pages": 1,
+          "has_next": false,
+          "has_prev": false,
+          "next_page": null,
+          "prev_page": null
+        },
+        "cached": false,
+        "success": true,
+        "services": [
+          {
+            "name": "ComfyUI",
+            "status": "stopped",
+            "pid": null,
+            "port": 8188
+          },
+          {
+            "name": "Knowledge Base Scheduler",
+            "status": "stopped",
+            "pid": null,
+            "port": null
+          }
+        ],
+        "count": 2
+      }
+    },
+    {
+      "name": "KB Stats",
+      "endpoint": "/api/knowledge/stats",
+      "status": "PASS",
+      "status_code": 200,
+      "response": {
+        "total_creators": 50,
+        "total_files": 8,
+        "total_size_bytes": 15478,
+        "total_size_mb": 0.01,
+        "recent_files_7d": 8,
+        "files_by_agent": {
+          "integration": 2,
+          "art-director": 1,
+          "character-pipeline": 3,
+          "environment-pipeline": 1,
+          "knowledge-base": 1
+        },
+        "last_scan": "2025-11-10T07:09:10.971319",
+        "kb_status": "active",
+        "cached": true
+      }
+    },
+    {
+      "name": "KB Files",
+      "endpoint": "/api/knowledge/files",
+      "status": "PASS",
+      "status_code": 200,
+      "response": {
+        "meta": {
+          "total": 8,
+          "page": 1,
+          "page_size": 50,
+          "total_pages": 1,
+          "has_next": false,
+          "has_prev": false,
+          "next_page": null,
+          "prev_page": null
+        },
+        "cached": true,
+        "files": [
+          {
+            "path": "C:\\meowping-rts\\ai-agents\\ai-agents\\integration\\comfyui-workflows\\instasd-E2E_TEST_001-20251107.md",
+            "name": "instasd-E2E_TEST_001-20251107.md",
+            "agent": "integration",
+            "size": 1642,
+            "modified": "2025-11-07T12:15:29.777231",
+            "category": "comfyui-workflows"
+          },
+          {
+            "path": "C:\\meowping-rts\\ai-agents\\ai-agents\\art-director\\comfyui-workflows\\instasd-E2E_TEST_001-20251107.md",
+            "name": "instasd-E2E_TEST_001-20251107.md",
+            "agent": "art-director",
+            "size": 1642,
+            "modified": "2025-11-07T12:15:29.776200",
+            "category": "comfyui-workflows"
+          },
+          {
+            "path": "C:\\meowping-rts\\ai-agents\\ai-agents\\character-pipeline\\comfyui-workflows\\instasd-E2E_TEST_001-20251107.md",
+            "name": "instasd-E2E_TEST_001-20251107.md",
+            "agent": "character-pipeline",
+            "size": 1642,
+            "modified": "2025-11-07T12:15:29.773796",
+            "category": "comfyui-workflows"
+          },
+          {
+            "path": "C:\\meowping-rts\\ai-agents\\ai-agents\\integration\\ip-adapter-knowledge\\instasd-E2E_TEST_001-20251107.md",
+            "name": "instasd-E2E_TEST_001-20251107.md",
+            "agent": "integration",
+            "size": 1515,
+            "modified": "2025-11-07T11:48:01.243584",
+            "category": "ip-adapter-knowledge"
+          },
+          {
+            "path": "C:\\meowping-rts\\ai-agents\\ai-agents\\environment-pipeline\\ip-adapter-knowledge\\instasd-E2E_TEST_001-20251107.md",
+            "name": "instasd-E2E_TEST_001-20251107.md",
+            "agent": "environment-pipeline",
+            "size": 1515,
+            "modified": "2025-11-07T11:48:01.241421",
+            "category": "ip-adapter-knowledge"
+          },
+          {
+            "path": "C:\\meowping-rts\\ai-agents\\ai-agents\\character-pipeline\\ip-adapter-knowledge\\instasd-E2E_TEST_001-20251107.md",
+            "name": "instasd-E2E_TEST_001-20251107.md",
+            "agent": "character-pipeline",
+            "size": 1515,
+            "modified": "2025-11-07T11:48:01.239562",
+            "category": "ip-adapter-knowledge"
+          },
+          {
+            "path": "C:\\meowping-rts\\ai-agents\\ai-agents\\character-pipeline\\comfyui-workflows\\instasd-TEST123-20251107.md",
+            "name": "instasd-TEST123-20251107.md",
+            "agent": "character-pipeline",
+            "size": 822,
+            "modified": "2025-11-07T11:46:09.514538",
+            "category": "comfyui-workflows"
+          },
+          {
+            "path": "C:\\meowping-rts\\ai-agents\\knowledge-base\\L1-character-pipeline\\comfyui-workflows\\instasd-insights.md",
+            "name": "instasd-insights.md",
+            "agent": "knowledge-base",
+            "size": 5185,
+            "modified": "2025-11-07T09:16:46.599089",
+            "category": "comfyui-workflows"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Basic Health",
+      "endpoint": "/health",
+      "status": "PASS",
+      "status_code": 200,
+      "response": {
+        "status": "healthy",
+        "timestamp": "2025-11-10T07:09:10.999565",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "Detailed Health",
+      "endpoint": "/health/detailed",
+      "status": "PASS",
+      "status_code": 200,
+      "response": {
+        "status": "healthy",
+        "timestamp": "2025-11-10T07:09:11.003136",
+        "version": "1.0.0",
+        "system": {
+          "cpu_percent": 28.1,
+          "cpu_count": 16,
+          "memory_percent": 82.9,
+          "memory_used_gb": 12.73,
+          "memory_available_gb": 2.62,
+          "memory_total_gb": 15.36,
+          "disk_percent": 58.3,
+          "disk_used_gb": 277.19,
+          "disk_free_gb": 198.24,
+          "disk_total_gb": 475.42
+        },
+        "python_version": "3.13.9 (tags/v3.13.9:8183fa5, Oct 14 2025, 14:09:13) [MSC v.1944 64 bit (AMD64)]",
+        "process_id": 48632,
+        "working_directory": "C:\\Ziggie\\control-center\\backend"
+      }
+    },
+    {
+      "name": "Readiness Check",
+      "endpoint": "/health/ready",
+      "status": "PASS",
+      "status_code": 200,
+      "response": {
+        "ready": true,
+        "status": "ready",
+        "checks": {
+          "service": true,
+          "system": true
+        },
+        "timestamp": "2025-11-10T07:09:11.031291"
+      }
+    },
+    {
+      "name": "Liveness Check",
+      "endpoint": "/health/live",
+      "status": "PASS",
+      "status_code": 200,
+      "response": {
+        "alive": true,
+        "timestamp": "2025-11-10T07:09:11.034042"
+      }
+    },
+    {
+      "name": "Startup Check",
+      "endpoint": "/health/startup",
+      "status": "PASS",
+      "status_code": 200,
+      "response": {
+        "startup_complete": true,
+        "timestamp": "2025-11-10T07:09:11.036367",
+        "version": "1.0.0"
+      }
+    }
+  ]
+}

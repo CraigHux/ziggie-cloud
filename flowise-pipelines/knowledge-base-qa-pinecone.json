@@ -1,0 +1,276 @@
+{
+  "name": "Ziggie Knowledge Base QA (Pinecone)",
+  "description": "RAG pipeline with Pinecone vector store for persistent storage. Recommended for production use.",
+  "nodes": [
+    {
+      "id": "directoryLoader_0",
+      "position": { "x": 100, "y": 200 },
+      "type": "customNode",
+      "data": {
+        "id": "directoryLoader_0",
+        "label": "Directory Loader",
+        "name": "directoryLoader",
+        "category": "Document Loaders",
+        "description": "Load markdown files from knowledge base directory",
+        "inputParams": [
+          {
+            "name": "folderPath",
+            "type": "string",
+            "label": "Folder Path",
+            "value": "/app/data/knowledge-base"
+          },
+          {
+            "name": "recursive",
+            "type": "boolean",
+            "label": "Recursive",
+            "value": true
+          },
+          {
+            "name": "extensions",
+            "type": "string",
+            "label": "File Extensions",
+            "value": ".md,.txt"
+          }
+        ],
+        "inputAnchors": [],
+        "outputs": { "output": "documents" },
+        "outputAnchors": [
+          {
+            "id": "directoryLoader_0-output-output-documents",
+            "name": "output",
+            "label": "Documents",
+            "type": "documents"
+          }
+        ]
+      }
+    },
+    {
+      "id": "markdownSplitter_0",
+      "position": { "x": 400, "y": 200 },
+      "type": "customNode",
+      "data": {
+        "id": "markdownSplitter_0",
+        "label": "Markdown Text Splitter",
+        "name": "markdownTextSplitter",
+        "category": "Text Splitters",
+        "inputParams": [
+          { "name": "chunkSize", "type": "number", "value": 1500 },
+          { "name": "chunkOverlap", "type": "number", "value": 200 }
+        ],
+        "inputAnchors": [
+          {
+            "id": "markdownSplitter_0-input-document-documents",
+            "name": "document",
+            "type": "documents"
+          }
+        ],
+        "outputs": { "output": "documents" },
+        "outputAnchors": [
+          {
+            "id": "markdownSplitter_0-output-output-documents",
+            "name": "output",
+            "type": "documents"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ollamaEmbedding_0",
+      "position": { "x": 400, "y": 400 },
+      "type": "customNode",
+      "data": {
+        "id": "ollamaEmbedding_0",
+        "label": "Ollama Embeddings",
+        "name": "ollamaEmbedding",
+        "category": "Embeddings",
+        "inputParams": [
+          { "name": "baseUrl", "type": "string", "value": "http://ollama:11434" },
+          { "name": "modelName", "type": "string", "value": "nomic-embed-text" }
+        ],
+        "inputAnchors": [],
+        "outputs": { "output": "embeddings" },
+        "outputAnchors": [
+          {
+            "id": "ollamaEmbedding_0-output-output-embeddings",
+            "name": "output",
+            "type": "embeddings"
+          }
+        ]
+      }
+    },
+    {
+      "id": "pinecone_0",
+      "position": { "x": 700, "y": 300 },
+      "type": "customNode",
+      "data": {
+        "id": "pinecone_0",
+        "label": "Pinecone Vector Store",
+        "name": "pinecone",
+        "category": "Vector Stores",
+        "description": "Persistent vector storage with Pinecone (free tier available)",
+        "inputParams": [
+          {
+            "name": "pineconeIndex",
+            "type": "string",
+            "label": "Pinecone Index",
+            "description": "Name of your Pinecone index",
+            "value": "ziggie-knowledge-base"
+          },
+          {
+            "name": "pineconeNamespace",
+            "type": "string",
+            "label": "Namespace",
+            "description": "Namespace for this vector store",
+            "value": "knowledge-base"
+          },
+          {
+            "name": "topK",
+            "type": "number",
+            "label": "Top K",
+            "value": 6
+          }
+        ],
+        "credentials": [
+          {
+            "name": "pineconeApi",
+            "type": "credential",
+            "label": "Pinecone API Key",
+            "description": "Connect your Pinecone credential"
+          }
+        ],
+        "inputAnchors": [
+          {
+            "id": "pinecone_0-input-document-documents",
+            "name": "document",
+            "type": "documents"
+          },
+          {
+            "id": "pinecone_0-input-embeddings-embeddings",
+            "name": "embeddings",
+            "type": "embeddings"
+          }
+        ],
+        "outputs": { "output": "vectorStore", "retriever": "retriever" },
+        "outputAnchors": [
+          {
+            "id": "pinecone_0-output-retriever-retriever",
+            "name": "retriever",
+            "type": "retriever"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ollamaChat_0",
+      "position": { "x": 700, "y": 500 },
+      "type": "customNode",
+      "data": {
+        "id": "ollamaChat_0",
+        "label": "Ollama Chat Model",
+        "name": "chatOllama",
+        "category": "Chat Models",
+        "inputParams": [
+          { "name": "baseUrl", "type": "string", "value": "http://ollama:11434" },
+          { "name": "modelName", "type": "string", "value": "llama3.2" },
+          { "name": "temperature", "type": "number", "value": 0.3 }
+        ],
+        "inputAnchors": [],
+        "outputs": { "output": "chatModel" },
+        "outputAnchors": [
+          {
+            "id": "ollamaChat_0-output-output-chatModel",
+            "name": "output",
+            "type": "chatModel"
+          }
+        ]
+      }
+    },
+    {
+      "id": "conversationalRetrievalQA_0",
+      "position": { "x": 1000, "y": 350 },
+      "type": "customNode",
+      "data": {
+        "id": "conversationalRetrievalQA_0",
+        "label": "Conversational Retrieval QA Chain",
+        "name": "conversationalRetrievalQAChain",
+        "category": "Chains",
+        "inputParams": [
+          {
+            "name": "systemMessagePrompt",
+            "type": "string",
+            "value": "You are Ziggie, an AI assistant for the MeowPing RTS game development project. You have access to the project's knowledge base which contains documentation about game development, AI asset generation, agent team structure, and infrastructure. Be specific, reference documentation, and provide actionable guidance."
+          },
+          { "name": "returnSourceDocuments", "type": "boolean", "value": true }
+        ],
+        "inputAnchors": [
+          { "id": "conversationalRetrievalQA_0-input-model-chatModel", "name": "model", "type": "chatModel" },
+          { "id": "conversationalRetrievalQA_0-input-vectorStoreRetriever-retriever", "name": "vectorStoreRetriever", "type": "retriever" }
+        ],
+        "outputs": { "output": "response" },
+        "outputAnchors": [
+          { "id": "conversationalRetrievalQA_0-output-output-response", "name": "output", "type": "response" }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "directoryLoader_0-markdownSplitter_0",
+      "source": "directoryLoader_0",
+      "sourceHandle": "directoryLoader_0-output-output-documents",
+      "target": "markdownSplitter_0",
+      "targetHandle": "markdownSplitter_0-input-document-documents",
+      "type": "buttonedge"
+    },
+    {
+      "id": "markdownSplitter_0-pinecone_0",
+      "source": "markdownSplitter_0",
+      "sourceHandle": "markdownSplitter_0-output-output-documents",
+      "target": "pinecone_0",
+      "targetHandle": "pinecone_0-input-document-documents",
+      "type": "buttonedge"
+    },
+    {
+      "id": "ollamaEmbedding_0-pinecone_0",
+      "source": "ollamaEmbedding_0",
+      "sourceHandle": "ollamaEmbedding_0-output-output-embeddings",
+      "target": "pinecone_0",
+      "targetHandle": "pinecone_0-input-embeddings-embeddings",
+      "type": "buttonedge"
+    },
+    {
+      "id": "pinecone_0-conversationalRetrievalQA_0",
+      "source": "pinecone_0",
+      "sourceHandle": "pinecone_0-output-retriever-retriever",
+      "target": "conversationalRetrievalQA_0",
+      "targetHandle": "conversationalRetrievalQA_0-input-vectorStoreRetriever-retriever",
+      "type": "buttonedge"
+    },
+    {
+      "id": "ollamaChat_0-conversationalRetrievalQA_0",
+      "source": "ollamaChat_0",
+      "sourceHandle": "ollamaChat_0-output-output-chatModel",
+      "target": "conversationalRetrievalQA_0",
+      "targetHandle": "conversationalRetrievalQA_0-input-model-chatModel",
+      "type": "buttonedge"
+    }
+  ],
+  "metadata": {
+    "version": "1.0.0",
+    "created": "2025-12-27",
+    "author": "Ziggie AI Pipeline Agent",
+    "pinecone_setup": {
+      "free_tier": "https://www.pinecone.io/",
+      "index_name": "ziggie-knowledge-base",
+      "dimension": 768,
+      "metric": "cosine",
+      "namespaces": ["knowledge-base", "code-base"]
+    },
+    "notes": [
+      "Pinecone free tier: 1 index, 1M vectors, 1 namespace",
+      "Create index with dimension 768 (nomic-embed-text)",
+      "Add Pinecone API key in Flowise credentials",
+      "Vectors persist across restarts unlike in-memory store"
+    ]
+  }
+}

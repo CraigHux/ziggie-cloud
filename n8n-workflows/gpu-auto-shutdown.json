@@ -1,0 +1,218 @@
+{
+  "name": "GPU Auto-Shutdown Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 5
+            }
+          ]
+        }
+      },
+      "id": "gpu-check-schedule",
+      "name": "GPU Check Schedule (5min)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Check for active GPU instances\nconst AWS = require('aws-sdk');\nconst ec2 = new AWS.EC2({ region: 'eu-north-1' });\n\nconst params = {\n  Filters: [\n    {\n      Name: 'tag:Purpose',\n      Values: ['ComfyUI-GPU']\n    },\n    {\n      Name: 'instance-state-name',\n      Values: ['running']\n    }\n  ]\n};\n\nconst data = await ec2.describeInstances(params).promise();\nconst instances = [];\n\ndata.Reservations.forEach(reservation => {\n  reservation.Instances.forEach(instance => {\n    instances.push({\n      instanceId: instance.InstanceId,\n      instanceType: instance.InstanceType,\n      launchTime: instance.LaunchTime,\n      publicIp: instance.PublicIpAddress,\n      privateIp: instance.PrivateIpAddress,\n      spotRequest: instance.SpotInstanceRequestId\n    });\n  });\n});\n\nif (instances.length === 0) {\n  return {\n    json: {\n      hasActiveInstances: false,\n      message: 'No active GPU instances found'\n    }\n  };\n}\n\nreturn instances.map(i => ({ json: i }));"
+      },
+      "id": "list-gpu-instances",
+      "name": "List Active GPU Instances",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-instances",
+              "leftValue": "={{ $json.hasActiveInstances }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "has-instances",
+      "name": "Has Active Instances?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=http://{{ $json.publicIp }}:8188/system_stats",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "check-comfyui-activity",
+      "name": "Check ComfyUI Activity",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 200],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Analyze idle time based on ComfyUI stats\n\nconst instanceData = $('List Active GPU Instances').item.json;\nconst statsResponse = $input.first().json;\n\nconst now = Date.now();\nconst launchTime = new Date(instanceData.launchTime).getTime();\nconst uptimeMinutes = Math.floor((now - launchTime) / 60000);\n\n// Check if ComfyUI responded\nif (!statsResponse || statsResponse.error) {\n  return {\n    json: {\n      instanceId: instanceData.instanceId,\n      instanceType: instanceData.instanceType,\n      uptimeMinutes: uptimeMinutes,\n      isIdle: true,\n      idleReason: 'ComfyUI unreachable',\n      lastActivity: null,\n      shouldShutdown: uptimeMinutes > 30\n    }\n  };\n}\n\n// Parse ComfyUI system stats\nconst stats = statsResponse;\nconst hasActiveQueue = (stats.exec_info?.queue_remaining || 0) > 0;\nconst hasRunningTasks = (stats.exec_info?.running || 0) > 0;\n\n// Calculate idle time from last task\nconst lastTaskTime = stats.last_task_time || launchTime;\nconst idleMinutes = Math.floor((now - new Date(lastTaskTime).getTime()) / 60000);\n\nconst isIdle = !hasActiveQueue && !hasRunningTasks && idleMinutes > 30;\n\nreturn {\n  json: {\n    instanceId: instanceData.instanceId,\n    instanceType: instanceData.instanceType,\n    publicIp: instanceData.publicIp,\n    uptimeMinutes: uptimeMinutes,\n    idleMinutes: idleMinutes,\n    queueSize: stats.exec_info?.queue_remaining || 0,\n    runningTasks: stats.exec_info?.running || 0,\n    isIdle: isIdle,\n    idleReason: isIdle ? `No activity for ${idleMinutes} minutes` : null,\n    shouldShutdown: isIdle && idleMinutes > 30\n  }\n};"
+      },
+      "id": "analyze-idle-time",
+      "name": "Analyze Idle Time",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "should-shutdown",
+              "leftValue": "={{ $json.shouldShutdown }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "should-shutdown",
+      "name": "Should Shutdown?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1340, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://lambda.eu-north-1.amazonaws.com/2015-03-31/functions/ziggie-gpu-auto-shutdown/invocations",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"instanceId\": \"{{ $json.instanceId }}\",\n  \"reason\": \"{{ $json.idleReason }}\",\n  \"idleMinutes\": {{ $json.idleMinutes }},\n  \"uptimeMinutes\": {{ $json.uptimeMinutes }}\n}",
+        "options": {
+          "timeout": 30000
+        },
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "aws"
+      },
+      "id": "invoke-shutdown-lambda",
+      "name": "Invoke Shutdown Lambda",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1560, 100],
+      "credentials": {
+        "aws": {
+          "id": "ziggie-aws",
+          "name": "Ziggie AWS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.DISCORD_WEBHOOK_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"@here GPU Instance Auto-Shutdown Triggered\",\n  \"embeds\": [{\n    \"title\": \"GPU Instance Shutdown\",\n    \"color\": 16776960,\n    \"fields\": [\n      {\n        \"name\": \"Instance ID\",\n        \"value\": \"{{ $('Analyze Idle Time').first().json.instanceId }}\",\n        \"inline\": true\n      },\n      {\n        \"name\": \"Instance Type\",\n        \"value\": \"{{ $('Analyze Idle Time').first().json.instanceType }}\",\n        \"inline\": true\n      },\n      {\n        \"name\": \"Idle Time\",\n        \"value\": \"{{ $('Analyze Idle Time').first().json.idleMinutes }} minutes\",\n        \"inline\": true\n      },\n      {\n        \"name\": \"Reason\",\n        \"value\": \"{{ $('Analyze Idle Time').first().json.idleReason }}\"\n      },\n      {\n        \"name\": \"Cost Savings\",\n        \"value\": \"Saving ~$0.35/hour ($8.40/day)\"\n      }\n    ],\n    \"footer\": {\n      \"text\": \"Ziggie GPU Auto-Shutdown\"\n    },\n    \"timestamp\": \"{{ new Date().toISOString() }}\"\n  }]\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "discord-shutdown-alert",
+      "name": "Discord Shutdown Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1780, 100]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Log idle instances that don't need shutdown yet\nconst data = $input.first().json;\n\nconsole.log(`GPU Instance ${data.instanceId} is idle for ${data.idleMinutes} minutes but below shutdown threshold`);\n\nreturn $input.all();"
+      },
+      "id": "log-idle-status",
+      "name": "Log Idle Status",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1560, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// No instances running - nothing to do\nconsole.log('No active GPU instances found');\nreturn $input.all();"
+      },
+      "id": "no-instances",
+      "name": "No Instances Running",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 400]
+    }
+  ],
+  "connections": {
+    "GPU Check Schedule (5min)": {
+      "main": [[{ "node": "List Active GPU Instances", "type": "main", "index": 0 }]]
+    },
+    "List Active GPU Instances": {
+      "main": [[{ "node": "Has Active Instances?", "type": "main", "index": 0 }]]
+    },
+    "Has Active Instances?": {
+      "main": [
+        [{ "node": "Check ComfyUI Activity", "type": "main", "index": 0 }],
+        [{ "node": "No Instances Running", "type": "main", "index": 0 }]
+      ]
+    },
+    "Check ComfyUI Activity": {
+      "main": [[{ "node": "Analyze Idle Time", "type": "main", "index": 0 }]]
+    },
+    "Analyze Idle Time": {
+      "main": [[{ "node": "Should Shutdown?", "type": "main", "index": 0 }]]
+    },
+    "Should Shutdown?": {
+      "main": [
+        [{ "node": "Invoke Shutdown Lambda", "type": "main", "index": 0 }],
+        [{ "node": "Log Idle Status", "type": "main", "index": 0 }]
+      ]
+    },
+    "Invoke Shutdown Lambda": {
+      "main": [[{ "node": "Discord Shutdown Alert", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "instanceId": "ziggie-gpu-auto-shutdown"
+  },
+  "tags": [
+    { "name": "gpu", "id": "tag-gpu" },
+    { "name": "cost-optimization", "id": "tag-cost" },
+    { "name": "monitoring", "id": "tag-monitoring" }
+  ]
+}

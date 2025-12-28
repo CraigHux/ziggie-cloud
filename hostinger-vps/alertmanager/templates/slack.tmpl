@@ -1,0 +1,38 @@
+{{ define "slack.default.title" }}
+{{ if eq .Status "firing" }}:fire:{{ else }}:white_check_mark:{{ end }} [{{ .Status | toUpper }}] {{ .CommonLabels.alertname }}
+{{ end }}
+
+{{ define "slack.default.text" }}
+{{ range .Alerts }}
+*Alert:* {{ .Labels.alertname }}
+*Severity:* {{ .Labels.severity }}
+*Service:* {{ .Labels.service }}
+{{ if .Annotations.summary }}*Summary:* {{ .Annotations.summary }}{{ end }}
+{{ if .Annotations.description }}*Description:* {{ .Annotations.description }}{{ end }}
+{{ if .Annotations.runbook_url }}*Runbook:* {{ .Annotations.runbook_url }}{{ end }}
+{{ end }}
+{{ end }}
+
+{{ define "slack.critical.title" }}
+:rotating_light: CRITICAL ALERT: {{ .CommonLabels.alertname }}
+{{ end }}
+
+{{ define "slack.critical.text" }}
+{{ range .Alerts }}
+*IMMEDIATE ACTION REQUIRED*
+
+*Alert:* {{ .Labels.alertname }}
+*Service:* {{ .Labels.service }}
+*Instance:* {{ .Labels.instance }}
+
+*Summary:* {{ .Annotations.summary }}
+
+*Details:* {{ .Annotations.description }}
+
+{{ if .Annotations.runbook_url }}
+:book: *Runbook:* {{ .Annotations.runbook_url }}
+{{ end }}
+
+*Started:* {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}
+{{ end }}
+{{ end }}

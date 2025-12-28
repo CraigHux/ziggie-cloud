@@ -1,0 +1,440 @@
+{
+  "name": "Asset Generation Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate-asset",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "generate-asset-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Input Validation Node\n// Validates: asset_type, prompt, faction_color, output_format\n\nconst input = $input.first().json;\n\n// Required fields validation\nconst requiredFields = ['asset_type', 'prompt'];\nconst missingFields = requiredFields.filter(field => !input[field]);\n\nif (missingFields.length > 0) {\n  throw new Error(`Missing required fields: ${missingFields.join(', ')}`);\n}\n\n// Validate asset_type\nconst validAssetTypes = ['unit_sprite', 'building', 'terrain_tile', 'hero', 'effect', 'prop'];\nif (!validAssetTypes.includes(input.asset_type)) {\n  throw new Error(`Invalid asset_type. Must be one of: ${validAssetTypes.join(', ')}`);\n}\n\n// Validate faction_color (optional, defaults to 'neutral')\nconst validFactions = ['red', 'blue', 'green', 'gold', 'neutral'];\nconst factionColor = input.faction_color || 'neutral';\nif (!validFactions.includes(factionColor)) {\n  throw new Error(`Invalid faction_color. Must be one of: ${validFactions.join(', ')}`);\n}\n\n// Validate output_format (optional, defaults to 'png')\nconst validFormats = ['png', 'webp', 'jpg'];\nconst outputFormat = input.output_format || 'png';\nif (!validFormats.includes(outputFormat)) {\n  throw new Error(`Invalid output_format. Must be one of: ${validFormats.join(', ')}`);\n}\n\n// Build enhanced prompt based on asset type\nlet enhancedPrompt = input.prompt;\n\nconst assetTypePromptAdditions = {\n  'unit_sprite': ', isometric view, game sprite, transparent background, pixel perfect edges',\n  'building': ', isometric view, game building asset, detailed architecture, transparent background',\n  'terrain_tile': ', seamless tileable texture, top-down isometric view, game terrain',\n  'hero': ', detailed character art, isometric view, game hero sprite, transparent background',\n  'effect': ', VFX effect, transparent background, particle effect, game ready',\n  'prop': ', game prop asset, isometric view, detailed, transparent background'\n};\n\nenhancedPrompt += assetTypePromptAdditions[input.asset_type] || '';\n\n// Faction color mapping for HSV shift\nconst factionHueShifts = {\n  'red': 0.0,\n  'blue': 0.55,\n  'green': 0.33,\n  'gold': 0.12,\n  'neutral': null\n};\n\n// Generate unique asset ID\nconst assetId = `${input.asset_type}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;\n\nreturn {\n  json: {\n    valid: true,\n    assetId: assetId,\n    assetType: input.asset_type,\n    originalPrompt: input.prompt,\n    enhancedPrompt: enhancedPrompt,\n    factionColor: factionColor,\n    factionHueShift: factionHueShifts[factionColor],\n    outputFormat: outputFormat,\n    width: input.width || 1024,\n    height: input.height || 1024,\n    negativePrompt: input.negative_prompt || 'blurry, low quality, distorted, watermark, text, signature',\n    timestamp: new Date().toISOString(),\n    requestMetadata: {\n      requestId: $input.first().json.headers?.['x-request-id'] || assetId,\n      userAgent: $input.first().json.headers?.['user-agent'] || 'n8n-internal'\n    }\n  }\n};"
+      },
+      "id": "validate-input",
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:8188/prompt",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"prompt\": {\n    \"3\": {\n      \"inputs\": {\n        \"seed\": {{ Math.floor(Math.random() * 1000000000) }},\n        \"steps\": 25,\n        \"cfg\": 7,\n        \"sampler_name\": \"euler_ancestral\",\n        \"scheduler\": \"normal\",\n        \"denoise\": 1,\n        \"model\": [\"4\", 0],\n        \"positive\": [\"6\", 0],\n        \"negative\": [\"7\", 0],\n        \"latent_image\": [\"5\", 0]\n      },\n      \"class_type\": \"KSampler\"\n    },\n    \"4\": {\n      \"inputs\": {\n        \"ckpt_name\": \"sd_xl_base_1.0.safetensors\"\n      },\n      \"class_type\": \"CheckpointLoaderSimple\"\n    },\n    \"5\": {\n      \"inputs\": {\n        \"width\": {{ $json.width }},\n        \"height\": {{ $json.height }},\n        \"batch_size\": 1\n      },\n      \"class_type\": \"EmptyLatentImage\"\n    },\n    \"6\": {\n      \"inputs\": {\n        \"text\": \"{{ $json.enhancedPrompt }}\",\n        \"clip\": [\"4\", 1]\n      },\n      \"class_type\": \"CLIPTextEncode\"\n    },\n    \"7\": {\n      \"inputs\": {\n        \"text\": \"{{ $json.negativePrompt }}\",\n        \"clip\": [\"4\", 1]\n      },\n      \"class_type\": \"CLIPTextEncode\"\n    },\n    \"8\": {\n      \"inputs\": {\n        \"samples\": [\"3\", 0],\n        \"vae\": [\"4\", 2]\n      },\n      \"class_type\": \"VAEDecode\"\n    },\n    \"9\": {\n      \"inputs\": {\n        \"filename_prefix\": \"{{ $json.assetId }}\",\n        \"images\": [\"8\", 0]\n      },\n      \"class_type\": \"SaveImage\"\n    }\n  },\n  \"client_id\": \"n8n-asset-pipeline\"\n}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "comfyui-generate",
+      "name": "Generate with ComfyUI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Poll ComfyUI for completion\n// Wait for the generation to complete\n\nconst promptId = $input.first().json.prompt_id;\nconst assetData = $('Validate Input').first().json;\n\nif (!promptId) {\n  throw new Error('No prompt_id received from ComfyUI');\n}\n\n// We'll poll the history endpoint\n// In production, this would use WebSocket for real-time updates\n\nreturn {\n  json: {\n    promptId: promptId,\n    assetId: assetData.assetId,\n    assetType: assetData.assetType,\n    factionColor: assetData.factionColor,\n    factionHueShift: assetData.factionHueShift,\n    outputFormat: assetData.outputFormat,\n    originalPrompt: assetData.originalPrompt,\n    enhancedPrompt: assetData.enhancedPrompt,\n    width: assetData.width,\n    height: assetData.height,\n    status: 'processing',\n    timestamp: assetData.timestamp\n  }\n};"
+      },
+      "id": "process-comfyui-response",
+      "name": "Process ComfyUI Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "amount": 5,
+        "unit": "seconds"
+      },
+      "id": "wait-for-generation",
+      "name": "Wait for Generation",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=http://localhost:8188/history/{{ $json.promptId }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "check-generation-status",
+      "name": "Check Generation Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1340, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse ComfyUI history response and extract output image\n\nconst historyData = $input.first().json;\nconst assetData = $('Process ComfyUI Response').first().json;\nconst promptId = assetData.promptId;\n\n// Check if generation is complete\nif (!historyData[promptId]) {\n  // Still processing - would need loop/retry logic in production\n  return {\n    json: {\n      ...assetData,\n      status: 'still_processing',\n      retryRequired: true\n    }\n  };\n}\n\nconst promptHistory = historyData[promptId];\n\nif (promptHistory.status?.status_str === 'error') {\n  throw new Error(`ComfyUI generation failed: ${promptHistory.status?.messages?.join(', ') || 'Unknown error'}`);\n}\n\n// Extract output images from node 9 (SaveImage)\nconst outputs = promptHistory.outputs;\nlet outputImages = [];\n\nfor (const nodeId in outputs) {\n  if (outputs[nodeId].images) {\n    outputImages = outputs[nodeId].images.map(img => ({\n      filename: img.filename,\n      subfolder: img.subfolder || '',\n      type: img.type || 'output'\n    }));\n  }\n}\n\nif (outputImages.length === 0) {\n  throw new Error('No output images found in ComfyUI response');\n}\n\n// Build local file path for the generated image\nconst primaryImage = outputImages[0];\nconst localFilePath = `C:/ComfyUI/output/${primaryImage.subfolder ? primaryImage.subfolder + '/' : ''}${primaryImage.filename}`;\n\nreturn {\n  json: {\n    ...assetData,\n    status: 'generated',\n    outputImages: outputImages,\n    primaryImage: primaryImage,\n    localFilePath: localFilePath,\n    comfyuiUrl: `http://localhost:8188/view?filename=${encodeURIComponent(primaryImage.filename)}&subfolder=${encodeURIComponent(primaryImage.subfolder || '')}&type=${primaryImage.type}`\n  }\n};"
+      },
+      "id": "extract-output",
+      "name": "Extract Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1560, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.comfyuiUrl }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          },
+          "timeout": 60000
+        }
+      },
+      "id": "download-image",
+      "name": "Download Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1780, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Post-processing: Resize and format conversion if needed\n// This node handles image manipulation\n\nconst assetData = $('Extract Output').first().json;\nconst binaryData = $input.first().binary;\n\n// In a production environment, this would use Sharp or ImageMagick\n// For now, we pass through with metadata\n\n// Calculate target dimensions based on asset type\nconst targetSizes = {\n  'unit_sprite': { width: 128, height: 128 },\n  'building': { width: 256, height: 256 },\n  'terrain_tile': { width: 64, height: 64 },\n  'hero': { width: 256, height: 256 },\n  'effect': { width: 128, height: 128 },\n  'prop': { width: 128, height: 128 }\n};\n\nconst targetSize = targetSizes[assetData.assetType] || { width: 128, height: 128 };\n\n// Build S3 key path\nconst s3KeyPath = `game-assets/${assetData.assetType}/${assetData.factionColor}/${assetData.assetId}.${assetData.outputFormat}`;\n\nreturn {\n  json: {\n    ...assetData,\n    status: 'post_processed',\n    targetSize: targetSize,\n    s3Key: s3KeyPath,\n    s3Bucket: 'ziggie-assets-prod',\n    contentType: `image/${assetData.outputFormat === 'jpg' ? 'jpeg' : assetData.outputFormat}`\n  },\n  binary: binaryData\n};"
+      },
+      "id": "post-process",
+      "name": "Post-Process Image",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2000, 300]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "={{ $json.s3Bucket }}",
+        "fileName": "={{ $json.s3Key }}",
+        "binaryPropertyName": "data",
+        "additionalFields": {
+          "acl": "public-read",
+          "contentType": "={{ $json.contentType }}",
+          "tagsUi": {
+            "tagsValues": [
+              {
+                "key": "asset_type",
+                "value": "={{ $json.assetType }}"
+              },
+              {
+                "key": "faction",
+                "value": "={{ $json.factionColor }}"
+              },
+              {
+                "key": "generated_by",
+                "value": "n8n-pipeline"
+              }
+            ]
+          },
+          "metadata": {
+            "metadataValues": [
+              {
+                "key": "original-prompt",
+                "value": "={{ $json.originalPrompt }}"
+              },
+              {
+                "key": "asset-id",
+                "value": "={{ $json.assetId }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "upload-s3",
+      "name": "Upload to S3",
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [2220, 300],
+      "credentials": {
+        "s3": {
+          "id": "ziggie-aws-s3",
+          "name": "Ziggie AWS S3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build final asset metadata and S3 URL\n\nconst assetData = $('Post-Process Image').first().json;\nconst s3Response = $input.first().json;\n\n// Build public S3 URL\nconst s3Url = `https://${assetData.s3Bucket}.s3.eu-north-1.amazonaws.com/${assetData.s3Key}`;\n\nreturn {\n  json: {\n    success: true,\n    assetId: assetData.assetId,\n    assetType: assetData.assetType,\n    factionColor: assetData.factionColor,\n    assetUrl: s3Url,\n    s3Location: {\n      bucket: assetData.s3Bucket,\n      key: assetData.s3Key,\n      region: 'eu-north-1'\n    },\n    metadata: {\n      originalPrompt: assetData.originalPrompt,\n      enhancedPrompt: assetData.enhancedPrompt,\n      dimensions: {\n        original: { width: assetData.width, height: assetData.height },\n        target: assetData.targetSize\n      },\n      format: assetData.outputFormat,\n      generatedAt: assetData.timestamp,\n      completedAt: new Date().toISOString()\n    },\n    pipeline: {\n      comfyuiPromptId: assetData.promptId,\n      processingTime: Date.now() - new Date(assetData.timestamp).getTime()\n    }\n  }\n};"
+      },
+      "id": "build-response",
+      "name": "Build Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2440, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.DISCORD_WEBHOOK_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"embeds\": [{\n    \"title\": \"Asset Generated Successfully\",\n    \"color\": 5763719,\n    \"fields\": [\n      {\n        \"name\": \"Asset ID\",\n        \"value\": \"{{ $json.assetId }}\",\n        \"inline\": true\n      },\n      {\n        \"name\": \"Type\",\n        \"value\": \"{{ $json.assetType }}\",\n        \"inline\": true\n      },\n      {\n        \"name\": \"Faction\",\n        \"value\": \"{{ $json.factionColor }}\",\n        \"inline\": true\n      },\n      {\n        \"name\": \"Prompt\",\n        \"value\": \"{{ $json.metadata.originalPrompt.substring(0, 200) }}...\"\n      }\n    ],\n    \"image\": {\n      \"url\": \"{{ $json.assetUrl }}\"\n    },\n    \"footer\": {\n      \"text\": \"Generated via Ziggie Asset Pipeline\"\n    },\n    \"timestamp\": \"{{ $json.metadata.completedAt }}\"\n  }]\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "discord-notify",
+      "name": "Discord Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2660, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "webhook-response",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2880, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "error-check",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "exists",
+                "negation": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "error-check",
+      "name": "Check for Errors",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [460, 500]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": false,\n  \"error\": \"{{ $json.error || 'Unknown error occurred' }}\",\n  \"timestamp\": \"{{ new Date().toISOString() }}\"\n}",
+        "options": {
+          "responseCode": 400,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "error-response",
+      "name": "Error Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [680, 500]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Input": {
+      "main": [
+        [
+          {
+            "node": "Generate with ComfyUI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate with ComfyUI": {
+      "main": [
+        [
+          {
+            "node": "Process ComfyUI Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process ComfyUI Response": {
+      "main": [
+        [
+          {
+            "node": "Wait for Generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Generation": {
+      "main": [
+        [
+          {
+            "node": "Check Generation Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Generation Status": {
+      "main": [
+        [
+          {
+            "node": "Extract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Output": {
+      "main": [
+        [
+          {
+            "node": "Download Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Image": {
+      "main": [
+        [
+          {
+            "node": "Post-Process Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post-Process Image": {
+      "main": [
+        [
+          {
+            "node": "Upload to S3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to S3": {
+      "main": [
+        [
+          {
+            "node": "Build Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Response": {
+      "main": [
+        [
+          {
+            "node": "Discord Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check for Errors": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "ziggie-asset-pipeline"
+  },
+  "pinData": {},
+  "versionId": "1.0.0",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "name": "asset-generation",
+      "id": "tag-asset-gen"
+    },
+    {
+      "name": "comfyui",
+      "id": "tag-comfyui"
+    },
+    {
+      "name": "s3",
+      "id": "tag-s3"
+    }
+  ]
+}

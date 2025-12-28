@@ -1,0 +1,162 @@
+# =============================================================================
+# INFRASTRUCTURE ALERT RULES
+# =============================================================================
+# Critical alerts for host, container, and network health
+# =============================================================================
+
+groups:
+  - name: infrastructure
+    interval: 30s
+    rules:
+      # =========================================================================
+      # HOST LEVEL ALERTS
+      # =========================================================================
+
+      - alert: HostHighCpuUsage
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+          tier: infrastructure
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is above 80% for more than 5 minutes. Current: {{ $value | printf \"%.1f\" }}%"
+          runbook_url: "https://docs.ziggie.cloud/runbooks/high-cpu"
+
+      - alert: HostCriticalCpuUsage
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 95
+        for: 2m
+        labels:
+          severity: critical
+          tier: infrastructure
+        annotations:
+          summary: "Critical CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is above 95%. Immediate investigation required. Current: {{ $value | printf \"%.1f\" }}%"
+
+      - alert: HostHighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          tier: infrastructure
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+          description: "Memory usage is above 85%. Current: {{ $value | printf \"%.1f\" }}%"
+
+      - alert: HostCriticalMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 95
+        for: 2m
+        labels:
+          severity: critical
+          tier: infrastructure
+        annotations:
+          summary: "Critical memory usage on {{ $labels.instance }}"
+          description: "Memory usage is above 95%. OOM killer may be triggered. Current: {{ $value | printf \"%.1f\" }}%"
+
+      - alert: HostHighDiskUsage
+        expr: 100 - ((node_filesystem_avail_bytes{fstype!="tmpfs"} / node_filesystem_size_bytes{fstype!="tmpfs"}) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+          tier: infrastructure
+        annotations:
+          summary: "High disk usage on {{ $labels.instance }}"
+          description: "Disk {{ $labels.mountpoint }} is {{ $value | printf \"%.1f\" }}% full"
+
+      - alert: HostCriticalDiskUsage
+        expr: 100 - ((node_filesystem_avail_bytes{fstype!="tmpfs"} / node_filesystem_size_bytes{fstype!="tmpfs"}) * 100) > 90
+        for: 2m
+        labels:
+          severity: critical
+          tier: infrastructure
+        annotations:
+          summary: "Critical disk usage on {{ $labels.instance }}"
+          description: "Disk {{ $labels.mountpoint }} is {{ $value | printf \"%.1f\" }}% full. Immediate action required."
+
+      - alert: HostDiskWillFillIn24Hours
+        expr: predict_linear(node_filesystem_avail_bytes{fstype!="tmpfs"}[6h], 24*3600) < 0
+        for: 30m
+        labels:
+          severity: warning
+          tier: infrastructure
+        annotations:
+          summary: "Disk on {{ $labels.instance }} will fill in 24 hours"
+          description: "Based on current growth rate, disk {{ $labels.mountpoint }} will be full within 24 hours"
+
+      # =========================================================================
+      # CONTAINER LEVEL ALERTS
+      # =========================================================================
+
+      - alert: ContainerDown
+        expr: absent(container_last_seen{name=~"ziggie-.*"}) == 1
+        for: 1m
+        labels:
+          severity: critical
+          tier: infrastructure
+        annotations:
+          summary: "Container {{ $labels.name }} is down"
+          description: "Container has not been seen for more than 1 minute"
+
+      - alert: ContainerHighCpuUsage
+        expr: sum(rate(container_cpu_usage_seconds_total{name=~"ziggie-.*"}[5m])) by (name) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          tier: infrastructure
+        annotations:
+          summary: "High CPU usage in container {{ $labels.name }}"
+          description: "Container CPU usage is {{ $value | printf \"%.1f\" }}%"
+
+      - alert: ContainerHighMemoryUsage
+        expr: (container_memory_usage_bytes{name=~"ziggie-.*"} / container_spec_memory_limit_bytes{name=~"ziggie-.*"}) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          tier: infrastructure
+        annotations:
+          summary: "High memory usage in container {{ $labels.name }}"
+          description: "Container memory usage is {{ $value | printf \"%.1f\" }}% of limit"
+
+      - alert: ContainerOOMKilled
+        expr: increase(container_oom_events_total{name=~"ziggie-.*"}[5m]) > 0
+        for: 0m
+        labels:
+          severity: critical
+          tier: infrastructure
+        annotations:
+          summary: "Container {{ $labels.name }} was OOM killed"
+          description: "Container has been killed due to out-of-memory condition"
+
+      - alert: ContainerRestartLoop
+        expr: increase(container_restart_count{name=~"ziggie-.*"}[15m]) > 3
+        for: 0m
+        labels:
+          severity: critical
+          tier: infrastructure
+        annotations:
+          summary: "Container {{ $labels.name }} is in restart loop"
+          description: "Container has restarted {{ $value }} times in the last 15 minutes"
+
+      # =========================================================================
+      # NETWORK ALERTS
+      # =========================================================================
+
+      - alert: HighNetworkTraffic
+        expr: sum(rate(node_network_receive_bytes_total[5m])) by (instance) > 100000000  # 100 MB/s
+        for: 5m
+        labels:
+          severity: warning
+          tier: infrastructure
+        annotations:
+          summary: "High network traffic on {{ $labels.instance }}"
+          description: "Network receive rate is {{ $value | humanize }}B/s"
+
+      - alert: NetworkInterfaceDown
+        expr: node_network_up{device!~"lo|docker.*|veth.*|br-.*"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          tier: infrastructure
+        annotations:
+          summary: "Network interface {{ $labels.device }} is down"
+          description: "Network interface has been down for more than 2 minutes"

@@ -1,0 +1,318 @@
+# =============================================================================
+# ZIGGIE COMMAND CENTER - Rollback Workflow
+# =============================================================================
+# Emergency rollback to previous deployment state
+# Can be triggered manually with specific commit SHA or auto-rollback
+# =============================================================================
+
+name: Rollback Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      rollback_type:
+        description: 'Rollback type'
+        required: true
+        default: 'previous_commit'
+        type: choice
+        options:
+          - previous_commit
+          - specific_commit
+          - container_restart
+          - full_restore
+      target_commit:
+        description: 'Target commit SHA (only for specific_commit)'
+        required: false
+        default: ''
+      services:
+        description: 'Services to rollback (comma-separated, or "all")'
+        required: false
+        default: 'all'
+      reason:
+        description: 'Reason for rollback'
+        required: true
+        default: 'Deployment issue'
+
+env:
+  DEPLOYMENT_DIR: /opt/ziggie
+
+jobs:
+  # ===========================================================================
+  # VALIDATE ROLLBACK REQUEST
+  # ===========================================================================
+  validate:
+    name: Validate Rollback
+    runs-on: self-hosted
+    outputs:
+      target_sha: ${{ steps.target.outputs.sha }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 10
+
+      - name: Determine rollback target
+        id: target
+        run: |
+          ROLLBACK_TYPE="${{ github.event.inputs.rollback_type }}"
+
+          case "$ROLLBACK_TYPE" in
+            "previous_commit")
+              TARGET_SHA=$(git rev-parse HEAD~1)
+              echo "Rolling back to previous commit: $TARGET_SHA"
+              ;;
+            "specific_commit")
+              TARGET_SHA="${{ github.event.inputs.target_commit }}"
+              if [ -z "$TARGET_SHA" ]; then
+                echo "::error::Target commit SHA required for specific_commit rollback"
+                exit 1
+              fi
+              # Validate commit exists
+              if ! git cat-file -e "$TARGET_SHA" 2>/dev/null; then
+                echo "::error::Commit $TARGET_SHA not found"
+                exit 1
+              fi
+              echo "Rolling back to specific commit: $TARGET_SHA"
+              ;;
+            "container_restart")
+              TARGET_SHA="N/A"
+              echo "Container restart only (no code rollback)"
+              ;;
+            "full_restore")
+              TARGET_SHA=$(git rev-parse HEAD~1)
+              echo "Full restore including database (previous commit): $TARGET_SHA"
+              ;;
+          esac
+
+          echo "sha=$TARGET_SHA" >> $GITHUB_OUTPUT
+
+      - name: Log rollback request
+        run: |
+          echo "## Rollback Request" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Parameter | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Type | ${{ github.event.inputs.rollback_type }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Target | ${{ steps.target.outputs.sha }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Services | ${{ github.event.inputs.services }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Reason | ${{ github.event.inputs.reason }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Initiated by | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Time | $(date -Iseconds) |" >> $GITHUB_STEP_SUMMARY
+
+  # ===========================================================================
+  # BACKUP CURRENT STATE
+  # ===========================================================================
+  backup:
+    name: Backup Current State
+    runs-on: self-hosted
+    needs: validate
+    steps:
+      - name: Create rollback backup
+        run: |
+          BACKUP_DIR="${{ env.DEPLOYMENT_DIR }}/backups/rollback_$(date +%Y%m%d_%H%M%S)"
+          mkdir -p "$BACKUP_DIR"
+          echo "BACKUP_DIR=$BACKUP_DIR" >> $GITHUB_ENV
+
+          # Save current container states
+          docker ps -a --format 'table {{.Names}}\t{{.Status}}\t{{.Image}}' > "$BACKUP_DIR/container_states.txt"
+
+          # Save current docker-compose
+          cp "${{ env.DEPLOYMENT_DIR }}/docker-compose.yml" "$BACKUP_DIR/" || true
+
+          # Save current commit SHA
+          cd "${{ env.DEPLOYMENT_DIR }}"
+          git rev-parse HEAD > "$BACKUP_DIR/current_commit.txt" 2>/dev/null || echo "unknown" > "$BACKUP_DIR/current_commit.txt"
+
+          echo "Backup created at $BACKUP_DIR"
+
+  # ===========================================================================
+  # EXECUTE ROLLBACK
+  # ===========================================================================
+  rollback:
+    name: Execute Rollback
+    runs-on: self-hosted
+    needs: [validate, backup]
+    steps:
+      - name: Stop affected services
+        run: |
+          cd ${{ env.DEPLOYMENT_DIR }}
+
+          SERVICES="${{ github.event.inputs.services }}"
+          if [ "$SERVICES" = "all" ]; then
+            SERVICES="ziggie-api mcp-gateway sim-studio"
+          fi
+
+          echo "Stopping services: $SERVICES"
+          for SERVICE in $SERVICES; do
+            docker compose stop "$SERVICE" 2>/dev/null || true
+            echo "Stopped $SERVICE"
+          done
+
+      - name: Rollback code (if applicable)
+        if: github.event.inputs.rollback_type != 'container_restart'
+        run: |
+          cd ${{ env.DEPLOYMENT_DIR }}
+
+          TARGET_SHA="${{ needs.validate.outputs.target_sha }}"
+          if [ "$TARGET_SHA" != "N/A" ]; then
+            echo "Checking out $TARGET_SHA..."
+            git fetch origin
+            git checkout "$TARGET_SHA" -- . || {
+              echo "::error::Failed to checkout $TARGET_SHA"
+              exit 1
+            }
+            echo "Code rolled back to $TARGET_SHA"
+          fi
+
+      - name: Rebuild services
+        if: github.event.inputs.rollback_type != 'container_restart'
+        run: |
+          cd ${{ env.DEPLOYMENT_DIR }}
+
+          SERVICES="${{ github.event.inputs.services }}"
+          if [ "$SERVICES" = "all" ]; then
+            SERVICES="ziggie-api mcp-gateway sim-studio"
+          fi
+
+          echo "Rebuilding services: $SERVICES"
+          for SERVICE in $SERVICES; do
+            docker compose build "$SERVICE" || {
+              echo "::error::Failed to build $SERVICE"
+              exit 1
+            }
+            echo "Built $SERVICE"
+          done
+
+      - name: Start services
+        run: |
+          cd ${{ env.DEPLOYMENT_DIR }}
+
+          SERVICES="${{ github.event.inputs.services }}"
+          if [ "$SERVICES" = "all" ]; then
+            SERVICES="ziggie-api mcp-gateway sim-studio"
+          fi
+
+          echo "Starting services: $SERVICES"
+          for SERVICE in $SERVICES; do
+            docker compose up -d "$SERVICE"
+            echo "Started $SERVICE"
+          done
+
+          echo "Waiting for services to stabilize..."
+          sleep 15
+
+      - name: Restore database (full_restore only)
+        if: github.event.inputs.rollback_type == 'full_restore'
+        run: |
+          echo "::warning::Database restore not implemented - manual intervention required"
+          echo "Check backups at: ${{ env.DEPLOYMENT_DIR }}/backups/"
+
+  # ===========================================================================
+  # VERIFY ROLLBACK
+  # ===========================================================================
+  verify:
+    name: Verify Rollback
+    runs-on: self-hosted
+    needs: rollback
+    steps:
+      - name: Health checks
+        run: |
+          SERVICES="${{ github.event.inputs.services }}"
+          if [ "$SERVICES" = "all" ]; then
+            SERVICES="ziggie-api mcp-gateway sim-studio"
+          fi
+
+          FAILED=0
+          for SERVICE in $SERVICES; do
+            CONTAINER="ziggie-${SERVICE#ziggie-}"
+
+            # Get container IP
+            IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$CONTAINER" 2>/dev/null || echo "")
+
+            if [ -z "$IP" ]; then
+              echo "::error::Container $CONTAINER not found"
+              FAILED=1
+              continue
+            fi
+
+            # Determine port
+            case "$SERVICE" in
+              "ziggie-api") PORT=8000 ;;
+              "mcp-gateway") PORT=8080 ;;
+              "sim-studio") PORT=8001 ;;
+              *) PORT=8000 ;;
+            esac
+
+            # Health check with retries
+            for i in {1..5}; do
+              if curl -sf "http://$IP:$PORT/health" > /dev/null 2>&1; then
+                echo "$SERVICE: HEALTHY"
+                break
+              fi
+              if [ $i -eq 5 ]; then
+                echo "::error::$SERVICE health check failed"
+                FAILED=1
+              fi
+              sleep 3
+            done
+          done
+
+          if [ $FAILED -eq 1 ]; then
+            echo "::error::Some services failed health checks"
+            exit 1
+          fi
+
+          echo "All services healthy after rollback"
+
+      - name: Generate rollback summary
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Rollback Result" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Status**: SUCCESS" >> $GITHUB_STEP_SUMMARY
+          echo "**Completed at**: $(date -Iseconds)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Service Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          docker ps --format 'table {{.Names}}\t{{.Status}}' | grep ziggie >> $GITHUB_STEP_SUMMARY || echo "No ziggie services found"
+
+  # ===========================================================================
+  # NOTIFICATION
+  # ===========================================================================
+  notify:
+    name: Notify
+    runs-on: self-hosted
+    needs: [validate, rollback, verify]
+    if: always()
+    steps:
+      - name: Send Slack notification
+        if: env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ "${{ needs.verify.result }}" = "success" ]; then
+            COLOR="warning"
+            EMOJI=":rewind:"
+            STATUS="completed"
+          else
+            COLOR="danger"
+            EMOJI=":x:"
+            STATUS="failed"
+          fi
+
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{
+              \"attachments\": [{
+                \"color\": \"$COLOR\",
+                \"title\": \"$EMOJI Ziggie Rollback $STATUS\",
+                \"fields\": [
+                  {\"title\": \"Type\", \"value\": \"${{ github.event.inputs.rollback_type }}\", \"short\": true},
+                  {\"title\": \"Target\", \"value\": \"${{ needs.validate.outputs.target_sha }}\", \"short\": true},
+                  {\"title\": \"Reason\", \"value\": \"${{ github.event.inputs.reason }}\", \"short\": false},
+                  {\"title\": \"Initiated by\", \"value\": \"${{ github.actor }}\", \"short\": true}
+                ],
+                \"footer\": \"GitHub Actions\",
+                \"ts\": $(date +%s)
+              }]
+            }" \
+            "$SLACK_WEBHOOK_URL" || echo "Slack notification failed"

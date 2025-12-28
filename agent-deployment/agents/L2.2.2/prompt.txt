@@ -1,0 +1,43 @@
+
+Fix performance issues in Control Center:
+
+ISSUE #2 - BLOCKING CPU MONITOR (HIGH):
+Location: backend/api/system.py:19
+Task: Remove 1-second blocking CPU call
+- Create background task to update CPU cache every 2 seconds
+- Change psutil.cpu_percent(interval=1) to interval=0
+- Use cached value in endpoint
+- Implement lifespan context manager
+Expected: 1000ms to <50ms (20x speedup)
+Code example in: C:/Ziggie/CONTROL_CENTER_ISSUES_ACTION_PLAN.md (Issue #2)
+
+ISSUE #4 - WEBSOCKET BLOCKING (HIGH):
+Location: backend/api/system.py:160
+Task: Fix WebSocket blocking connections
+- Use same background task approach
+- Update shared state instead of blocking
+Expected: 2 to 50+ concurrent connections
+
+ISSUE #8 - MISSING DB INDEXES (MEDIUM):
+Location: backend/database/models.py
+Task: Add indexes for common queries
+- Service.status (index=True)
+- Service.name (index=True)
+- Agent.level (index=True)
+- KnowledgeFile.agent_id (index=True)
+- Create alembic migration
+
+ISSUE #11 - STATE OPTIMIZATION (MEDIUM):
+Location: frontend/src/App.jsx:16-20
+Task: Use useMemo for array slicing
+Code example in action plan
+
+ISSUE #13 - NO RESPONSE CACHING (LOW):
+Location: backend/api/system.py
+Task: Implement 2-second TTL cache
+Code example in action plan
+
+DELIVERABLE:
+- Create completion report: C:/Ziggie/agent-reports/L2.2.2_PERFORMANCE_FIX_REPORT.md
+- Document: Performance gains measured, files modified
+    

@@ -1,0 +1,36 @@
+# Knowledge Extraction Pipeline Dependencies
+# Install: pip install -r requirements.txt
+
+# YouTube Data Extraction
+yt-dlp>=2024.3.10              # YouTube video/transcript download
+youtube-transcript-api>=0.6.1   # Direct transcript extraction
+google-api-python-client>=2.119.0  # YouTube Data API v3
+
+# AI Analysis
+anthropic>=0.18.1              # Claude API for insight extraction
+openai>=1.12.0                 # Optional: Whisper API fallback
+
+# HTTP & Web
+requests>=2.32.3               # API requests (security update)
+urllib3>=2.2.0                 # URL handling
+
+# Data Processing
+pyyaml>=6.0.1                  # YAML config files
+python-dotenv>=1.0.0           # Environment variable management
+json5>=0.9.14                  # JSON with comments support
+
+# Scheduling & Automation
+apscheduler>=3.10.4            # Task scheduling
+schedule>=1.2.1                # Simple scheduling alternative
+
+# Database & Storage
+tinydb>=4.8.0                  # Lightweight JSON database for logs
+
+# Utilities
+python-dateutil>=2.8.2         # Date parsing
+colorama>=0.4.6                # Colored terminal output
+tqdm>=4.66.2                   # Progress bars
+
+# Optional: Advanced Features
+# whisper>=1.1.10              # Local Whisper transcription (large download)
+# pytube>=15.0.0               # Alternative YouTube downloader

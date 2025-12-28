@@ -1,0 +1,241 @@
+# =============================================================================
+# PROMTAIL CONFIGURATION - ZIGGIE COMMAND CENTER
+# =============================================================================
+# Log collection from all 18 Docker services with structured labeling
+# =============================================================================
+
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+# Positions file (tracks log positions for resumption)
+positions:
+  filename: /tmp/positions.yaml
+
+# Loki server to push logs to
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+    batchwait: 1s
+    batchsize: 1048576  # 1MB
+    timeout: 10s
+    tenant_id: ""
+    external_labels:
+      environment: production
+      host: ziggie-vps
+
+# Scrape configurations
+scrape_configs:
+  # ===========================================================================
+  # DOCKER CONTAINER LOGS
+  # ===========================================================================
+  - job_name: docker-containers
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: containerlogs
+          __path__: /var/lib/docker/containers/*/*-json.log
+
+    pipeline_stages:
+      # Parse Docker JSON log format
+      - json:
+          expressions:
+            log: log
+            stream: stream
+            time: time
+
+      # Extract container name and ID from path
+      - regex:
+          source: filename
+          expression: '/var/lib/docker/containers/(?P<container_id>[a-z0-9]+)/[a-z0-9]+-json.log'
+
+      # Set labels from parsed values
+      - labels:
+          stream:
+          container_id:
+
+      # Parse the actual log line content
+      - output:
+          source: log
+
+      # Detect log level from content
+      - regex:
+          source: log
+          expression: '(?i)(?P<level>(error|warn|warning|info|debug|critical|fatal))'
+      - labels:
+          level:
+
+      # Drop empty logs
+      - match:
+          selector: '{job="containerlogs"}'
+          stages:
+            - drop:
+                expression: '^\s*$'
+
+  # ===========================================================================
+  # ZIGGIE SERVICE LOGS (Enhanced parsing)
+  # ===========================================================================
+  - job_name: ziggie-services
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 30s
+        filters:
+          - name: name
+            values: ["ziggie-.*"]
+
+    relabel_configs:
+      # Keep only ziggie containers
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/ziggie-(.*)'
+        action: keep
+
+      # Extract service name
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/ziggie-(.*)'
+        target_label: service
+
+      # Add container labels
+      - source_labels: ['__meta_docker_container_id']
+        target_label: container_id
+
+      - source_labels: ['__meta_docker_container_image']
+        target_label: image
+
+      # Set tier based on service name
+      - source_labels: ['service']
+        regex: '(postgres|mongodb|redis)'
+        target_label: tier
+        replacement: database
+
+      - source_labels: ['service']
+        regex: '(api|mcp-gateway|sim-studio)'
+        target_label: tier
+        replacement: application
+
+      - source_labels: ['service']
+        regex: '(n8n|flowise)'
+        target_label: tier
+        replacement: workflow
+
+      - source_labels: ['service']
+        regex: '(ollama|open-webui)'
+        target_label: tier
+        replacement: ai
+
+      - source_labels: ['service']
+        regex: '(prometheus|grafana|loki|promtail|alertmanager)'
+        target_label: tier
+        replacement: monitoring
+
+      - source_labels: ['service']
+        regex: '(nginx|portainer|watchtower|certbot)'
+        target_label: tier
+        replacement: infrastructure
+
+    pipeline_stages:
+      # Parse JSON logs (common format)
+      - json:
+          expressions:
+            level: level
+            msg: msg
+            message: message
+            error: error
+            timestamp: timestamp
+            ts: ts
+
+      # Fallback: detect level from text
+      - regex:
+          source: msg
+          expression: '(?i)(?P<detected_level>(error|warn|warning|info|debug|critical|fatal))'
+
+      # Normalize level label
+      - template:
+          source: level
+          template: '{{ if .detected_level }}{{ .detected_level }}{{ else }}{{ .level }}{{ end }}'
+
+      - labels:
+          level:
+
+      # Extract error details
+      - regex:
+          source: error
+          expression: '(?P<error_type>[A-Za-z]+Error)'
+      - labels:
+          error_type:
+
+  # ===========================================================================
+  # NGINX ACCESS LOGS (Structured)
+  # ===========================================================================
+  - job_name: nginx-access
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: nginx
+          log_type: access
+          __path__: /var/log/nginx/access.log
+
+    pipeline_stages:
+      # Parse nginx access log format
+      - regex:
+          expression: '^(?P<remote_addr>[\d\.]+) - (?P<remote_user>\S+) \[(?P<time_local>[^\]]+)\] "(?P<method>\S+) (?P<request_uri>\S+) (?P<protocol>[^"]+)" (?P<status>\d+) (?P<body_bytes_sent>\d+) "(?P<http_referer>[^"]*)" "(?P<http_user_agent>[^"]*)"'
+
+      - labels:
+          method:
+          status:
+
+      # Add severity based on status code
+      - template:
+          source: status
+          template: '{{ if ge (atoi .Value) 500 }}error{{ else if ge (atoi .Value) 400 }}warn{{ else }}info{{ end }}'
+      - labels:
+          level:
+
+  # ===========================================================================
+  # NGINX ERROR LOGS
+  # ===========================================================================
+  - job_name: nginx-error
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: nginx
+          log_type: error
+          level: error
+          __path__: /var/log/nginx/error.log
+
+  # ===========================================================================
+  # SYSTEM LOGS
+  # ===========================================================================
+  - job_name: system
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: syslog
+          __path__: /var/log/syslog
+
+    pipeline_stages:
+      - regex:
+          expression: '(?P<timestamp>\w+\s+\d+\s+[\d:]+)\s+(?P<hostname>\S+)\s+(?P<process>[^\[]+)\[(?P<pid>\d+)\]:\s+(?P<message>.*)'
+
+      - labels:
+          process:
+
+      - timestamp:
+          source: timestamp
+          format: 'Jan _2 15:04:05'
+
+  # ===========================================================================
+  # JOURNAL LOGS (systemd)
+  # ===========================================================================
+  - job_name: journal
+    journal:
+      max_age: 12h
+      labels:
+        job: systemd-journal
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'
+      - source_labels: ['__journal_priority_keyword']
+        target_label: 'level'

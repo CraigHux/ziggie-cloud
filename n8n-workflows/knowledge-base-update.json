@@ -1,0 +1,356 @@
+{
+  "name": "Knowledge Base Update Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 6
+            }
+          ]
+        }
+      },
+      "id": "kb-schedule-trigger",
+      "name": "Scheduled Trigger (6h)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "update-knowledge-base",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "kb-webhook-trigger",
+      "name": "Manual Trigger Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 500],
+      "webhookId": "update-kb-webhook"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "id": "merge-triggers",
+      "name": "Merge Triggers",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [460, 400]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://mcp-gateway:8080/memory/read_graph",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "read-current-graph",
+      "name": "Read Current Knowledge Graph",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Analyze knowledge graph for health and staleness\n\nconst graphData = $input.first().json;\nconst now = Date.now();\n\n// Time thresholds\nconst STALE_THRESHOLD = 7 * 24 * 60 * 60 * 1000; // 7 days\nconst CRITICAL_THRESHOLD = 30 * 24 * 60 * 60 * 1000; // 30 days\n\n// Extract entities and relations\nconst entities = graphData.entities || [];\nconst relations = graphData.relations || [];\n\n// Analyze entity freshness\nconst entityAnalysis = entities.map(entity => {\n  const createdAt = new Date(entity.createdAt || entity.created_at || 0).getTime();\n  const updatedAt = new Date(entity.updatedAt || entity.updated_at || createdAt).getTime();\n  const age = now - updatedAt;\n  \n  let freshness = 'fresh';\n  if (age > CRITICAL_THRESHOLD) freshness = 'critical';\n  else if (age > STALE_THRESHOLD) freshness = 'stale';\n  \n  return {\n    name: entity.name,\n    entityType: entity.entityType,\n    observationCount: (entity.observations || []).length,\n    lastUpdated: new Date(updatedAt).toISOString(),\n    ageInDays: Math.floor(age / (24 * 60 * 60 * 1000)),\n    freshness: freshness\n  };\n});\n\n// Categorize entities\nconst freshEntities = entityAnalysis.filter(e => e.freshness === 'fresh');\nconst staleEntities = entityAnalysis.filter(e => e.freshness === 'stale');\nconst criticalEntities = entityAnalysis.filter(e => e.freshness === 'critical');\n\n// Identify entity types\nconst entityTypes = [...new Set(entities.map(e => e.entityType))];\n\n// Relation health check\nconst relationHealth = {\n  total: relations.length,\n  orphaned: relations.filter(r => {\n    const fromExists = entities.some(e => e.name === r.from);\n    const toExists = entities.some(e => e.name === r.to);\n    return !fromExists || !toExists;\n  }).length\n};\n\n// Overall health score (0-100)\nconst freshRatio = entities.length > 0 ? freshEntities.length / entities.length : 0;\nconst orphanRatio = relations.length > 0 ? relationHealth.orphaned / relations.length : 0;\nconst healthScore = Math.round((freshRatio * 70 + (1 - orphanRatio) * 30));\n\nreturn {\n  json: {\n    analysisId: `kb_${Date.now()}`,\n    timestamp: new Date().toISOString(),\n    health: {\n      score: healthScore,\n      status: healthScore >= 80 ? 'healthy' : healthScore >= 50 ? 'warning' : 'critical'\n    },\n    statistics: {\n      totalEntities: entities.length,\n      totalRelations: relations.length,\n      entityTypes: entityTypes,\n      freshEntities: freshEntities.length,\n      staleEntities: staleEntities.length,\n      criticalEntities: criticalEntities.length\n    },\n    relationHealth: relationHealth,\n    staleEntities: staleEntities.slice(0, 20),\n    criticalEntities: criticalEntities.slice(0, 10),\n    recommendations: []\n  }\n};"
+      },
+      "id": "analyze-graph-health",
+      "name": "Analyze Graph Health",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate recommendations based on analysis\n\nconst analysis = $input.first().json;\nconst recommendations = [];\n\n// Recommendation 1: Stale entities\nif (analysis.statistics.staleEntities > 0) {\n  recommendations.push({\n    priority: 'medium',\n    type: 'stale_entities',\n    message: `${analysis.statistics.staleEntities} entities haven't been updated in 7+ days`,\n    action: 'Review and update stale entities or mark as archived',\n    entities: analysis.staleEntities.slice(0, 5).map(e => e.name)\n  });\n}\n\n// Recommendation 2: Critical entities\nif (analysis.statistics.criticalEntities > 0) {\n  recommendations.push({\n    priority: 'high',\n    type: 'critical_entities',\n    message: `${analysis.statistics.criticalEntities} entities haven't been updated in 30+ days`,\n    action: 'Urgently review and update or archive these entities',\n    entities: analysis.criticalEntities.slice(0, 5).map(e => e.name)\n  });\n}\n\n// Recommendation 3: Orphaned relations\nif (analysis.relationHealth.orphaned > 0) {\n  recommendations.push({\n    priority: 'high',\n    type: 'orphaned_relations',\n    message: `${analysis.relationHealth.orphaned} relations reference non-existent entities`,\n    action: 'Clean up orphaned relations to maintain graph integrity'\n  });\n}\n\n// Recommendation 4: Low entity count\nif (analysis.statistics.totalEntities < 50) {\n  recommendations.push({\n    priority: 'low',\n    type: 'expand_knowledge',\n    message: 'Knowledge base has fewer than 50 entities',\n    action: 'Consider expanding the knowledge base with more project entities'\n  });\n}\n\n// Recommendation 5: Missing entity types\nconst expectedTypes = ['Project', 'Agent', 'Service', 'Workflow', 'Asset', 'Configuration'];\nconst missingTypes = expectedTypes.filter(t => !analysis.statistics.entityTypes.includes(t));\nif (missingTypes.length > 0) {\n  recommendations.push({\n    priority: 'medium',\n    type: 'missing_entity_types',\n    message: `Missing entity types: ${missingTypes.join(', ')}`,\n    action: 'Add entities for missing types to complete the knowledge graph'\n  });\n}\n\nanalysis.recommendations = recommendations;\nanalysis.recommendationCount = recommendations.length;\nanalysis.requiresAction = recommendations.some(r => r.priority === 'high');\n\nreturn { json: analysis };"
+      },
+      "id": "generate-recommendations",
+      "name": "Generate Recommendations",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 400]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-critical",
+              "leftValue": "={{ $json.statistics.criticalEntities }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "larger"
+              }
+            }
+          ],
+          "combinator": "or"
+        }
+      },
+      "id": "has-critical-issues",
+      "name": "Has Critical Issues?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1340, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare cleanup actions for critical entities\n\nconst analysis = $input.first().json;\n\n// Build cleanup tasks\nconst cleanupTasks = [];\n\n// Task 1: Archive critically stale entities\nif (analysis.criticalEntities && analysis.criticalEntities.length > 0) {\n  cleanupTasks.push({\n    type: 'archive_entities',\n    description: 'Archive entities not updated in 30+ days',\n    entities: analysis.criticalEntities.map(e => e.name),\n    autoExecute: false  // Require manual confirmation\n  });\n}\n\n// Task 2: Clean orphaned relations\nif (analysis.relationHealth.orphaned > 0) {\n  cleanupTasks.push({\n    type: 'delete_orphaned_relations',\n    description: 'Remove relations with missing endpoints',\n    count: analysis.relationHealth.orphaned,\n    autoExecute: true  // Safe to auto-execute\n  });\n}\n\nreturn {\n  json: {\n    ...analysis,\n    cleanupTasks: cleanupTasks,\n    cleanupRequired: cleanupTasks.length > 0\n  }\n};"
+      },
+      "id": "prepare-cleanup",
+      "name": "Prepare Cleanup Actions",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1560, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pass through for healthy knowledge base\nreturn $input.all();"
+      },
+      "id": "healthy-passthrough",
+      "name": "Healthy - No Action Needed",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1560, 500]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "id": "merge-paths",
+      "name": "Merge Paths",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [1780, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.DISCORD_WEBHOOK_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"embeds\": [{\n    \"title\": \"Knowledge Base Health Report\",\n    \"color\": {{ $json.health.score >= 80 ? 5763719 : $json.health.score >= 50 ? 16776960 : 15158332 }},\n    \"fields\": [\n      {\n        \"name\": \"Health Score\",\n        \"value\": \"{{ $json.health.score }}/100 ({{ $json.health.status }})\",\n        \"inline\": true\n      },\n      {\n        \"name\": \"Total Entities\",\n        \"value\": \"{{ $json.statistics.totalEntities }}\",\n        \"inline\": true\n      },\n      {\n        \"name\": \"Total Relations\",\n        \"value\": \"{{ $json.statistics.totalRelations }}\",\n        \"inline\": true\n      },\n      {\n        \"name\": \"Entity Status\",\n        \"value\": \"Fresh: {{ $json.statistics.freshEntities }}\\nStale: {{ $json.statistics.staleEntities }}\\nCritical: {{ $json.statistics.criticalEntities }}\"\n      },\n      {\n        \"name\": \"Recommendations\",\n        \"value\": \"{{ $json.recommendationCount > 0 ? $json.recommendations.slice(0,3).map(r => '- ' + r.message).join('\\\\n') : 'No actions needed' }}\"\n      }\n    ],\n    \"footer\": {\n      \"text\": \"Ziggie Knowledge Base Monitor\"\n    },\n    \"timestamp\": \"{{ $json.timestamp }}\"\n  }]\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "discord-kb-notify",
+      "name": "Discord KB Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2000, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "kb-response",
+      "name": "KB Update Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2220, 500]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build final report\nconst data = $input.first().json;\n\nreturn {\n  json: {\n    reportType: 'knowledge_base_health',\n    analysisId: data.analysisId,\n    timestamp: data.timestamp,\n    health: data.health,\n    statistics: data.statistics,\n    relationHealth: data.relationHealth,\n    recommendations: data.recommendations,\n    cleanupTasks: data.cleanupTasks || [],\n    nextCheckIn: new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString()\n  }\n};"
+      },
+      "id": "build-final-report",
+      "name": "Build Final Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2000, 500]
+    }
+  ],
+  "connections": {
+    "Scheduled Trigger (6h)": {
+      "main": [
+        [
+          {
+            "node": "Merge Triggers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger Webhook": {
+      "main": [
+        [
+          {
+            "node": "Merge Triggers",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Triggers": {
+      "main": [
+        [
+          {
+            "node": "Read Current Knowledge Graph",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Current Knowledge Graph": {
+      "main": [
+        [
+          {
+            "node": "Analyze Graph Health",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Graph Health": {
+      "main": [
+        [
+          {
+            "node": "Generate Recommendations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Recommendations": {
+      "main": [
+        [
+          {
+            "node": "Has Critical Issues?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Critical Issues?": {
+      "main": [
+        [
+          {
+            "node": "Prepare Cleanup Actions",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Healthy - No Action Needed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Cleanup Actions": {
+      "main": [
+        [
+          {
+            "node": "Merge Paths",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Healthy - No Action Needed": {
+      "main": [
+        [
+          {
+            "node": "Merge Paths",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Paths": {
+      "main": [
+        [
+          {
+            "node": "Discord KB Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Build Final Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Final Report": {
+      "main": [
+        [
+          {
+            "node": "KB Update Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "ziggie-kb-update"
+  },
+  "pinData": {},
+  "versionId": "1.0.0",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "name": "knowledge-base",
+      "id": "tag-kb"
+    },
+    {
+      "name": "monitoring",
+      "id": "tag-monitoring"
+    },
+    {
+      "name": "scheduled",
+      "id": "tag-scheduled"
+    }
+  ]
+}

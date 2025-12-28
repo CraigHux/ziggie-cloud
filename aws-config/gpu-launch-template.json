@@ -1,0 +1,51 @@
+{
+    "LaunchTemplateName": "ziggie-gpu-spot",
+    "VersionDescription": "Ziggie GPU Spot Instance with ComfyUI",
+    "LaunchTemplateData": {
+        "ImageId": "ami-0beaf1366830fe924",
+        "InstanceType": "g4dn.xlarge",
+        "KeyName": "ziggie-gpu-key",
+        "SecurityGroupIds": ["sg-07c0d59d11ac62192"],
+        "BlockDeviceMappings": [
+            {
+                "DeviceName": "/dev/sda1",
+                "Ebs": {
+                    "VolumeSize": 100,
+                    "VolumeType": "gp3",
+                    "DeleteOnTermination": true
+                }
+            }
+        ],
+        "InstanceMarketOptions": {
+            "MarketType": "spot",
+            "SpotOptions": {
+                "SpotInstanceType": "one-time",
+                "InstanceInterruptionBehavior": "terminate"
+            }
+        },
+        "TagSpecifications": [
+            {
+                "ResourceType": "instance",
+                "Tags": [
+                    {"Key": "Name", "Value": "Ziggie-GPU-Worker"},
+                    {"Key": "Project", "Value": "Ziggie"},
+                    {"Key": "Type", "Value": "GPU"},
+                    {"Key": "Environment", "Value": "Production"}
+                ]
+            },
+            {
+                "ResourceType": "volume",
+                "Tags": [
+                    {"Key": "Name", "Value": "Ziggie-GPU-Volume"},
+                    {"Key": "Project", "Value": "Ziggie"}
+                ]
+            }
+        ],
+        "UserData": "IyEvYmluL2Jhc2gNCiMgWmlnZ2llIEdQVSBJbnN0YW5jZSBCb290c3RyYXAgU2NyaXB0DQojIEF1dG8taW5zdGFsbHMgQ29tZnlVSSBmb3IgQUkgYXNzZXQgZ2VuZXJhdGlvbg0KDQpzZXQgLWUNCg0KIyBMb2cgZXZlcnl0aGluZw0KZXhlYyA+ID4odGVlIC92YXIvbG9nL3ppZ2dpZS1ib290c3RyYXAubG9nKSAyPiYxDQoNCmVjaG8gIj09PSBaaWdnaWUgR1BVIEJvb3RzdHJhcCBTdGFydGVkIGF0ICQoZGF0ZSkgPT09Ig0KDQojIFVwZGF0ZSBzeXN0ZW0NCmFwdC1nZXQgdXBkYXRlDQphcHQtZ2V0IHVwZ3JhZGUgLXkNCg0KIyBJbnN0YWxsIHJlcXVpcmVkIHBhY2thZ2VzDQphcHQtZ2V0IGluc3RhbGwgLXkgZ2l0IHB5dGhvbjMtcGlwIHB5dGhvbjMtdmVudg0KDQojIENyZWF0ZSB6aWdnaWUgdXNlciBkaXJlY3RvcnkNCm1rZGlyIC1wIC9ob21lL3VidW50dS96aWdnaWUNCmNkIC9ob21lL3VidW50dS96aWdnaWUNCg0KIyBDbG9uZSBDb21meVVJDQpnaXQgY2xvbmUgaHR0cHM6Ly9naXRodWIuY29tL2NvbWZ5YW5vbnltb3VzL0NvbWZ5VUkuZ2l0DQpjZCBDb21meVVJDQoNCiMgQ3JlYXRlIHZpcnR1YWwgZW52aXJvbm1lbnQNCnB5dGhvbjMgLW0gdmVudiB2ZW52DQpzb3VyY2UgdmVudi9iaW4vYWN0aXZhdGUNCg0KIyBJbnN0YWxsIFB5VG9yY2ggd2l0aCBDVURBIHN1cHBvcnQNCnBpcCBpbnN0YWxsIHRvcmNoIHRvcmNodmlzaW9uIHRvcmNoYXVkaW8gLS1pbmRleC11cmwgaHR0cHM6Ly9kb3dubG9hZC5weXRvcmNoLm9yZy93aGwvY3UxMjENCg0KIyBJbnN0YWxsIENvbWZ5VUkgcmVxdWlyZW1lbnRzDQpwaXAgaW5zdGFsbCAtciByZXF1aXJlbWVudHMudHh0DQoNCiMgSW5zdGFsbCBhZGRpdGlvbmFsIG5vZGVzIGZvciBnYW1lIGFzc2V0IGdlbmVyYXRpb24NCmNkIGN1c3RvbV9ub2Rlcw0KZ2l0IGNsb25lIGh0dHBzOi8vZ2l0aHViLmNvbS9sdGRyZGF0YS9Db21meVVJLU1hbmFnZXIuZ2l0DQpjZCAuLg0KDQojIENyZWF0ZSBzeXN0ZW1kIHNlcnZpY2UgZm9yIENvbWZ5VUkNCmNhdCA+IC9ldGMvc3lzdGVtZC9zeXN0ZW0vY29tZnl1aS5zZXJ2aWNlIDw8ICdFT0YnDQpbVW5pdF0NCkRlc2NyaXB0aW9uPUNvbWZ5VUkgU2VydmVyDQpBZnRlcj1uZXR3b3JrLnRhcmdldA0KDQpbU2VydmljZV0NClR5cGU9c2ltcGxlDQpVc2VyPXVidW50dQ0KV29ya2luZ0RpcmVjdG9yeT0vaG9tZS91YnVudHUvemlnZ2llL0NvbWZ5VUkNCkV4ZWNTdGFydD0vaG9tZS91YnVudHUvemlnZ2llL0NvbWZ5VUkvdmVudi9iaW4vcHl0aG9uIG1haW4ucHkgLS1saXN0ZW4gMC4wLjAuMCAtLXBvcnQgODE4OA0KUmVzdGFydD1hbHdheXMNClJlc3RhcnRTZWM9MTANCg0KW0luc3RhbGxdDQpXYW50ZWRCeT1tdWx0aS11c2VyLnRhcmdldA0KRU9GDQoNCiMgU2V0IG93bmVyc2hpcA0KY2hvd24gLVIgdWJ1bnR1OnVidW50dSAvaG9tZS91YnVudHUvemlnZ2llDQoNCiMgRW5hYmxlIGFuZCBzdGFydCBDb21meVVJDQpzeXN0ZW1jdGwgZGFlbW9uLXJlbG9hZA0Kc3lzdGVtY3RsIGVuYWJsZSBjb21meXVpDQpzeXN0ZW1jdGwgc3RhcnQgY29tZnl1aQ0KDQojIFRhZyBpbnN0YW5jZSBhcyByZWFkeQ0KSU5TVEFOQ0VfSUQ9JChjdXJsIC1zIGh0dHA6Ly8xNjkuMjU0LjE2OS4yNTQvbGF0ZXN0L21ldGEtZGF0YS9pbnN0YW5jZS1pZCkNClJFR0lPTj0kKGN1cmwgLXMgaHR0cDovLzE2OS4yNTQuMTY5LjI1NC9sYXRlc3QvbWV0YS1kYXRhL3BsYWNlbWVudC9yZWdpb24pDQoNCiMgSW5zdGFsbCBBV1MgQ0xJIGlmIG5vdCBwcmVzZW50DQppZiAhIGNvbW1hbmQgLXYgYXdzICY+IC9kZXYvbnVsbDsgdGhlbg0KICAgIGN1cmwgImh0dHBzOi8vYXdzY2xpLmFtYXpvbmF3cy5jb20vYXdzY2xpLWV4ZS1saW51eC14ODZfNjQuemlwIiAtbyAiYXdzY2xpdjIuemlwIg0KICAgIHVuemlwIC1xIGF3c2NsaXYyLnppcA0KICAgIC4vYXdzL2luc3RhbGwNCmZpDQoNCiMgVGFnIGluc3RhbmNlIGFzIHJlYWR5DQphd3MgZWMyIGNyZWF0ZS10YWdzIC0tcmVzb3VyY2VzICRJTlNUQU5DRV9JRCAtLXRhZ3MgS2V5PVN0YXR1cyxWYWx1ZT1SZWFkeSAtLXJlZ2lvbiAkUkVHSU9OIHx8IHRydWUNCg0KZWNobyAiPT09IFppZ2dpZSBHUFUgQm9vdHN0cmFwIENvbXBsZXRlIGF0ICQoZGF0ZSkgPT09Ig0KZWNobyAiQ29tZnlVSSBhdmFpbGFibGUgYXQgaHR0cDovLzxwdWJsaWMtaXA+OjgxODgiDQo=",
+        "MetadataOptions": {
+            "HttpTokens": "required",
+            "HttpPutResponseHopLimit": 2,
+            "HttpEndpoint": "enabled"
+        }
+    }
+}
