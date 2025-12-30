@@ -423,3 +423,6 @@ TODO_PERSONAL.md
 # Keep README files
 !README.md
 !*/README.md
+.secrets/
+nul
+.claude/

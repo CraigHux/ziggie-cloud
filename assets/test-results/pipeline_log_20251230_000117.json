@@ -1,0 +1,352 @@
+[
+  {
+    "timestamp": "2025-12-30T00:02:16.899089",
+    "stage": "Gate 1",
+    "action": "Approved: C:/Ziggie/assets/test-results/stage1_generated/generated_20251229_060853.png",
+    "status": "APPROVED",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-30T00:02:16.899128",
+    "stage": "Stage 2",
+    "action": "Starting background removal",
+    "status": "IN_PROGRESS",
+    "details": {
+      "input": "C:/Ziggie/assets/test-results/stage1_generated/generated_20251229_060853.png"
+    }
+  },
+  {
+    "timestamp": "2025-12-30T00:02:18.966327",
+    "stage": "Stage 2",
+    "action": "Connecting to BRIA RMBG",
+    "status": "IN_PROGRESS",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-30T00:02:24.436480",
+    "stage": "Stage 2",
+    "action": "Processing image",
+    "status": "IN_PROGRESS",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-30T00:02:32.741338",
+    "stage": "Stage 2",
+    "action": "Background removed",
+    "status": "SUCCESS",
+    "details": {
+      "input": "C:/Ziggie/assets/test-results/stage1_generated/generated_20251229_060853.png",
+      "output": "C:/Ziggie/assets/test-results/stage2_nobg/generated_20251229_060853_nobg.png",
+      "size_bytes": 773669
+    }
+  },
+  {
+    "timestamp": "2025-12-30T00:03:28.088812",
+    "stage": "Gate 2",
+    "action": "Approved: C:/Ziggie/assets/test-results/stage2_nobg/generated_20251229_060853_nobg.png",
+    "status": "APPROVED",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-30T00:03:28.088843",
+    "stage": "Stage 3",
+    "action": "Starting upscale",
+    "status": "IN_PROGRESS",
+    "details": {
+      "input": "C:/Ziggie/assets/test-results/stage2_nobg/generated_20251229_060853_nobg.png",
+      "scale": 4
+    }
+  },
+  {
+    "timestamp": "2025-12-30T00:03:28.088893",
+    "stage": "Stage 3",
+    "action": "Using PIL Lanczos fallback (no Replicate token)",
+    "status": "INFO",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-30T00:03:28.088900",
+    "stage": "Stage 3",
+    "action": "Starting PIL Lanczos upscale",
+    "status": "IN_PROGRESS",
+    "details": {
+      "input": "C:/Ziggie/assets/test-results/stage2_nobg/generated_20251229_060853_nobg.png",
+      "scale": 4
+    }
+  },
+  {
+    "timestamp": "2025-12-30T00:03:29.768879",
+    "stage": "Stage 3",
+    "action": "PIL Lanczos upscale complete",
+    "status": "SUCCESS",
+    "details": {
+      "input": "C:/Ziggie/assets/test-results/stage2_nobg/generated_20251229_060853_nobg.png",
+      "output": "C:/Ziggie/assets/test-results/stage3_upscaled/generated_20251229_060853_nobg_upscaled_4x_lanczos.png",
+      "original_size": "1024x1024",
+      "new_size": "4096x4096",
+      "scale": 4,
+      "size_bytes": 5582097
+    }
+  },
+  {
+    "timestamp": "2025-12-30T00:03:43.728005",
+    "stage": "Gate 3",
+    "action": "Approved: C:/Ziggie/assets/test-results/stage3_upscaled/generated_20251229_060853_nobg_upscaled_4x_lanczos.png",
+    "status": "APPROVED",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-30T00:03:43.728030",
+    "stage": "Stage 4",
+    "action": "Starting 2D to 3D conversion",
+    "status": "IN_PROGRESS",
+    "details": {
+      "input": "C:/Ziggie/assets/test-results/stage3_upscaled/generated_20251229_060853_nobg_upscaled_4x_lanczos.png"
+    }
+  },
+  {
+    "timestamp": "2025-12-30T00:03:43.728110",
+    "stage": "Stage 4",
+    "action": "Encoding image for Meshy.ai",
+    "status": "IN_PROGRESS",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-30T00:03:43.754394",
+    "stage": "Stage 4",
+    "action": "Creating Meshy.ai task",
+    "status": "IN_PROGRESS",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-30T00:03:55.838731",
+    "stage": "Stage 4",
+    "action": "Task created: 019b6c91-7efd-7d85-b474-69bdd9580778",
+    "status": "IN_PROGRESS",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-30T00:04:01.875191",
+    "stage": "Stage 4",
+    "action": "Poll 1: IN_PROGRESS (10%)",
+    "status": "IN_PROGRESS",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-30T00:04:38.102685",
+    "stage": "Stage 4",
+    "action": "Poll 7: IN_PROGRESS (49%)",
+    "status": "IN_PROGRESS",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-30T00:05:14.671989",
+    "stage": "Stage 4",
+    "action": "Poll 13: IN_PROGRESS (49%)",
+    "status": "IN_PROGRESS",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-30T00:05:51.568427",
+    "stage": "Stage 4",
+    "action": "Poll 19: IN_PROGRESS (49%)",
+    "status": "IN_PROGRESS",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-30T00:06:28.598933",
+    "stage": "Stage 4",
+    "action": "Poll 25: IN_PROGRESS (49%)",
+    "status": "IN_PROGRESS",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-30T00:07:05.398653",
+    "stage": "Stage 4",
+    "action": "Poll 31: IN_PROGRESS (86%)",
+    "status": "IN_PROGRESS",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-30T00:07:36.337621",
+    "stage": "Stage 4",
+    "action": "Downloading 3D model",
+    "status": "IN_PROGRESS",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-30T00:07:44.456042",
+    "stage": "Stage 4",
+    "action": "3D model created",
+    "status": "SUCCESS",
+    "details": {
+      "input": "C:/Ziggie/assets/test-results/stage3_upscaled/generated_20251229_060853_nobg_upscaled_4x_lanczos.png",
+      "output": "C:/Ziggie/assets/test-results/stage4_3d/generated_20251229_060853_nobg_upscaled_4x_lanczos.glb",
+      "size_bytes": 9471024,
+      "task_id": "019b6c91-7efd-7d85-b474-69bdd9580778"
+    }
+  },
+  {
+    "timestamp": "2025-12-30T00:08:27.475452",
+    "stage": "Gate 4",
+    "action": "Approved: C:/Ziggie/assets/test-results/stage4_3d/generated_20251229_060853_nobg_upscaled_4x_lanczos.glb",
+    "status": "APPROVED",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-30T00:08:27.475504",
+    "stage": "Stage 5",
+    "action": "Starting 8-direction sprite rendering",
+    "status": "IN_PROGRESS",
+    "details": {
+      "input": "C:/Ziggie/assets/test-results/stage4_3d/generated_20251229_060853_nobg_upscaled_4x_lanczos.glb",
+      "resolution": 512
+    }
+  },
+  {
+    "timestamp": "2025-12-30T00:08:27.475954",
+    "stage": "Stage 5",
+    "action": "Running Blender renderer",
+    "status": "IN_PROGRESS",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-30T00:08:50.996489",
+    "stage": "Stage 5",
+    "action": "Rendered 8 sprites",
+    "status": "SUCCESS",
+    "details": {
+      "files": [
+        "C:/Ziggie/assets/test-results/stage5_sprites/generated_20251229_060853_nobg_upscaled_4x_lanczos_dir0_S.png",
+        "C:/Ziggie/assets/test-results/stage5_sprites/generated_20251229_060853_nobg_upscaled_4x_lanczos_dir1_SW.png",
+        "C:/Ziggie/assets/test-results/stage5_sprites/generated_20251229_060853_nobg_upscaled_4x_lanczos_dir2_W.png",
+        "C:/Ziggie/assets/test-results/stage5_sprites/generated_20251229_060853_nobg_upscaled_4x_lanczos_dir3_NW.png",
+        "C:/Ziggie/assets/test-results/stage5_sprites/generated_20251229_060853_nobg_upscaled_4x_lanczos_dir4_N.png",
+        "C:/Ziggie/assets/test-results/stage5_sprites/generated_20251229_060853_nobg_upscaled_4x_lanczos_dir5_NE.png",
+        "C:/Ziggie/assets/test-results/stage5_sprites/generated_20251229_060853_nobg_upscaled_4x_lanczos_dir6_E.png",
+        "C:/Ziggie/assets/test-results/stage5_sprites/generated_20251229_060853_nobg_upscaled_4x_lanczos_dir7_SE.png"
+      ],
+      "total_size_bytes": 1122056
+    }
+  },
+  {
+    "timestamp": "2025-12-30T00:09:12.778653",
+    "stage": "Gate 5",
+    "action": "Approved: C:/Ziggie/assets/test-results/stage5_sprites/generated_20251229_060853_nobg_upscaled_4x_lanczos_dir0_S.png",
+    "status": "APPROVED",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-30T00:09:12.778742",
+    "stage": "Stage 6",
+    "action": "Scanning directory: C:\\Ziggie\\assets\\test-results\\stage5_sprites",
+    "status": "IN_PROGRESS",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-30T00:09:12.779373",
+    "stage": "Stage 6",
+    "action": "Assembling sprite sheet",
+    "status": "IN_PROGRESS",
+    "details": {
+      "sprites": 8,
+      "columns": 4
+    }
+  },
+  {
+    "timestamp": "2025-12-30T00:09:13.035463",
+    "stage": "Stage 6",
+    "action": "Sprite sheet assembled",
+    "status": "SUCCESS",
+    "details": {
+      "output": "C:/Ziggie/assets/test-results/stage5_sprites/generated_20251229_060853_nobg_spritesheet.png",
+      "size_bytes": 940496,
+      "dimensions": "2048x1024",
+      "sprites": 8,
+      "layout": "4x2"
+    }
+  },
+  {
+    "timestamp": "2025-12-30T00:09:42.909289",
+    "stage": "Gate 6",
+    "action": "Approved: C:/Ziggie/assets/test-results/stage5_sprites/generated_20251229_060853_nobg_spritesheet.png",
+    "status": "APPROVED",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-30T00:09:42.909317",
+    "stage": "Stage 7",
+    "action": "Creating faction color variants",
+    "status": "IN_PROGRESS",
+    "details": {
+      "input": "C:/Ziggie/assets/test-results/stage5_sprites/generated_20251229_060853_nobg_spritesheet.png",
+      "factions": [
+        "red",
+        "blue",
+        "green",
+        "gold"
+      ]
+    }
+  },
+  {
+    "timestamp": "2025-12-30T00:09:43.897945",
+    "stage": "Stage 7",
+    "action": "Created red variant",
+    "status": "SUCCESS",
+    "details": {
+      "output": "C:/Ziggie/assets/test-results/stage7_factions/generated_20251229_060853_nobg_spritesheet_red.png",
+      "size_bytes": 582485
+    }
+  },
+  {
+    "timestamp": "2025-12-30T00:09:44.835819",
+    "stage": "Stage 7",
+    "action": "Created blue variant",
+    "status": "SUCCESS",
+    "details": {
+      "output": "C:/Ziggie/assets/test-results/stage7_factions/generated_20251229_060853_nobg_spritesheet_blue.png",
+      "size_bytes": 562837
+    }
+  },
+  {
+    "timestamp": "2025-12-30T00:09:45.775686",
+    "stage": "Stage 7",
+    "action": "Created green variant",
+    "status": "SUCCESS",
+    "details": {
+      "output": "C:/Ziggie/assets/test-results/stage7_factions/generated_20251229_060853_nobg_spritesheet_green.png",
+      "size_bytes": 562006
+    }
+  },
+  {
+    "timestamp": "2025-12-30T00:09:46.665580",
+    "stage": "Stage 7",
+    "action": "Created gold variant",
+    "status": "SUCCESS",
+    "details": {
+      "output": "C:/Ziggie/assets/test-results/stage7_factions/generated_20251229_060853_nobg_spritesheet_gold.png",
+      "size_bytes": 561907
+    }
+  },
+  {
+    "timestamp": "2025-12-30T00:09:46.665606",
+    "stage": "Stage 7",
+    "action": "Created 4 faction variants",
+    "status": "SUCCESS",
+    "details": {
+      "variants": [
+        "red",
+        "blue",
+        "green",
+        "gold"
+      ]
+    }
+  },
+  {
+    "timestamp": "2025-12-30T00:11:06.774073",
+    "stage": "Gate 7",
+    "action": "Approved: C:/Ziggie/assets/test-results/stage7_factions/generated_20251229_060853_nobg_spritesheet_red.png",
+    "status": "APPROVED",
+    "details": {}
+  }
+]

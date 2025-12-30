@@ -1,0 +1,117 @@
+[
+  {
+    "timestamp": "2025-12-29T06:08:13.916863",
+    "stage": "Stage 1",
+    "action": "Starting 2D generation",
+    "status": "IN_PROGRESS",
+    "details": {
+      "prompt": "A cute cat samurai warrior with katana, fantasy game character, chibi style, isometric view, game as"
+    }
+  },
+  {
+    "timestamp": "2025-12-29T06:08:21.898833",
+    "stage": "Stage 1",
+    "action": "Job submitted: 597da861-cfc3-4861-8cd5-a0259cb124ce-e1",
+    "status": "IN_PROGRESS",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-29T06:08:34.649625",
+    "stage": "Stage 1",
+    "action": "Poll 1: IN_QUEUE",
+    "status": "IN_PROGRESS",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-29T06:08:53.010676",
+    "stage": "Stage 1",
+    "action": "Poll 2: COMPLETED",
+    "status": "IN_PROGRESS",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-29T06:08:53.012898",
+    "stage": "Stage 1",
+    "action": "Generation complete",
+    "status": "SUCCESS",
+    "details": {
+      "output": "C:/Ziggie/assets/test-results/stage1_generated/generated_20251229_060853.png",
+      "size_bytes": 669861
+    }
+  },
+  {
+    "timestamp": "2025-12-29T06:08:53.015808",
+    "stage": "Stage 2",
+    "action": "Starting background removal",
+    "status": "IN_PROGRESS",
+    "details": {
+      "input": "C:/Ziggie/assets/test-results/stage1_generated/generated_20251229_060853.png"
+    }
+  },
+  {
+    "timestamp": "2025-12-29T06:08:54.424535",
+    "stage": "Stage 2",
+    "action": "Connecting to BRIA RMBG",
+    "status": "IN_PROGRESS",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-29T06:09:02.946130",
+    "stage": "Stage 2",
+    "action": "Processing image",
+    "status": "IN_PROGRESS",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-29T06:09:10.717526",
+    "stage": "Stage 2",
+    "action": "Background removed",
+    "status": "SUCCESS",
+    "details": {
+      "input": "C:/Ziggie/assets/test-results/stage1_generated/generated_20251229_060853.png",
+      "output": "C:/Ziggie/assets/test-results/stage2_nobg/generated_20251229_060853_nobg.png",
+      "size_bytes": 773669
+    }
+  },
+  {
+    "timestamp": "2025-12-29T06:09:10.717563",
+    "stage": "Stage 3",
+    "action": "Starting upscale",
+    "status": "IN_PROGRESS",
+    "details": {
+      "input": "C:/Ziggie/assets/test-results/stage2_nobg/generated_20251229_060853_nobg.png",
+      "scale": 4
+    }
+  },
+  {
+    "timestamp": "2025-12-29T06:09:10.717594",
+    "stage": "Stage 3",
+    "action": "Using PIL Lanczos fallback (no Replicate token)",
+    "status": "INFO",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-29T06:09:10.717604",
+    "stage": "Stage 3",
+    "action": "Starting PIL Lanczos upscale",
+    "status": "IN_PROGRESS",
+    "details": {
+      "input": "C:/Ziggie/assets/test-results/stage2_nobg/generated_20251229_060853_nobg.png",
+      "scale": 4
+    }
+  },
+  {
+    "timestamp": "2025-12-29T06:09:12.066606",
+    "stage": "Stage 3",
+    "action": "PIL Lanczos upscale complete",
+    "status": "SUCCESS",
+    "details": {
+      "input": "C:/Ziggie/assets/test-results/stage2_nobg/generated_20251229_060853_nobg.png",
+      "output": "C:/Ziggie/assets/test-results/stage3_upscaled/generated_20251229_060853_nobg_upscaled_4x_lanczos.png",
+      "original_size": "1024x1024",
+      "new_size": "4096x4096",
+      "scale": 4,
+      "size_bytes": 5582097
+    }
+  }
+]

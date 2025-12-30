@@ -1,0 +1,339 @@
+{
+  "name": "Ziggie Asset Pipeline - 24/7 Orchestrator",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "pipeline-start",
+        "options": {}
+      },
+      "id": "webhook-start",
+      "name": "Pipeline Start Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "webhookId": "pipeline-start-24-7"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "prompt",
+              "value": "={{ $json.body.prompt || 'Default cat warrior' }}"
+            },
+            {
+              "name": "asset_type",
+              "value": "={{ $json.body.asset_type || 'unit' }}"
+            },
+            {
+              "name": "skip_stages",
+              "value": "={{ $json.body.skip_stages || '' }}"
+            },
+            {
+              "name": "request_id",
+              "value": "={{ $now.format('yyyyMMdd_HHmmss') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "parse-request",
+      "name": "Parse Request",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.DISCORD_WEBHOOK_URL }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "🚀 **Pipeline Started**\n\n**Prompt:** {{ $node['Parse Request'].json.prompt }}\n**Type:** {{ $node['Parse Request'].json.asset_type }}\n**Request ID:** {{ $node['Parse Request'].json.request_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "discord-start",
+      "name": "Discord - Pipeline Started",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [650, 200]
+    },
+    {
+      "parameters": {
+        "command": "cd /opt/ziggie/scripts && source /opt/ziggie/pipeline/venv/bin/activate && python automated_pipeline.py --prompt \"{{ $node['Parse Request'].json.prompt }}\" --asset-type {{ $node['Parse Request'].json.asset_type }} 2>&1"
+      },
+      "id": "execute-pipeline",
+      "name": "Execute Pipeline",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [650, 400]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition-success",
+              "leftValue": "={{ $json.exitCode }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-result",
+      "name": "Check Result",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [850, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.DISCORD_WEBHOOK_URL }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "✅ **Pipeline Complete**\n\n**Request ID:** {{ $node['Parse Request'].json.request_id }}\n**Status:** Success\n**Output:**\n```\n{{ $node['Execute Pipeline'].json.stdout.substring(0, 1500) }}\n```"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "discord-success",
+      "name": "Discord - Success",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.DISCORD_WEBHOOK_URL }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "❌ **Pipeline Failed**\n\n**Request ID:** {{ $node['Parse Request'].json.request_id }}\n**Error:**\n```\n{{ $node['Execute Pipeline'].json.stderr.substring(0, 1500) }}\n```"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "discord-failure",
+      "name": "Discord - Failure",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1050, 500]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "health-check-schedule",
+      "name": "Health Check Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [250, 600]
+    },
+    {
+      "parameters": {
+        "command": "/opt/ziggie/pipeline/venv/bin/python /opt/ziggie/scripts/health_check.py 2>&1"
+      },
+      "id": "run-health-check",
+      "name": "Run Health Check",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [450, 600]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "health-fail",
+              "leftValue": "={{ $json.exitCode }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "health-check-result",
+      "name": "Health Issue?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [650, 600]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.DISCORD_WEBHOOK_URL }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "🚨 **Health Check Alert**\n\n{{ $node['Run Health Check'].json.stdout }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "discord-health-alert",
+      "name": "Discord - Health Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [850, 600]
+    }
+  ],
+  "connections": {
+    "Pipeline Start Webhook": {
+      "main": [
+        [
+          {
+            "node": "Parse Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Request": {
+      "main": [
+        [
+          {
+            "node": "Discord - Pipeline Started",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execute Pipeline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Pipeline": {
+      "main": [
+        [
+          {
+            "node": "Check Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Result": {
+      "main": [
+        [
+          {
+            "node": "Discord - Success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord - Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Health Check Schedule": {
+      "main": [
+        [
+          {
+            "node": "Run Health Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Health Check": {
+      "main": [
+        [
+          {
+            "node": "Health Issue?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Health Issue?": {
+      "main": [
+        [
+          {
+            "node": "Discord - Health Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "ziggie",
+      "createdAt": "2025-12-30T00:00:00.000Z",
+      "updatedAt": "2025-12-30T00:00:00.000Z"
+    },
+    {
+      "name": "pipeline",
+      "createdAt": "2025-12-30T00:00:00.000Z",
+      "updatedAt": "2025-12-30T00:00:00.000Z"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2025-12-30T00:00:00.000Z",
+  "versionId": "1"
+}

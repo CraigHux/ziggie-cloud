@@ -1,0 +1,267 @@
+{
+  "name": "Ziggie Pipeline Approval",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "pipeline-approval",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Approval Request Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "webhookId": "pipeline-approval"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "webhookUrl": "={{ $env.DISCORD_WEBHOOK_URL }}",
+        "content": "={{ '**' + $json.stage_name + '** - Review Required' }}",
+        "options": {
+          "embeds": [
+            {
+              "title": "={{ $json.stage_name }}",
+              "description": "={{ $json.description || 'Asset ready for review' }}",
+              "color": 16776960,
+              "fields": [
+                {
+                  "name": "Asset",
+                  "value": "={{ $json.asset_name || 'Unknown' }}",
+                  "inline": true
+                },
+                {
+                  "name": "Stage",
+                  "value": "={{ $json.stage_number || 'N/A' }}",
+                  "inline": true
+                }
+              ],
+              "image": {
+                "url": "={{ $json.image_url || '' }}"
+              },
+              "footer": {
+                "text": "Click the link below to approve or reject"
+              }
+            }
+          ]
+        }
+      },
+      "id": "discord-notification",
+      "name": "Send Discord Notification",
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "formTitle": "Pipeline Approval",
+        "formDescription": "={{ 'Review ' + $json.stage_name + ' output' }}",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Decision",
+              "fieldType": "select",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {"option": "approve"},
+                  {"option": "reject"},
+                  {"option": "regenerate"}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Feedback",
+              "fieldType": "textarea",
+              "requiredField": false,
+              "placeholder": "Optional feedback or instructions for regeneration"
+            }
+          ]
+        },
+        "options": {
+          "respondWithData": true
+        }
+      },
+      "id": "approval-form",
+      "name": "Approval Form",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2,
+      "position": [750, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "approve-condition",
+              "leftValue": "={{ $json.Decision }}",
+              "rightValue": "approve",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "decision-switch",
+      "name": "Check Decision",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1000, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ decision: 'approved', feedback: $json.Feedback || '', timestamp: new Date().toISOString() }) }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "respond-approved",
+      "name": "Respond Approved",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1250, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "reject-condition",
+              "leftValue": "={{ $json.Decision }}",
+              "rightValue": "reject",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-reject",
+      "name": "Check Reject",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1000, 450]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ decision: 'rejected', feedback: $json.Feedback || '', timestamp: new Date().toISOString() }) }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "respond-rejected",
+      "name": "Respond Rejected",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1250, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ decision: 'regenerate', feedback: $json.Feedback || '', timestamp: new Date().toISOString() }) }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "respond-regenerate",
+      "name": "Respond Regenerate",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1250, 550]
+    }
+  ],
+  "connections": {
+    "Approval Request Webhook": {
+      "main": [
+        [
+          {"node": "Send Discord Notification", "type": "main", "index": 0}
+        ]
+      ]
+    },
+    "Send Discord Notification": {
+      "main": [
+        [
+          {"node": "Approval Form", "type": "main", "index": 0}
+        ]
+      ]
+    },
+    "Approval Form": {
+      "main": [
+        [
+          {"node": "Check Decision", "type": "main", "index": 0}
+        ]
+      ]
+    },
+    "Check Decision": {
+      "main": [
+        [
+          {"node": "Respond Approved", "type": "main", "index": 0}
+        ],
+        [
+          {"node": "Check Reject", "type": "main", "index": 0}
+        ]
+      ]
+    },
+    "Check Reject": {
+      "main": [
+        [
+          {"node": "Respond Rejected", "type": "main", "index": 0}
+        ],
+        [
+          {"node": "Respond Regenerate", "type": "main", "index": 0}
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": ["pipeline", "approval", "ziggie"],
+  "triggerCount": 0,
+  "updatedAt": "2025-12-29T00:00:00.000Z",
+  "versionId": "1"
+}

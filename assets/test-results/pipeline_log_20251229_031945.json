@@ -1,0 +1,100 @@
+[
+  {
+    "timestamp": "2025-12-29T03:19:45.527511",
+    "stage": "Stage 2",
+    "action": "Starting background removal",
+    "status": "IN_PROGRESS",
+    "details": {
+      "input": "C:/Ziggie/assets/concepts/salvage_warrior_v2.jpg"
+    }
+  },
+  {
+    "timestamp": "2025-12-29T03:19:46.122684",
+    "stage": "Stage 2",
+    "action": "Connecting to BRIA RMBG",
+    "status": "IN_PROGRESS",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-29T03:19:52.165078",
+    "stage": "Stage 2",
+    "action": "Processing image",
+    "status": "IN_PROGRESS",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-29T03:20:16.600231",
+    "stage": "Stage 2",
+    "action": "Background removed",
+    "status": "SUCCESS",
+    "details": {
+      "input": "C:/Ziggie/assets/concepts/salvage_warrior_v2.jpg",
+      "output": "C:/Ziggie/assets/test-results/stage2_nobg/salvage_warrior_v2_nobg.png",
+      "size_bytes": 998337
+    }
+  },
+  {
+    "timestamp": "2025-12-29T03:20:16.600269",
+    "stage": "Gate 2",
+    "action": "Auto-approved: C:/Ziggie/assets/test-results/stage2_nobg/salvage_warrior_v2_nobg.png",
+    "status": "APPROVED",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-29T03:20:16.600282",
+    "stage": "Stage 3",
+    "action": "Starting upscale",
+    "status": "IN_PROGRESS",
+    "details": {
+      "input": "C:/Ziggie/assets/test-results/stage2_nobg/salvage_warrior_v2_nobg.png",
+      "scale": 4
+    }
+  },
+  {
+    "timestamp": "2025-12-29T03:20:16.600327",
+    "stage": "Stage 3",
+    "action": "Using PIL Lanczos fallback (no Replicate token)",
+    "status": "INFO",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-29T03:20:16.600339",
+    "stage": "Stage 3",
+    "action": "Starting PIL Lanczos upscale",
+    "status": "IN_PROGRESS",
+    "details": {
+      "input": "C:/Ziggie/assets/test-results/stage2_nobg/salvage_warrior_v2_nobg.png",
+      "scale": 4
+    }
+  },
+  {
+    "timestamp": "2025-12-29T03:20:19.303382",
+    "stage": "Stage 3",
+    "action": "PIL Lanczos upscale complete",
+    "status": "SUCCESS",
+    "details": {
+      "input": "C:/Ziggie/assets/test-results/stage2_nobg/salvage_warrior_v2_nobg.png",
+      "output": "C:/Ziggie/assets/test-results/stage3_upscaled/salvage_warrior_v2_nobg_upscaled_4x_lanczos.png",
+      "original_size": "1152x896",
+      "new_size": "4608x3584",
+      "scale": 4,
+      "size_bytes": 5277336
+    }
+  },
+  {
+    "timestamp": "2025-12-29T03:20:19.311694",
+    "stage": "Gate 3",
+    "action": "Auto-approved: C:/Ziggie/assets/test-results/stage3_upscaled/salvage_warrior_v2_nobg_upscaled_4x_lanczos.png",
+    "status": "APPROVED",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-12-29T03:20:19.311882",
+    "stage": "Pipeline",
+    "action": "Complete",
+    "status": "SUCCESS",
+    "details": {
+      "final": "C:/Ziggie/assets/test-results/stage3_upscaled/salvage_warrior_v2_nobg_upscaled_4x_lanczos.png"
+    }
+  }
+]
