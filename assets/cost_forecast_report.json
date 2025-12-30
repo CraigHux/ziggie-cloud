@@ -1,0 +1,119 @@
+{
+  "generated_at": "2025-12-30T16:26:30.744233",
+  "summary": {
+    "total_assets": 151,
+    "completed": 0,
+    "in_progress": 0,
+    "pending": 151,
+    "completion_pct": 0.0
+  },
+  "costs": {
+    "total_estimated": 0.6,
+    "total_actual": 0.0,
+    "avg_per_asset_est": 0.004,
+    "avg_per_asset_actual": 0.0,
+    "projected_total": 0.0,
+    "variance": 0
+  },
+  "value": {
+    "total_market_value": 22275.0,
+    "avg_per_asset": 147.52,
+    "total_mint_revenue": 15592.5
+  },
+  "roi": {
+    "projected_roi_multiplier": 5568750.0,
+    "gross_profit_projected": 15592.5,
+    "profit_margin_pct": 100.0
+  },
+  "by_category": {
+    "Hero": {
+      "count": 25,
+      "est_cost": 0.10000000000000006,
+      "market_value": 18750.0
+    },
+    "Unit": {
+      "count": 50,
+      "est_cost": 0.20000000000000015,
+      "market_value": 1000.0
+    },
+    "Enemy": {
+      "count": 19,
+      "est_cost": 0.07600000000000004,
+      "market_value": 400.0
+    },
+    "Building": {
+      "count": 42,
+      "est_cost": 0.16800000000000012,
+      "market_value": 2050.0
+    },
+    "Prop": {
+      "count": 15,
+      "est_cost": 0.060000000000000026,
+      "market_value": 75.0
+    }
+  },
+  "by_faction": {
+    "Sand_Vanguard": {
+      "count": 22,
+      "est_cost": 0.08800000000000005,
+      "market_value": 4275.0
+    },
+    "Cinder_Forgers": {
+      "count": 22,
+      "est_cost": 0.08800000000000005,
+      "market_value": 4275.0
+    },
+    "Cryo_Sentinels": {
+      "count": 22,
+      "est_cost": 0.08800000000000005,
+      "market_value": 4275.0
+    },
+    "Bio_Hunters": {
+      "count": 22,
+      "est_cost": 0.08800000000000005,
+      "market_value": 4275.0
+    },
+    "Signal_Hackers": {
+      "count": 22,
+      "est_cost": 0.08800000000000005,
+      "market_value": 4275.0
+    },
+    "AI_Corruption": {
+      "count": 20,
+      "est_cost": 0.08000000000000004,
+      "market_value": 525.0
+    },
+    "Universal": {
+      "count": 21,
+      "est_cost": 0.08400000000000005,
+      "market_value": 375.0
+    }
+  },
+  "by_rarity": {
+    "Legendary": {
+      "count": 6,
+      "est_cost": 0.024,
+      "market_value": 7600.0
+    },
+    "Epic": {
+      "count": 17,
+      "est_cost": 0.06800000000000003,
+      "market_value": 8000.0
+    },
+    "Rare": {
+      "count": 51,
+      "est_cost": 0.20400000000000015,
+      "market_value": 5305.0
+    },
+    "Common": {
+      "count": 32,
+      "est_cost": 0.12800000000000009,
+      "market_value": 419.0
+    },
+    "Uncommon": {
+      "count": 45,
+      "est_cost": 0.18000000000000013,
+      "market_value": 951.0
+    }
+  }
+}

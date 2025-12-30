@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meow Ping NFT - Asset Browser Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a24;
+            --bg-hover: #252530;
+            --text-primary: #e4e4e7;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --accent-gold: #D4AF37;
+            --accent-blue: #3b82f6;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --accent-purple: #a855f7;
+            --border-color: #27272a;
+            --sand-vanguard: #D4A574;
+            --cinder-forgers: #FF6B35;
+            --cryo-sentinels: #7DD3FC;
+            --bio-hunters: #4ADE80;
+            --signal-hackers: #C084FC;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo { display: flex; align-items: center; gap: 0.75rem; }
+        .logo-icon { font-size: 2rem; }
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-gold), #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .logo span { color: var(--text-muted); font-size: 0.875rem; }
+
+        .stats-bar { display: flex; gap: 1.5rem; }
+        .stat-item {
+            text-align: center;
+            padding: 0.5rem 1rem;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            min-width: 100px;
+        }
+        .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--accent-gold); }
+        .stat-value.cost { color: var(--accent-blue); }
+        .stat-value.value { color: var(--accent-green); }
+        .stat-value.roi { color: var(--accent-purple); }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
+
+        .vps-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            font-size: 0.875rem;
+        }
+        .vps-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        .vps-indicator.online { background: var(--accent-green); }
+        .vps-indicator.offline { background: var(--accent-red); animation: none; }
+        .vps-indicator.checking { background: var(--accent-gold); }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .vps-info { display: flex; flex-direction: column; gap: 0.125rem; }
+        .vps-label { color: var(--text-muted); font-size: 0.625rem; text-transform: uppercase; }
+        .vps-host { color: var(--text-secondary); font-weight: 500; }
+
+        .tab-nav {
+            display: flex;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .tab-btn.active { background: var(--accent-gold); color: var(--bg-primary); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .main-container { max-width: 1800px; margin: 0 auto; padding: 1.5rem 2rem; }
+
+        .filter-section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+        .filter-row { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+        .filter-group { display: flex; flex-direction: column; gap: 0.25rem; }
+        .filter-group label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
+        .filter-group select, .filter-group input {
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            min-width: 150px;
+        }
+        .filter-group select:focus, .filter-group input:focus { outline: none; border-color: var(--accent-gold); }
+        .search-input { flex: 1; min-width: 250px; }
+        .filter-actions { display: flex; gap: 0.5rem; margin-left: auto; }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: var(--accent-gold); color: var(--bg-primary); }
+        .btn-primary:hover { background: #c9a431; }
+        .btn-secondary { background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { background: var(--bg-hover); }
+
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .stats-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid var(--border-color);
+        }
+        .stats-card h3 { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+        .stats-card .value { font-size: 2rem; font-weight: 700; }
+        .stats-card .breakdown { display: flex; gap: 0.75rem; margin-top: 0.5rem; flex-wrap: wrap; }
+        .breakdown-item { font-size: 0.75rem; color: var(--text-secondary); }
+        .breakdown-item .count { font-weight: 600; }
+
+        .pipeline-progress { display: flex; gap: 0.25rem; margin-top: 0.75rem; }
+        .pipeline-bar { flex: 1; height: 6px; background: var(--bg-secondary); border-radius: 3px; overflow: hidden; }
+        .pipeline-bar .fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+        .pipeline-bar.success .fill { background: var(--accent-green); }
+        .pipeline-bar.in-progress .fill { background: var(--accent-blue); }
+        .pipeline-bar.failed .fill { background: var(--accent-red); }
+        .pipeline-bar.pending .fill { background: var(--text-muted); }
+
+        .view-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .results-count { color: var(--text-secondary); }
+        .view-toggle { display: flex; gap: 0.5rem; }
+        .view-btn {
+            padding: 0.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+        .view-btn.active { background: var(--accent-gold); color: var(--bg-primary); border-color: var(--accent-gold); }
+
+        .asset-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
+        .asset-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .asset-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-gold);
+            box-shadow: 0 4px 20px rgba(212, 175, 55, 0.1);
+        }
+        .asset-header {
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .asset-title { font-weight: 600; margin-bottom: 0.25rem; }
+        .asset-id { font-size: 0.75rem; color: var(--text-muted); font-family: monospace; }
+        .asset-badges { display: flex; gap: 0.5rem; }
+        .badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; }
+        .badge-priority-P0 { background: var(--accent-red); color: white; }
+        .badge-priority-P1 { background: var(--accent-gold); color: black; }
+        .badge-priority-P2 { background: var(--text-muted); color: white; }
+        .badge-tier-Legendary { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
+        .badge-tier-Epic { background: var(--accent-purple); color: white; }
+        .badge-tier-Rare { background: var(--accent-blue); color: white; }
+        .badge-tier-Common { background: var(--text-muted); color: white; }
+
+        .asset-body { padding: 1rem; }
+        .asset-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; }
+        .meta-item { font-size: 0.8rem; }
+        .meta-label { color: var(--text-muted); }
+        .meta-value { color: var(--text-primary); font-weight: 500; }
+        .faction-badge { display: inline-flex; align-items: center; gap: 0.25rem; }
+        .faction-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .faction-Sand_Vanguard { background: var(--sand-vanguard); }
+        .faction-Cinder_Forgers { background: var(--cinder-forgers); }
+        .faction-Cryo_Sentinels { background: var(--cryo-sentinels); }
+        .faction-Bio_Hunters { background: var(--bio-hunters); }
+        .faction-Signal_Hackers { background: var(--signal-hackers); }
+
+        .color-palette { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+        .color-swatch { width: 24px; height: 24px; border-radius: 4px; border: 2px solid var(--border-color); }
+
+        .pipeline-status { display: flex; justify-content: space-between; gap: 0.25rem; }
+        .stage-indicator { flex: 1; text-align: center; padding: 0.25rem; border-radius: 4px; font-size: 0.65rem; font-weight: 600; }
+        .stage-pending { background: var(--bg-secondary); color: var(--text-muted); }
+        .stage-in_progress { background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); }
+        .stage-success { background: rgba(34, 197, 94, 0.2); color: var(--accent-green); }
+        .stage-failed { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); }
+
+        .cost-value-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-top: 1px solid var(--border-color);
+            margin-top: 0.5rem;
+        }
+        .cost-display, .value-display { text-align: center; }
+        .cost-display .amount { color: var(--accent-blue); font-weight: 600; }
+        .value-display .amount { color: var(--accent-green); font-weight: 600; }
+        .cost-display .label, .value-display .label { font-size: 0.65rem; color: var(--text-muted); }
+
+        .asset-table { width: 100%; border-collapse: collapse; display: none; }
+        .asset-table.active { display: table; }
+        .asset-grid.active { display: grid; }
+        .asset-grid:not(.active) { display: none; }
+        .asset-table th, .asset-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .asset-table th { background: var(--bg-card); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); }
+        .asset-table tr:hover { background: var(--bg-hover); }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .analytics-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+        .analytics-card h3 { font-size: 1rem; margin-bottom: 1rem; color: var(--text-primary); }
+        .analytics-card h3 span { font-size: 0.75rem; color: var(--text-muted); font-weight: normal; margin-left: 0.5rem; }
+
+        .cost-breakdown-list { list-style: none; }
+        .cost-breakdown-list li { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border-color); }
+        .cost-breakdown-list li:last-child { border-bottom: none; }
+        .cost-breakdown-list .service-name { display: flex; align-items: center; gap: 0.5rem; }
+        .cost-breakdown-list .service-icon { width: 8px; height: 8px; border-radius: 50%; }
+        .cost-breakdown-list .cost-amount { font-weight: 600; font-family: monospace; }
+        .cost-breakdown-list .cost-free { color: var(--accent-green); }
+        .cost-breakdown-list .cost-paid { color: var(--accent-blue); }
+
+        .forecast-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        .forecast-table th, .forecast-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .forecast-table th { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
+        .forecast-table td { font-family: monospace; }
+        .forecast-table .highlight-row { background: rgba(212, 175, 55, 0.1); }
+
+        .roi-value { font-size: 2.5rem; font-weight: 700; color: var(--accent-gold); text-align: center; }
+        .roi-sublabel { font-size: 0.875rem; color: var(--text-muted); text-align: center; }
+        .roi-meter { margin-top: 1rem; }
+        .roi-meter-bar { height: 24px; background: var(--bg-secondary); border-radius: 12px; overflow: hidden; }
+        .roi-meter-fill { height: 100%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-green), var(--accent-gold)); border-radius: 12px; }
+        .roi-meter-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal {
+            background: var(--bg-card);
+            border-radius: 16px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+        }
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-close { background: none; border: none; color: var(--text-secondary); font-size: 1.5rem; cursor: pointer; }
+        .modal-close:hover { color: var(--text-primary); }
+        .modal-body { padding: 1.5rem; }
+        .detail-section { margin-bottom: 1.5rem; }
+        .detail-section h3 { font-size: 0.875rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.75rem; }
+        .prompt-text { background: var(--bg-secondary); padding: 1rem; border-radius: 8px; font-size: 0.875rem; line-height: 1.6; white-space: pre-wrap; }
+        .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
+        .detail-item { background: var(--bg-secondary); padding: 0.75rem; border-radius: 8px; }
+        .detail-item .label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem; }
+        .detail-item .value { font-weight: 500; }
+
+        .cost-summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1rem; }
+        .cost-summary-item { background: var(--bg-secondary); padding: 1rem; border-radius: 8px; text-align: center; }
+        .cost-summary-item .amount { font-size: 1.25rem; font-weight: 700; }
+        .cost-summary-item .amount.cost { color: var(--accent-blue); }
+        .cost-summary-item .amount.value { color: var(--accent-green); }
+        .cost-summary-item .amount.roi { color: var(--accent-gold); }
+        .cost-summary-item .amount.variance { color: var(--accent-purple); }
+        .cost-summary-item .label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
+
+        .loading { text-align: center; padding: 3rem; color: var(--text-muted); }
+        .loading-spinner { width: 40px; height: 40px; border: 3px solid var(--border-color); border-top-color: var(--accent-gold); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .empty-state { text-align: center; padding: 3rem; color: var(--text-muted); }
+
+        @media (max-width: 768px) {
+            .header-content { flex-direction: column; gap: 1rem; }
+            .stats-bar { flex-wrap: wrap; justify-content: center; }
+            .filter-row { flex-direction: column; }
+            .filter-group { width: 100%; }
+            .asset-grid { grid-template-columns: 1fr; }
+            .cost-summary-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-icon">🐱</span>
+                <div>
+                    <h1>Meow Ping NFT</h1>
+                    <span>Asset Production Dashboard</span>
+                </div>
+            </div>
+            <div class="stats-bar">
+                <div class="vps-status" title="Pipeline runs on VPS 24/7">
+                    <div class="vps-indicator online" id="vps-indicator"></div>
+                    <div class="vps-info">
+                        <span class="vps-label">VPS Pipeline</span>
+                        <span class="vps-host">82.25.112.73</span>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="total-assets">--</div>
+                    <div class="stat-label">Total Assets</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value cost" id="total-cost">--</div>
+                    <div class="stat-label">Est. Cost</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value value" id="total-value">--</div>
+                    <div class="stat-label">Market Value</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value roi" id="total-roi">--</div>
+                    <div class="stat-label">ROI</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('browser')">Asset Browser</button>
+        <button class="tab-btn" onclick="switchTab('costs')">Cost Analytics</button>
+        <button class="tab-btn" onclick="switchTab('forecast')">Forecast & ROI</button>
+    </div>
+
+    <div id="tab-browser" class="tab-content active">
+        <main class="main-container">
+            <section class="filter-section">
+                <div class="filter-row">
+                    <div class="filter-group search-input">
+                        <label>Search</label>
+                        <input type="text" id="search-input" placeholder="Search by name or ID...">
+                    </div>
+                    <div class="filter-group">
+                        <label>Category</label>
+                        <select id="filter-category">
+                            <option value="">All Categories</option>
+                            <option value="Hero">Hero</option>
+                            <option value="Unit">Unit</option>
+                            <option value="Building">Building</option>
+                            <option value="Enemy">Enemy</option>
+                            <option value="Prop">Prop</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Faction</label>
+                        <select id="filter-faction">
+                            <option value="">All Factions</option>
+                            <option value="Sand_Vanguard">Sand Vanguard</option>
+                            <option value="Cinder_Forgers">Cinder Forgers</option>
+                            <option value="Cryo_Sentinels">Cryo Sentinels</option>
+                            <option value="Bio_Hunters">Bio Hunters</option>
+                            <option value="Signal_Hackers">Signal Hackers</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Priority</label>
+                        <select id="filter-priority">
+                            <option value="">All Priorities</option>
+                            <option value="P0">P0 - Critical</option>
+                            <option value="P1">P1 - High</option>
+                            <option value="P2">P2 - Normal</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Status</label>
+                        <select id="filter-status">
+                            <option value="">All Status</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="SUCCESS">Completed</option>
+                            <option value="FAILED">Failed</option>
+                        </select>
+                    </div>
+                    <div class="filter-actions">
+                        <button class="btn btn-secondary" onclick="resetFilters()">Reset</button>
+                        <button class="btn btn-primary" onclick="exportFiltered()">Export CSV</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="stats-cards">
+                <div class="stats-card">
+                    <h3>By Category</h3>
+                    <div id="stats-category" class="breakdown"></div>
+                </div>
+                <div class="stats-card">
+                    <h3>By Faction</h3>
+                    <div id="stats-faction" class="breakdown"></div>
+                </div>
+                <div class="stats-card">
+                    <h3>Pipeline Progress</h3>
+                    <div class="value" id="pipeline-percent">0%</div>
+                    <div class="pipeline-progress">
+                        <div class="pipeline-bar success"><div class="fill" id="pipeline-success" style="width: 0%"></div></div>
+                        <div class="pipeline-bar in-progress"><div class="fill" id="pipeline-progress" style="width: 0%"></div></div>
+                        <div class="pipeline-bar pending"><div class="fill" id="pipeline-pending" style="width: 100%"></div></div>
+                    </div>
+                    <div class="breakdown" id="stats-pipeline"></div>
+                </div>
+                <div class="stats-card">
+                    <h3>By NFT Tier</h3>
+                    <div id="stats-tier" class="breakdown"></div>
+                </div>
+            </section>
+
+            <div class="view-controls">
+                <span class="results-count"><span id="results-count">0</span> assets found</span>
+                <div class="view-toggle">
+                    <button class="view-btn active" onclick="setView('grid')" id="view-grid" title="Grid View">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <rect x="3" y="3" width="7" height="7" rx="1"/>
+                            <rect x="14" y="3" width="7" height="7" rx="1"/>
+                            <rect x="3" y="14" width="7" height="7" rx="1"/>
+                            <rect x="14" y="14" width="7" height="7" rx="1"/>
+                        </svg>
+                    </button>
+                    <button class="view-btn" onclick="setView('list')" id="view-list" title="List View">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <rect x="3" y="4" width="18" height="2" rx="1"/>
+                            <rect x="3" y="11" width="18" height="2" rx="1"/>
+                            <rect x="3" y="18" width="18" height="2" rx="1"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="loading" id="loading-state">
+                <div class="loading-spinner"></div>
+                <p>Loading assets...</p>
+            </div>
+
+            <div class="asset-grid active" id="asset-grid"></div>
+
+            <table class="asset-table" id="asset-table">
+                <thead>
+                    <tr>
+                        <th>Asset ID</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Faction</th>
+                        <th>Tier</th>
+                        <th>Est. Cost</th>
+                        <th>Est. Value</th>
+                        <th>S1</th><th>S2</th><th>S3</th><th>S4</th><th>S5</th><th>S6</th><th>S7</th>
+                    </tr>
+                </thead>
+                <tbody id="asset-table-body"></tbody>
+            </table>
+
+            <div class="empty-state" id="empty-state" style="display: none;">
+                <h3>No assets found</h3>
+                <p>Try adjusting your filters</p>
+            </div>
+        </main>
+    </div>
+
+    <div id="tab-costs" class="tab-content">
+        <main class="main-container">
+            <section class="analytics-grid">
+                <div class="analytics-card">
+                    <h3>Cost by Pipeline Stage <span>(per asset)</span></h3>
+                    <ul class="cost-breakdown-list">
+                        <li><span class="service-name"><span class="service-icon" style="background: var(--accent-blue);"></span>Stage 1: 2D Generation (RunPod Cloud)</span><span class="cost-amount cost-paid">$0.004</span></li>
+                        <li><span class="service-name"><span class="service-icon" style="background: var(--accent-green);"></span>Stage 2: BG Removal (VPS)</span><span class="cost-amount cost-free">FREE</span></li>
+                        <li><span class="service-name"><span class="service-icon" style="background: var(--accent-green);"></span>Stage 3: 4x Upscale (VPS)</span><span class="cost-amount cost-free">FREE</span></li>
+                        <li><span class="service-name"><span class="service-icon" style="background: var(--accent-purple);"></span>Stage 4: 2D to 3D (Meshy API via VPS)</span><span class="cost-amount cost-free">FREE*</span></li>
+                        <li><span class="service-name"><span class="service-icon" style="background: var(--accent-green);"></span>Stage 5: 8-Dir Sprites (VPS Blender)</span><span class="cost-amount cost-free">FREE</span></li>
+                        <li><span class="service-name"><span class="service-icon" style="background: var(--accent-green);"></span>Stage 6: Sprite Sheet (VPS)</span><span class="cost-amount cost-free">FREE</span></li>
+                        <li><span class="service-name"><span class="service-icon" style="background: var(--accent-green);"></span>Stage 7: Faction Colors (VPS)</span><span class="cost-amount cost-free">FREE</span></li>
+                    </ul>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: var(--text-muted);">Total per asset:</span>
+                            <span style="font-weight: 700; color: var(--accent-blue);">$0.004</span>
+                        </div>
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">*Meshy.ai: 200 free/mo, then $0.08-0.15/model | Stages 2-7 run on VPS 24/7</p>
+                    </div>
+                </div>
+
+                <div class="analytics-card">
+                    <h3>Cost by Category</h3>
+                    <ul class="cost-breakdown-list" id="cost-by-category"></ul>
+                </div>
+
+                <div class="analytics-card">
+                    <h3>Estimated Value by Rarity</h3>
+                    <ul class="cost-breakdown-list" id="value-by-rarity"></ul>
+                </div>
+
+                <div class="analytics-card">
+                    <h3>Monthly Infrastructure Costs</h3>
+                    <ul class="cost-breakdown-list">
+                        <li><span class="service-name">Hostinger VPS (Stages 2-7, 24/7)</span><span class="cost-amount cost-paid">$12/mo</span></li>
+                        <li><span class="service-name">RunPod (Stage 1 GPU, ~5000/mo)</span><span class="cost-amount cost-paid">~$20/mo</span></li>
+                        <li><span class="service-name">Meshy.ai (after 200 free tier)</span><span class="cost-amount cost-paid">$16/mo</span></li>
+                        <li><span class="service-name">Discord Bot (runs on VPS)</span><span class="cost-amount cost-free">FREE</span></li>
+                        <li><span class="service-name">19 Docker Containers</span><span class="cost-amount cost-free">Included</span></li>
+                    </ul>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                        <span style="color: var(--text-muted);">Est. Monthly Total:</span>
+                        <span style="font-weight: 700; color: var(--accent-blue);">~$48/mo</span>
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Pipeline runs 24/7 on VPS - no local system required</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="stats-cards">
+                <div class="stats-card">
+                    <h3>Total Production Cost</h3>
+                    <div class="value" style="color: var(--accent-blue);" id="analytics-total-cost">$0.00</div>
+                </div>
+                <div class="stats-card">
+                    <h3>Total Market Value</h3>
+                    <div class="value" style="color: var(--accent-green);" id="analytics-total-value">$0</div>
+                </div>
+                <div class="stats-card">
+                    <h3>Cost Efficiency</h3>
+                    <div class="value" style="color: var(--accent-gold);" id="analytics-efficiency">100%</div>
+                </div>
+                <div class="stats-card">
+                    <h3>ROI Multiplier</h3>
+                    <div class="value" style="color: var(--accent-purple);" id="analytics-roi">0x</div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="tab-forecast" class="tab-content">
+        <main class="main-container">
+            <section class="analytics-grid">
+                <div class="analytics-card" style="grid-column: span 2;">
+                    <h3>Return on Investment Overview</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2rem; margin-top: 1rem;">
+                        <div style="text-align: center;">
+                            <div class="roi-value" id="forecast-roi">0x</div>
+                            <div class="roi-sublabel">Current ROI Multiplier</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div class="roi-value" style="color: var(--accent-green);" id="forecast-profit">$0</div>
+                            <div class="roi-sublabel">Projected Profit</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div class="roi-value" style="color: var(--accent-blue);" id="forecast-break-even">1 asset</div>
+                            <div class="roi-sublabel">Break-Even Point</div>
+                        </div>
+                    </div>
+                    <div class="roi-meter">
+                        <div class="roi-meter-bar">
+                            <div class="roi-meter-fill" id="roi-meter-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="roi-meter-label">
+                            <span id="roi-cost-label">Cost: $0</span>
+                            <span id="roi-value-label">Value: $0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="analytics-card" style="grid-column: span 2;">
+                    <h3>Scaling Projections</h3>
+                    <table class="forecast-table">
+                        <thead>
+                            <tr><th>Scale</th><th>Assets</th><th>Est. Cost</th><th>Est. Value</th><th>Profit</th><th>ROI</th></tr>
+                        </thead>
+                        <tbody id="scaling-projections"></tbody>
+                    </table>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 1rem;">* Projections assume current category/rarity distribution scales proportionally.</p>
+                </div>
+
+                <div class="analytics-card">
+                    <h3>Value Distribution by NFT Tier</h3>
+                    <ul class="cost-breakdown-list" id="forecast-tier-value"></ul>
+                </div>
+
+                <div class="analytics-card">
+                    <h3>Monthly Operating Costs</h3>
+                    <ul class="cost-breakdown-list">
+                        <li><span class="service-name">Fixed Costs (VPS, Services)</span><span class="cost-amount cost-paid">$48/mo</span></li>
+                        <li><span class="service-name">Variable (100 assets/mo)</span><span class="cost-amount cost-paid">$0.40/mo</span></li>
+                        <li><span class="service-name">Variable (500 assets/mo)</span><span class="cost-amount cost-paid">$2.00/mo</span></li>
+                        <li><span class="service-name">Variable (1000 assets/mo)</span><span class="cost-amount cost-paid">$4.00/mo</span></li>
+                    </ul>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                        <p style="font-size: 0.8rem; color: var(--text-secondary);">At 1000 assets/month: <strong style="color: var(--accent-gold);">$52/mo</strong> generating <strong style="color: var(--accent-green);">$147,500 value</strong></p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div>
+                    <h2 id="modal-title">Asset Details</h2>
+                    <span id="modal-id" style="color: var(--text-muted); font-family: monospace;"></span>
+                </div>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        let allAssets = [];
+        let filteredAssets = [];
+        let currentView = 'grid';
+
+        const STAGE_COSTS = { stage1: 0.004, stage2: 0, stage3: 0, stage4: 0, stage5: 0, stage6: 0, stage7: 0 };
+        const CATEGORY_VALUES = { 'Hero': 50, 'Unit': 10, 'Building': 25, 'Terrain': 5, 'Prop': 3, 'Effect': 8, 'Enemy': 15 };
+        const RARITY_MULTIPLIERS = { 'Common': 1, 'Uncommon': 1.5, 'Rare': 2.5, 'Epic': 5, 'Legendary': 10, 'Mythic': 25 };
+        const NFT_TIER_MULTIPLIERS = { 'Heroes': 3, 'Commanders': 2, 'Units': 1, 'Structures': 1.5, 'Terrain': 0.5 };
+
+        document.addEventListener('DOMContentLoaded', () => { loadCSV(); setupEventListeners(); });
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.querySelector(`[onclick="switchTab('${tabId}')"]`).classList.add('active');
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            if (tabId !== 'browser') updateCostAnalytics();
+        }
+
+        function loadCSV() {
+            fetch('../assets/MEOW_PING_NFT_ASSET_TRACKING.csv')
+                .then(r => r.ok ? r.text() : Promise.reject('CSV not found'))
+                .then(parseCSV)
+                .catch(e => {
+                    document.getElementById('loading-state').innerHTML = `<p style="color: var(--accent-red);">Error loading CSV. Run: python -m http.server 8080</p>`;
+                });
+        }
+
+        function parseCSV(csvText) {
+            Papa.parse(csvText, {
+                header: true,
+                skipEmptyLines: true,
+                complete: (results) => {
+                    allAssets = results.data;
+                    filteredAssets = [...allAssets];
+                    document.getElementById('loading-state').style.display = 'none';
+                    updateStats();
+                    updateCostAnalytics();
+                    renderAssets();
+                }
+            });
+        }
+
+        function calculateAssetCost(asset) {
+            return parseFloat(asset.Total_Est_Cost) || 0.004;
+        }
+
+        function calculateAssetValue(asset) {
+            if (asset.Market_Value_Est) return parseFloat(asset.Market_Value_Est);
+            const base = CATEGORY_VALUES[asset.Category] || 10;
+            const rarity = RARITY_MULTIPLIERS[asset.Rarity] || 1;
+            const tier = NFT_TIER_MULTIPLIERS[asset.NFT_Tier] || 1;
+            return base * rarity * tier;
+        }
+
+        function updateCostAnalytics() {
+            if (!allAssets.length) return;
+            let totalCost = 0, totalValue = 0;
+            const costByCategory = {}, valueByRarity = {}, valueByTier = {};
+
+            allAssets.forEach(asset => {
+                const cost = calculateAssetCost(asset);
+                const value = calculateAssetValue(asset);
+                totalCost += cost;
+                totalValue += value;
+
+                const cat = asset.Category || 'Unknown';
+                if (!costByCategory[cat]) costByCategory[cat] = { cost: 0, count: 0 };
+                costByCategory[cat].cost += cost;
+                costByCategory[cat].count++;
+
+                const rarity = asset.Rarity || 'Common';
+                if (!valueByRarity[rarity]) valueByRarity[rarity] = { value: 0, count: 0 };
+                valueByRarity[rarity].value += value;
+                valueByRarity[rarity].count++;
+
+                const tier = asset.NFT_Tier || 'Units';
+                if (!valueByTier[tier]) valueByTier[tier] = { value: 0, count: 0 };
+                valueByTier[tier].value += value;
+                valueByTier[tier].count++;
+            });
+
+            document.getElementById('total-cost').textContent = `$${totalCost.toFixed(2)}`;
+            document.getElementById('total-value').textContent = `$${totalValue.toLocaleString()}`;
+            const roi = totalCost > 0 ? Math.round(totalValue / totalCost) : 0;
+            document.getElementById('total-roi').textContent = `${roi}x`;
+
+            document.getElementById('analytics-total-cost').textContent = `$${totalCost.toFixed(2)}`;
+            document.getElementById('analytics-total-value').textContent = `$${totalValue.toLocaleString()}`;
+            document.getElementById('analytics-roi').textContent = `${roi}x`;
+            document.getElementById('forecast-roi').textContent = `${roi}x`;
+            document.getElementById('forecast-profit').textContent = `$${Math.round(totalValue - totalCost).toLocaleString()}`;
+
+            document.getElementById('roi-cost-label').textContent = `Cost: $${totalCost.toFixed(2)}`;
+            document.getElementById('roi-value-label').textContent = `Value: $${totalValue.toLocaleString()}`;
+            document.getElementById('roi-meter-fill').style.width = '95%';
+
+            const catList = document.getElementById('cost-by-category');
+            if (catList) catList.innerHTML = Object.entries(costByCategory).sort((a,b) => b[1].cost - a[1].cost)
+                .map(([cat, d]) => `<li><span class="service-name">${cat} (${d.count})</span><span class="cost-amount cost-paid">$${d.cost.toFixed(3)}</span></li>`).join('');
+
+            const rarityList = document.getElementById('value-by-rarity');
+            if (rarityList) rarityList.innerHTML = Object.entries(valueByRarity).sort((a,b) => b[1].value - a[1].value)
+                .map(([r, d]) => `<li><span class="service-name">${r} (${d.count})</span><span class="cost-amount" style="color: var(--accent-green);">$${d.value.toLocaleString()}</span></li>`).join('');
+
+            const tierList = document.getElementById('forecast-tier-value');
+            if (tierList) tierList.innerHTML = Object.entries(valueByTier).sort((a,b) => b[1].value - a[1].value)
+                .map(([t, d]) => `<li><span class="service-name">${t} (${d.count})</span><span class="cost-amount" style="color: var(--accent-green);">$${d.value.toLocaleString()}</span></li>`).join('');
+
+            updateScalingProjections(allAssets.length, totalCost, totalValue);
+        }
+
+        function updateScalingProjections(count, cost, value) {
+            const costPer = cost / count, valuePer = value / count;
+            const scales = [{ name: 'Current', count }, { name: 'Phase 2', count: 500 }, { name: 'Phase 3', count: 1000 }, { name: 'Full Collection', count: 5000 }, { name: 'Mega Collection', count: 10000 }];
+            const tbody = document.getElementById('scaling-projections');
+            if (tbody) tbody.innerHTML = scales.map((s, i) => {
+                const c = s.count * costPer, v = s.count * valuePer, p = v - c, r = c > 0 ? Math.round(v / c) : 0;
+                return `<tr ${i === 0 ? 'class="highlight-row"' : ''}><td>${s.name}</td><td>${s.count.toLocaleString()}</td><td>$${c.toFixed(2)}</td><td>$${v.toLocaleString()}</td><td style="color: var(--accent-green);">$${p.toLocaleString()}</td><td style="color: var(--accent-gold);">${r}x</td></tr>`;
+            }).join('');
+        }
+
+        function setupEventListeners() {
+            document.getElementById('search-input').addEventListener('input', debounce(applyFilters, 300));
+            ['filter-category', 'filter-faction', 'filter-priority', 'filter-status'].forEach(id => document.getElementById(id).addEventListener('change', applyFilters));
+        }
+
+        function debounce(func, wait) { let timeout; return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func(...args), wait); }; }
+
+        function applyFilters() {
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const category = document.getElementById('filter-category').value;
+            const faction = document.getElementById('filter-faction').value;
+            const priority = document.getElementById('filter-priority').value;
+            const status = document.getElementById('filter-status').value;
+
+            filteredAssets = allAssets.filter(asset => {
+                if (search && !asset.Asset_Name?.toLowerCase().includes(search) && !asset.Asset_ID?.toLowerCase().includes(search)) return false;
+                if (category && asset.Category !== category) return false;
+                if (faction && asset.Faction !== faction) return false;
+                if (priority && asset.Priority !== priority) return false;
+                if (status) {
+                    const stages = ['Stage1_Status', 'Stage2_Status', 'Stage3_Status', 'Stage4_Status', 'Stage5_Status', 'Stage6_Status', 'Stage7_Status'];
+                    const hasStatus = stages.some(s => asset[s]?.toUpperCase() === status);
+                    if (!hasStatus && status !== 'PENDING') return false;
+                    if (status === 'PENDING' && asset.Stage1_Status !== 'PENDING') return false;
+                }
+                return true;
+            });
+            renderAssets();
+        }
+
+        function resetFilters() {
+            document.getElementById('search-input').value = '';
+            ['filter-category', 'filter-faction', 'filter-priority', 'filter-status'].forEach(id => document.getElementById(id).value = '');
+            filteredAssets = [...allAssets];
+            renderAssets();
+        }
+
+        function updateStats() {
+            document.getElementById('total-assets').textContent = allAssets.length;
+            let completed = 0, inProgress = 0, pending = 0;
+            const categories = {}, factions = {}, tiers = {};
+
+            allAssets.forEach(asset => {
+                if (asset.Stage7_Status === 'SUCCESS') completed++;
+                else if (asset.Stage1_Status === 'PENDING') pending++;
+                else inProgress++;
+                categories[asset.Category] = (categories[asset.Category] || 0) + 1;
+                const faction = asset.Faction?.replace('_', ' ') || 'Unknown';
+                factions[faction] = (factions[faction] || 0) + 1;
+                tiers[asset.NFT_Tier] = (tiers[asset.NFT_Tier] || 0) + 1;
+            });
+
+            document.getElementById('stats-category').innerHTML = Object.entries(categories).map(([c, n]) => `<span class="breakdown-item"><span class="count">${n}</span> ${c}</span>`).join('');
+            document.getElementById('stats-faction').innerHTML = Object.entries(factions).map(([f, n]) => `<span class="breakdown-item"><span class="count">${n}</span> ${f}</span>`).join('');
+            document.getElementById('stats-tier').innerHTML = Object.entries(tiers).map(([t, n]) => `<span class="breakdown-item"><span class="count">${n}</span> ${t}</span>`).join('');
+
+            const total = allAssets.length;
+            const successPct = (completed / total * 100).toFixed(1);
+            document.getElementById('pipeline-percent').textContent = `${successPct}% Complete`;
+            document.getElementById('pipeline-success').style.width = `${successPct}%`;
+            document.getElementById('pipeline-progress').style.width = `${inProgress / total * 100}%`;
+            document.getElementById('pipeline-pending').style.width = `${pending / total * 100}%`;
+            document.getElementById('stats-pipeline').innerHTML = `<span class="breakdown-item" style="color: var(--accent-green);"><span class="count">${completed}</span> Done</span><span class="breakdown-item" style="color: var(--accent-blue);"><span class="count">${inProgress}</span> Active</span><span class="breakdown-item" style="color: var(--text-muted);"><span class="count">${pending}</span> Pending</span>`;
+        }
+
+        function renderAssets() {
+            document.getElementById('results-count').textContent = filteredAssets.length;
+            if (!filteredAssets.length) {
+                document.getElementById('empty-state').style.display = 'block';
+                document.getElementById('asset-grid').innerHTML = '';
+                document.getElementById('asset-table-body').innerHTML = '';
+                return;
+            }
+            document.getElementById('empty-state').style.display = 'none';
+            document.getElementById('asset-grid').innerHTML = filteredAssets.map(createAssetCard).join('');
+            document.getElementById('asset-table-body').innerHTML = filteredAssets.map(createAssetRow).join('');
+        }
+
+        function createAssetCard(asset) {
+            const stages = ['Stage1_Status', 'Stage2_Status', 'Stage3_Status', 'Stage4_Status', 'Stage5_Status', 'Stage6_Status', 'Stage7_Status'];
+            const pipelineHtml = stages.map((s, i) => `<div class="stage-indicator stage-${(asset[s] || 'PENDING').toLowerCase()}">S${i + 1}</div>`).join('');
+            const cost = calculateAssetCost(asset), value = calculateAssetValue(asset);
+            return `<div class="asset-card" onclick="openModal('${asset.Asset_ID}')">
+                <div class="asset-header">
+                    <div><div class="asset-title">${asset.Asset_Name || 'Unnamed'}</div><div class="asset-id">${asset.Asset_ID}</div></div>
+                    <div class="asset-badges"><span class="badge badge-priority-${asset.Priority}">${asset.Priority}</span><span class="badge badge-tier-${asset.NFT_Tier}">${asset.NFT_Tier}</span></div>
+                </div>
+                <div class="asset-body">
+                    <div class="asset-meta">
+                        <div class="meta-item"><span class="meta-label">Category</span><span class="meta-value">${asset.Category}</span></div>
+                        <div class="meta-item"><span class="meta-label">Faction</span><span class="meta-value faction-badge"><span class="faction-dot faction-${asset.Faction}"></span>${asset.Faction?.replace('_', ' ') || 'N/A'}</span></div>
+                        <div class="meta-item"><span class="meta-label">Rarity</span><span class="meta-value">${asset.Rarity || 'N/A'}</span></div>
+                    </div>
+                    <div class="color-palette">
+                        ${asset.Primary_Color_Hex ? `<div class="color-swatch" style="background: ${asset.Primary_Color_Hex};"></div>` : ''}
+                        ${asset.Secondary_Color_Hex ? `<div class="color-swatch" style="background: ${asset.Secondary_Color_Hex};"></div>` : ''}
+                        ${asset.Accent_Color_Hex ? `<div class="color-swatch" style="background: ${asset.Accent_Color_Hex};"></div>` : ''}
+                    </div>
+                    <div class="pipeline-status">${pipelineHtml}</div>
+                    <div class="cost-value-row">
+                        <div class="cost-display"><div class="amount">$${cost.toFixed(3)}</div><div class="label">Est. Cost</div></div>
+                        <div class="value-display"><div class="amount">$${value.toLocaleString()}</div><div class="label">Est. Value</div></div>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function createAssetRow(asset) {
+            const stages = ['Stage1_Status', 'Stage2_Status', 'Stage3_Status', 'Stage4_Status', 'Stage5_Status', 'Stage6_Status', 'Stage7_Status'];
+            const stageHtml = stages.map(s => `<td><span class="stage-indicator stage-${(asset[s] || 'PENDING').toLowerCase()}">${(asset[s] || 'PND').substring(0, 3).toUpperCase()}</span></td>`).join('');
+            const cost = calculateAssetCost(asset), value = calculateAssetValue(asset);
+            return `<tr onclick="openModal('${asset.Asset_ID}')" style="cursor: pointer;">
+                <td class="asset-id-cell">${asset.Asset_ID}</td>
+                <td class="asset-name-cell">${asset.Asset_Name}</td>
+                <td>${asset.Category}</td>
+                <td><span class="faction-badge"><span class="faction-dot faction-${asset.Faction}"></span>${asset.Faction?.replace('_', ' ') || 'N/A'}</span></td>
+                <td><span class="badge badge-tier-${asset.NFT_Tier}">${asset.NFT_Tier}</span></td>
+                <td style="color: var(--accent-blue);">$${cost.toFixed(3)}</td>
+                <td style="color: var(--accent-green);">$${value.toLocaleString()}</td>
+                ${stageHtml}
+            </tr>`;
+        }
+
+        function setView(view) {
+            currentView = view;
+            document.getElementById('view-grid').classList.toggle('active', view === 'grid');
+            document.getElementById('view-list').classList.toggle('active', view === 'list');
+            document.getElementById('asset-grid').classList.toggle('active', view === 'grid');
+            document.getElementById('asset-table').classList.toggle('active', view === 'list');
+        }
+
+        function openModal(assetId) {
+            const asset = allAssets.find(a => a.Asset_ID === assetId);
+            if (!asset) return;
+            document.getElementById('modal-title').textContent = asset.Asset_Name;
+            document.getElementById('modal-id').textContent = asset.Asset_ID;
+            const cost = calculateAssetCost(asset), value = calculateAssetValue(asset), roi = cost > 0 ? Math.round(value / cost) : 0;
+            const stages = ['Stage1_Status', 'Stage2_Status', 'Stage3_Status', 'Stage4_Status', 'Stage5_Status', 'Stage6_Status', 'Stage7_Status'];
+            const stageNames = ['2D Gen', 'BG Rem', 'Upscale', '2D→3D', '8-Dir', 'Sheet', 'Colors'];
+            document.getElementById('modal-body').innerHTML = `
+                <div class="detail-section">
+                    <h3>Cost & Value Summary</h3>
+                    <div class="cost-summary-grid">
+                        <div class="cost-summary-item"><div class="amount cost">$${cost.toFixed(3)}</div><div class="label">Est. Cost</div></div>
+                        <div class="cost-summary-item"><div class="amount value">$${value.toLocaleString()}</div><div class="label">Est. Value</div></div>
+                        <div class="cost-summary-item"><div class="amount roi">${roi}x</div><div class="label">ROI</div></div>
+                        <div class="cost-summary-item"><div class="amount variance">$${(value - cost).toLocaleString()}</div><div class="label">Profit</div></div>
+                    </div>
+                </div>
+                <div class="detail-section"><h3>Base Prompt</h3><div class="prompt-text">${asset.Base_Prompt || 'No prompt'}</div></div>
+                <div class="detail-section"><h3>Negative Prompt</h3><div class="prompt-text">${asset.Negative_Prompt || 'None'}</div></div>
+                <div class="detail-section">
+                    <h3>Asset Details</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item"><div class="label">Category</div><div class="value">${asset.Category}</div></div>
+                        <div class="detail-item"><div class="label">Faction</div><div class="value">${asset.Faction?.replace('_', ' ')}</div></div>
+                        <div class="detail-item"><div class="label">NFT Tier</div><div class="value">${asset.NFT_Tier}</div></div>
+                        <div class="detail-item"><div class="label">Rarity</div><div class="value">${asset.Rarity}</div></div>
+                        <div class="detail-item"><div class="label">Priority</div><div class="value">${asset.Priority}</div></div>
+                        <div class="detail-item"><div class="label">Resolution</div><div class="value">${asset.Resolution}</div></div>
+                    </div>
+                </div>
+                <div class="detail-section">
+                    <h3>Pipeline Status</h3>
+                    <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem;">
+                        ${stages.map((s, i) => {
+                            const status = (asset[s] || 'PENDING').toLowerCase();
+                            return `<div style="text-align: center;"><div class="stage-indicator stage-${status}" style="padding: 0.5rem;">${status === 'success' ? '✓' : status === 'failed' ? '✗' : '○'}</div><div style="font-size: 0.65rem; color: var(--text-muted);">${stageNames[i]}</div></div>`;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+            document.getElementById('modal-overlay').classList.add('active');
+        }
+
+        function closeModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            document.getElementById('modal-overlay').classList.remove('active');
+        }
+
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+        function exportFiltered() {
+            if (!filteredAssets.length) { alert('No assets to export'); return; }
+            const csv = Papa.unparse(filteredAssets);
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `meow_ping_assets_${new Date().toISOString().slice(0, 10)}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
